@@ -6,5 +6,6 @@
   @id - integer that is database ID
 */
 var Content = function(image, id) {
-
+    self.image = image;
+    self.id = id;
 }
