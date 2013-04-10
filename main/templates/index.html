@@ -1,18 +1,101 @@
 <html>
+<head>
+<!-- jQuery -->
+<link href="static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
+<script src="static/js/jquery-1.9.1.js"></script>
+<script src="static/js/jquery-ui-1.10.2.custom.js"></script>
 
-<script type="text/javascript" src="static/js/playlist.js" />
-<script type="text/javascript" src="static/js/external_js/jquery-1.9.0.min.js">
+<!-- Isotope -->
+<script src="static/js/jquery.isotope.min.js"></script>
+<link href="static/css/isotope.css" rel="stylesheet">
+
+<!-- Models -->
+<script src="static/js/album.js"></script>
+<script src="static/js/content.js"></script>
+<script src="static/js/model.js"></script>
+
+<style>
+
+body {
+    font: 62.5% "Trebuchet MS", sans-serif;
+    margin: 50px;
+}
+
+.album-name {
+    font-family: Arial;
+    margin:0.5em;
+    background-color: #CCC;
+    padding: 5px;
+}
+
+.album-name:hover {
+    cursor: pointer;
+}
+
+.selected-album {
+    background-color: red;
+}
+
+.content {
+    margin: 10px;
+}
+</style>
+
+<script type="text/javascript">
 $(function() {
-    $("#playlists").html("WINNING!");
+
+    $('#contents-container').isotope({
+        itemClass: ".content",
+        layoutMode: 'fitRows',
+    });
+
+    // Create dummy albums
+    var model = new Model();
+    model.addEventListener("add_album", function(e) {
+        $("#albums").append(
+            $("<div/>")
+                .addClass("album-name")
+                .text(e.album.get_name())
+                .click(function() {
+                    model.select_album(e.album);
+                    $(".album-name").removeClass("selected-album .content");
+                    $(this).addClass("selected-album");
+                })
+        );
+    });
+
+    model.addEventListener("select_album", function(e) {
+        $("#playlist-title").text(e.album.get_name());
+        $("#contents-container").isotope("remove", $("#contents-container .content"));
+        var contents = e.album.get_content();
+        for (var i in contents) {
+            var div = $("<div />")
+                .append(contents[i].get_content())
+                .addClass("content");
+            $("#contents-container").isotope("insert", div);
+        }
+        $("#content").text("content from " + e.album.get_name());
+    });
+
+    for (var i = 0; i < 3; ++i) {
+        model.add_album(new Album(i));
+    }
 
 });
 </script>
+</head>
+
+<body>
 <h1>Dummy Main Page</h1>
 <table>
     <tr>
-        <td><div id="playlists"></td>
-        <td><div id="content"></td>
+        <td><div id="albums">
+        </div></td>
+        <td>
+            <h3 id="playlist-title"></h3>
+            <div id="contents-container" />
+        </td>
     </tr>
 </table>
-<div
+</body>
 </html>
