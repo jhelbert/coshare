@@ -16,41 +16,59 @@
 
 <style>
 
-body {
-    font: 62.5% "Trebuchet MS", sans-serif;
-    margin: 50px;
-}
+    body {
+        font: 62.5% "Trebuchet MS", sans-serif;
+        margin: 50px;
+    }
 
-.album-name {
-    font-family: Arial;
-    margin:0.5em;
-    background-color: #CCC;
-    padding: 5px;
-}
+    .album-name {
+        font-family: Arial;
+        margin:0.5em;
+        background-color: #CCC;
+        padding: 5px;
+    }
 
-.album-name:hover {
-    cursor: pointer;
-}
+    .album-name:hover {
+        cursor: pointer;
+    }
 
-.selected-album {
-    background-color: red;
-}
+    .selected-album {
+        background-color: red;
+    }
 
-.content {
-    margin: 10px;
-}
+    .content {
+        margin: 10px;
+    }
+
+    #contents-container {
+        width: 500px;
+    }
+
+    td {
+        vertical-align: top;
+    }
 </style>
 
 <script type="text/javascript">
 $(function() {
+    
+    // Code to run on page load
 
+    // use isotope to display content
+    // this indicates that the div with id="contents-container"
+    // houses the pictures and isotope treats the divs within
+    // contents-container with class="content" as the elements
     $('#contents-container').isotope({
         itemClass: ".content",
         layoutMode: 'fitRows',
     });
 
-    // Create dummy albums
+    // instantiate model
     var model = new Model();
+
+    // listen for add_album event
+    // occurs when a new album is added to the model
+    // also used on load
     model.addEventListener("add_album", function(e) {
         $("#albums").append(
             $("<div/>")
@@ -64,10 +82,14 @@ $(function() {
         );
     });
 
+    // listen for select_albym event
+    // occurs when User selects an album to view
+    // e is an event object with an e.album attribute
+    // this is the album selected
     model.addEventListener("select_album", function(e) {
-        $("#playlist-title").text(e.album.get_name());
+        $("#album-title").text(e.album.get_name());
         $("#contents-container").isotope("remove", $("#contents-container .content"));
-        var contents = e.album.get_content();
+        var contents = e.album.get_contents();
         for (var i in contents) {
             var div = $("<div />")
                 .append(contents[i].get_content())
@@ -77,6 +99,7 @@ $(function() {
         $("#content").text("content from " + e.album.get_name());
     });
 
+    // create stubbed out albums
     for (var i = 0; i < 3; ++i) {
         model.add_album(new Album(i));
     }
@@ -87,12 +110,12 @@ $(function() {
 
 <body>
 <h1>Dummy Main Page</h1>
-<table>
+<table border=1>
     <tr>
         <td><div id="albums">
         </div></td>
         <td>
-            <h3 id="playlist-title"></h3>
+            <h3 id="album-title"></h3>
             <div id="contents-container" />
         </td>
     </tr>

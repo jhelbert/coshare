@@ -7,6 +7,8 @@
 var Album = function(id) {
     this.id  = id;
 
+    // TODO: create checkrep?
+
     /** returns name of album */
     this.get_name = function() {
         return "STUBBED ALBUM NAME " + this.id;
@@ -15,7 +17,7 @@ var Album = function(id) {
         // caching?
     }
 
-    this.get_content = function() {
+    this.get_contents = function() {
 
         var output = [];
         for (var i = 0; i < id + 1; ++i) {

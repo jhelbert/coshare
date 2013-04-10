@@ -9,13 +9,15 @@
 var Content = function(id) {
     this.id = id;
 
+    // TODO: create checkrep?
+
     /** @return javascript object of the image */
     this.get_content = function() {
 
         // use stubbed image for now
         var output = new Image();
         output.src = "static/rsc/pic.jpg";
-        output.height = 50;
+        output.height = 100;
         return output;
 
         // TODO: interface with backend
