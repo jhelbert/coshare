@@ -8,6 +8,10 @@ var Album = function(id) {
     this.id  = id;
     this.name = "STUBBED ALBUM NAME " + (this.id + 1);
     this.is_auto = false;
+    this.contents = [];
+    for (var i = 0; i < id + 1; ++i) {
+        this.contents.push(new Content(i));
+    }
 
     // TODO: using this variable lends to rep-exposure; fix it.
 
@@ -22,13 +26,12 @@ var Album = function(id) {
     }
 
     this.get_contents = function() {
-
         var output = [];
-        for (var i = 0; i < id + 1; ++i) {
-            output.push(new Content(i));
+        for (var i in this.contents) {
+            output.push(this.contents[i]);
         }
         return output;
-
+        
         // TODO: interface with server
         // caching?
     }
@@ -51,6 +54,11 @@ var Album = function(id) {
     /** removes @content from this album, if present */
     this.remove_content = function(content) {
         // current does nothing
+        var index = this.contents.indexOf(content);
+        if (index >= 0) {
+            this.contents.splice(index, 1);
+        }
+
 
         // TODO: interface with server
     }

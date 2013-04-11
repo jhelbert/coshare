@@ -116,19 +116,44 @@ var Model = function() {
         this.selected_contents = [];
     }
 
+
+    // i'm really sorry about this name
+    this.remove_selected_contents_from_selected_album = function() {
+        // ask me about this if it's confusing
+        var that = this;
+        for (var i = 0; i < this.selected_contents.length; ++i) {
+            (function(content) {
+                that.selected_album.remove_content(content);
+                that.fireEvent("remove_content", {album: that.selected_album, content: content});
+            })(this.selected_contents[i]);
+        }
+        /*
+        for (var i in self.selected_contents) {
+            (function (x) {
+                console.log(x);
+                this.selected_album.remove_content(contents[x]);
+                this.fireEvent("remove_content", {album: this.selected_album, content: contents[i]});
+            })(i);
+        }
+        this.selected_contents = [];
+        console.log(this.selected_album.get_contents());
+        */
+    }
+
     // Event Management
 
     this.allHandlers = new Array();
 
-    this.addEventListener = function(eventType, handler){
-        if (!this.allHandlers[eventType])
+    this.addEventListener = function(eventType, handler) {
+        if (!this.allHandlers[eventType]) {
             this.allHandlers[eventType] = [];
+        }
         this.allHandlers[eventType].push(handler);
     }
 
-    this.fireEvent = function(type, details){
-        if (this.allHandlers[type]){
-            for (var i in this.allHandlers[type]){
+    this.fireEvent = function(type, details) {
+        if (this.allHandlers[type]) {
+            for (var i in this.allHandlers[type]) {
                 this.allHandlers[type][i](details);
             }
         }

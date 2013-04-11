@@ -136,6 +136,7 @@ $(function() {
                 var div = $("<div />")
                     .append(content.get_content())
                     .addClass("content")
+                    .attr("id", "content-" + content.id)
                     .click(function() {
                         model.toggle_content(content);
                     });
@@ -164,7 +165,11 @@ $(function() {
 
     model.addEventListener("remove_album", function(e) {
         $("#album-" + e.album.id).fadeOut();
-    })
+    });
+
+    model.addEventListener("remove_content", function(e) {
+        $("#content-" + e.content.id).fadeOut();
+    });
 
 
     // create stubbed out albums
@@ -173,7 +178,7 @@ $(function() {
     }
     var all_content_album = new Album(4);
     all_content_album.is_auto = true;
-    all_content_album.set_name('All Content');
+    all_content_album.set_name('All Content (stub)');
 
     model.add_album(all_content_album);
 
@@ -203,6 +208,10 @@ $(function() {
     $("#btnDeselectAll").click(function() {
         model.deselect_all();
     });
+
+    $("#btnRemoveSelectedContent").click(function() {
+        model.remove_selected_contents_from_selected_album();
+    });
 });
 </script>
 </head>
@@ -211,6 +220,7 @@ $(function() {
 <button id="btnRemoveAlbum">Remove Album</button>
 <button id="btnSelectAll">Select All</button>
 <button id="btnDeselectAll">Deselect All</button>
+<button id="btnRemoveSelectedContent">Remove Selected Content</button>
 <body>
 <h1>Dummy Main Page</h1>
 <table border=1>
