@@ -49,8 +49,6 @@ var Model = function() {
      */
     this.toggle_content = function(content) {
 
-        console.log("toggle content for " + content.id);
-
         var is_selected = false;
         var index;
         for (var i in this.selected_contents) {

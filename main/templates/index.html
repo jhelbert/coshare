@@ -85,7 +85,6 @@ $(function() {
         $("#albums").append(album_div);
         model.addEventListener("rename_album", function(e2) {
             if (e2.album.equals(e.album)) {
-                console.log("renaming!");
                 album_div.text(e2.album.get_name());
                 $("#album-title").text(e2.album.get_name());
             }
