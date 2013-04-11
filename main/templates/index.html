@@ -36,6 +36,10 @@
         background-color: red;
     }
 
+    .selected-auto-album {
+        background-color: pink;
+    }
+
     .content {
         margin: 10px;
         text-align: center;
@@ -101,7 +105,25 @@ $(function() {
         $("#album-title").text(e.album.get_name());
 
         // update display
-        $("#album-" + e.album.id).addClass("selected-album");
+        // TODO: fix rep exposure
+        if (e.album.is_auto) {
+            $("#album-" + e.album.id).addClass("selected-auto-album");
+        } else {
+            $("#album-" + e.album.id).addClass("selected-album");
+        }
+
+        // show/hide relevant pictures
+        if (e.album.can_rename()) {
+            $("#btnRenameAlbum").removeAttr("disabled");
+        } else {
+            $("#btnRenameAlbum").attr("disabled", "disabled");
+        }
+
+        if (e.album.can_remove()) {
+            $("#btnRemoveAlbum").removeAttr("disabled");
+        } else {
+            $("#btnRemoveAlbum").attr("disabled", "disabled");
+        }
 
         // refresh contents
         $("#contents-container .content").remove();
@@ -135,7 +157,9 @@ $(function() {
     });
 
     model.addEventListener("deselect_album", function(e) {
-        $("#album-" + e.album.id).removeClass("selected-album");
+        $("#album-" + e.album.id)
+            .removeClass("selected-album")
+            .removeClass("selected-auto-album");
     });
 
     model.addEventListener("remove_album", function(e) {
@@ -147,6 +171,12 @@ $(function() {
     for (var i = 0; i < 3; ++i) {
         model.add_album(new Album(i));
     }
+    var all_content_album = new Album(4);
+    all_content_album.is_auto = true;
+    all_content_album.set_name('All Content');
+
+    model.add_album(all_content_album);
+
     model.select_album(model.albums[0]);
 
     // CRUD operations on albums

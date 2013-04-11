@@ -27,6 +27,12 @@ var Model = function() {
     }
 
     this.remove_selected_album = function() {
+
+        // should not be able to remove auto album
+        if (!this.selected_album.can_remove()) {
+            return false;
+        }
+
         var index = this.albums.indexOf(this.selected_album);
         this.albums.splice(index, 1);
         this.fireEvent("deselect_album", {album: this.selected_album});
@@ -36,6 +42,12 @@ var Model = function() {
     }
 
     this.rename_selected_album = function() {
+
+        // should not be able to rename auto album
+        if (!this.selected_album.can_rename()) {
+            return false;
+        }
+
         // note, this is and MUST REMAIN a reference 
         // to the album in the `albums` liset
         this.selected_album.set_name("RENAMED");

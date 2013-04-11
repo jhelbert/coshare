@@ -7,6 +7,9 @@
 var Album = function(id) {
     this.id  = id;
     this.name = "STUBBED ALBUM NAME " + (this.id + 1);
+    this.is_auto = false;
+
+    // TODO: using this variable lends to rep-exposure; fix it.
 
     // TODO: create checkrep?
 
@@ -58,5 +61,13 @@ var Album = function(id) {
      */
     this.equals = function(other) {
         return this.id === other.id;
+    }
+
+    this.can_rename = function() {
+        return !this.is_auto;
+    }
+
+    this.can_remove = function() {
+        return !this.is_auto;
     }
 }
