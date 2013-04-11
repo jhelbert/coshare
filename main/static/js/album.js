@@ -78,4 +78,8 @@ var Album = function(id) {
     this.can_remove = function() {
         return !this.is_auto;
     }
+
+    this.can_edit_content = function() {
+        return !this.is_auto;
+    }
 }

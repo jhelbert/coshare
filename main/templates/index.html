@@ -125,6 +125,12 @@ $(function() {
             $("#btnRemoveAlbum").attr("disabled", "disabled");
         }
 
+        if (e.album.can_edit_content()) {
+            $("#btnRemoveSelectedContent").removeAttr("disabled");
+        } else {
+            $("#btnRemoveSelectedContent").attr("disabled", "disabled");
+        }
+
         // refresh contents
         $("#contents-container .content").remove();
         var contents = e.album.get_contents();
