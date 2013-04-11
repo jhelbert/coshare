@@ -38,10 +38,12 @@
 
     .content {
         margin: 10px;
+        text-align: center;
     }
 
-    #contents-container {
-        width: 500px;
+    .selected-content {
+        padding: 10px;
+        background-color: yellow;
     }
 
     td {
@@ -58,10 +60,13 @@ $(function() {
     // this indicates that the div with id="contents-container"
     // houses the pictures and isotope treats the divs within
     // contents-container with class="content" as the elements
+    // ISOTOPE WAS BEING **SUPER** PENISY - so i gave up for a bit
+    /*
     $('#contents-container').isotope({
         itemClass: ".content",
         layoutMode: 'fitRows',
     });
+*/
 
     // instantiate model
     var model = new Model();
@@ -100,13 +105,32 @@ $(function() {
         $("#album-" + e.album.id).addClass("selected-album");
 
         // refresh contents
-        $("#contents-container").isotope("remove", $("#contents-container .content"));
+        $("#contents-container .content").remove();
         var contents = e.album.get_contents();
         for (var i in contents) {
-            var div = $("<div />")
-                .append(contents[i].get_content())
-                .addClass("content");
-            $("#contents-container").isotope("insert", div).isotope("reloadItems");
+            // FUCK JAVASCRIPT -- it doesn't even have block level scoping???
+            // whatever. use this closure to ensure the meaning of i doesn't suck.
+            (function(content) {
+
+                var div = $("<div />")
+                    .append(content.get_content())
+                    .addClass("content")
+                    .click(function() {
+                        model.toggle_content(content);
+                    });
+                $("#contents-container").append(div);
+
+                model.addEventListener("select_content", function(e2) {
+                    if (e2.content.equals(content)) {
+                        div.addClass("selected-content");
+                    }
+                });
+                model.addEventListener("deselect_content", function(e2) {
+                    if (e2.content.equals(content)) {
+                        div.removeClass("selected-content");
+                    }
+                });
+            })(contents[i]);
         }
         $("#content").text("content from " + e.album.get_name());
     });
@@ -141,12 +165,23 @@ $(function() {
     $("#btnRemoveAlbum").click(function() {
         model.remove_selected_album();
     });
+
+    // Select/Deselect All
+    $("#btnSelectAll").click(function() {
+        model.select_all();
+    });
+
+    $("#btnDeselectAll").click(function() {
+        model.deselect_all();
+    });
 });
 </script>
 </head>
 <button id="btnNewAlbum">New Album</button>
 <button id="btnRenameAlbum">Rename Album</button>
 <button id="btnRemoveAlbum">Remove Album</button>
+<button id="btnSelectAll">Select All</button>
+<button id="btnDeselectAll">Deselect All</button>
 <body>
 <h1>Dummy Main Page</h1>
 <table border=1>

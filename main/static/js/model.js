@@ -48,10 +48,13 @@ var Model = function() {
      * @return true if content is now selected, false if unselected
      */
     this.toggle_content = function(content) {
+
+        console.log("toggle content for " + content.id);
+
         var is_selected = false;
         var index;
-        for (var i in this.selected_content) {
-            if (selected_content[i].equals(content)) {
+        for (var i in this.selected_contents) {
+            if (this.selected_contents[i].equals(content)) {
                 is_selected = true;
                 index = i;
             }
@@ -59,14 +62,31 @@ var Model = function() {
 
         if (is_selected) {
             // remove from selection
-            this.selected_content.splice(index, 1);
+            this.selected_contents.splice(index, 1);
             this.fireEvent("deselect_content", {content: content});
             return false;
         } else {
-            this.selected_content.push(content);
-            this.fireEvent("content_selected", {content: content});
+            this.selected_contents.push(content);
+            this.fireEvent("select_content", {content: content});
             return true;
         }
+    }
+
+    this.select_all = function() {
+        var contents = this.selected_album.get_contents();
+        for (var i in contents) {
+            // WARNING: requires event listeners to be idempotent
+            this.fireEvent("select_content", {content: contents[i]});
+        }
+        this.selected_contents = this.selected_album.get_contents();
+    }
+
+    this.deselect_all = function() {
+        var contents = this.selected_contents;
+        for (var i in contents) {
+            this.fireEvent("deselect_content", {content: contents[i]});
+        }
+        this.selected_contents = [];
     }
 
     /**

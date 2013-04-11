@@ -22,7 +22,7 @@ var Album = function(id) {
 
         var output = [];
         for (var i = 0; i < id + 1; ++i) {
-            output.push(new Content());
+            output.push(new Content(i));
         }
         return output;
 
