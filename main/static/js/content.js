@@ -48,7 +48,7 @@ var Content = function(id) {
      *         false otherwise
      */
     this.equals = function(other) {
-        return other.id && (this.id === other.id);
+        return this.id === other.id;
     }
     
 }

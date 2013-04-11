@@ -15,7 +15,7 @@ var Model = function() {
     
     this.albums = []
     this.selected_album = null;
-    this.selected_content = [];
+    this.selected_contents = [];
 
     // TODO: get from server
 
@@ -26,8 +26,20 @@ var Model = function() {
         this.fireEvent("add_album", {album: album});
     }
 
-    this.remove_album = function(album) {
-        // TODO
+    this.remove_selected_album = function() {
+        var index = this.albums.indexOf(this.selected_album);
+        this.albums.splice(index, 1);
+        this.fireEvent("deselect_album", {album: this.selected_album});
+        this.fireEvent("remove_album", {album: this.selected_album});
+        this.select_album(this.albums[0]); // TODO: improve 
+        this.select_album(this.albums[0]);
+    }
+
+    this.rename_selected_album = function() {
+        // note, this is and MUST REMAIN a reference 
+        // to the album in the `albums` liset
+        this.selected_album.set_name("RENAMED");
+        this.fireEvent("rename_album", {album: this.selected_album});
     }
 
     /**
@@ -68,6 +80,10 @@ var Model = function() {
         }
         this.selected_album = album;
         this.fireEvent("select_album", {album: album});
+
+        // TODO: manage content selection
+        // what if we are selecting the current playlist again?
+        this.selected_contents = [];
     }
 
     // Event Management

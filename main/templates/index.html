@@ -70,16 +70,21 @@ $(function() {
     // occurs when a new album is added to the model
     // also used on load
     model.addEventListener("add_album", function(e) {
-        $("#albums").append(
-            $("<div/>")
-                .addClass("album-name")
-                .text(e.album.get_name())
-                .click(function() {
-                    model.select_album(e.album);
-                    $(".album-name").removeClass("selected-album .content");
-                    $(this).addClass("selected-album");
-                })
-        );
+        var album_div = $("<div/>")
+            .addClass("album-name")
+            .attr("id", "album-" + e.album.id)
+            .text(e.album.get_name())
+            .click(function() {
+                model.select_album(e.album);
+            });
+        $("#albums").append(album_div);
+        model.addEventListener("rename_album", function(e2) {
+            if (e2.album.equals(e.album)) {
+                console.log("renaming!");
+                album_div.text(e2.album.get_name());
+                $("#album-title").text(e2.album.get_name());
+            }
+        });
     });
 
     // listen for select_albym event
@@ -87,27 +92,61 @@ $(function() {
     // e is an event object with an e.album attribute
     // this is the album selected
     model.addEventListener("select_album", function(e) {
+
+        // refresh title
         $("#album-title").text(e.album.get_name());
+
+        // update display
+        $("#album-" + e.album.id).addClass("selected-album");
+
+        // refresh contents
         $("#contents-container").isotope("remove", $("#contents-container .content"));
         var contents = e.album.get_contents();
         for (var i in contents) {
             var div = $("<div />")
                 .append(contents[i].get_content())
                 .addClass("content");
-            $("#contents-container").isotope("insert", div);
+            $("#contents-container").isotope("insert", div).isotope("reloadItems");
         }
         $("#content").text("content from " + e.album.get_name());
     });
+
+    model.addEventListener("deselect_album", function(e) {
+        $("#album-" + e.album.id).removeClass("selected-album");
+    });
+
+    model.addEventListener("remove_album", function(e) {
+        $("#album-" + e.album.id).fadeOut();
+    })
+
 
     // create stubbed out albums
     for (var i = 0; i < 3; ++i) {
         model.add_album(new Album(i));
     }
+    model.select_album(model.albums[0]);
 
+    // CRUD operations on albums
+
+    // crea
+    $("#btnNewAlbum").click(function() {
+        // add stubbed out
+        model.add_album(new Album(new Date().getTime() % 100));
+    });
+
+    $("#btnRenameAlbum").click(function() {
+        model.rename_selected_album();
+    });
+
+    $("#btnRemoveAlbum").click(function() {
+        model.remove_selected_album();
+    });
 });
 </script>
 </head>
-
+<button id="btnNewAlbum">New Album</button>
+<button id="btnRenameAlbum">Rename Album</button>
+<button id="btnRemoveAlbum">Remove Album</button>
 <body>
 <h1>Dummy Main Page</h1>
 <table border=1>

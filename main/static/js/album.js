@@ -6,12 +6,13 @@
  */
 var Album = function(id) {
     this.id  = id;
+    this.name = "STUBBED ALBUM NAME " + (this.id + 1);
 
     // TODO: create checkrep?
 
     /** returns name of album */
     this.get_name = function() {
-        return "STUBBED ALBUM NAME " + this.id;
+        return this.name;
 
         // TODO: interface with server
         // caching?
@@ -30,10 +31,11 @@ var Album = function(id) {
     }
 
     /** sets new name for this album */
-    this.set_name = function() {
-        // currently does nothing
+    this.set_name = function(name) {
+        this.name = name;
 
         // TODO: interface with server
+
     }
 
     /** adds @new_content to the album, if not already present */
@@ -48,5 +50,13 @@ var Album = function(id) {
         // current does nothing
 
         // TODO: interface with server
+    }
+
+    /** 
+     * @return true iff @other has same id as album, 
+     *         false otherwise
+     */
+    this.equals = function(other) {
+        return this.id === other.id;
     }
 }
