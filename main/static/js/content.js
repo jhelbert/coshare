@@ -6,7 +6,7 @@
  * @image - an Image object of the actual media
  * @id - integer that is database ID
  */
-var Content = function(id) {
+var Content = function(id,src) {
     this.id = id;
 
     // TODO: create checkrep?
@@ -16,7 +16,7 @@ var Content = function(id) {
 
         // use stubbed image for now
         var output = new Image();
-        output.src = "static/rsc/pic.jpg";
+        output.src = "/media/" + src;
         output.height = 100;
         return output;
 

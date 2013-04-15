@@ -56,6 +56,35 @@
 </style>
 
 <script type="text/javascript">
+
+var selected_content_ids = [];
+function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#blah').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+function add_objects(id) {
+    var foo = "/add/?album=" + id;
+            for (var i = 0; i < selected_content_ids.length;i++) {
+                foo += "&eles=" + selected_content_ids[i];
+            }
+        var link = $("<a/>")
+            .attr('href', function() {
+    return foo;
+
+})
+            .text("Add");
+  console.log(foo);
+  window.location = foo;
+}
+
 $(function() {
     
     // Code to run on page load
@@ -74,6 +103,8 @@ $(function() {
 
     // instantiate model
     var model = new Model();
+    
+
 
     // listen for add_album event
     // occurs when a new album is added to the model
@@ -86,6 +117,9 @@ $(function() {
             .click(function() {
                 model.select_album(e.album);
             });
+            
+        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
+    
         $("#albums").append(album_div);
         model.addEventListener("rename_album", function(e2) {
             if (e2.album.equals(e.album)) {
@@ -100,7 +134,8 @@ $(function() {
     // e is an event object with an e.album attribute
     // this is the album selected
     model.addEventListener("select_album", function(e) {
-
+        selected_content_ids = [];
+        selected_album = e.album.id;
         // refresh title
         $("#album-title").text(e.album.get_name());
 
@@ -138,17 +173,23 @@ $(function() {
                     .addClass("content")
                     .click(function() {
                         model.toggle_content(content);
+
                     });
                 $("#contents-container").append(div);
 
                 model.addEventListener("select_content", function(e2) {
                     if (e2.content.equals(content)) {
                         div.addClass("selected-content");
+                        console.dir(e2.content.id);
+                        selected_content_ids.push(e2.content.id);
+                        console.log(selected_content_ids);
                     }
                 });
                 model.addEventListener("deselect_content", function(e2) {
                     if (e2.content.equals(content)) {
                         div.removeClass("selected-content");
+                        var index = selected_content_ids.indexOf(e2.content.id);
+                        selected_content_ids.splice(index,1);
                     }
                 });
             })(contents[i]);
@@ -168,14 +209,14 @@ $(function() {
 
 
     // create stubbed out albums
-    for (var i = 0; i < 3; ++i) {
-        model.add_album(new Album(i));
-    }
-    var all_content_album = new Album(4);
-    all_content_album.is_auto = true;
-    all_content_album.set_name('All Content');
-
-    model.add_album(all_content_album);
+    {% for playlist in playlists %}
+        var album = new Album({{playlist.id}},"{{playlist.name}}");
+         model.add_album(album);
+        {% for content in playlist.content.all %}
+            album.add_content({{content.id}},"{{content.image}}");
+        {% endfor %}
+       
+    {% endfor %}
 
     model.select_album(model.albums[0]);
 
@@ -211,6 +252,11 @@ $(function() {
 <button id="btnRemoveAlbum">Remove Album</button>
 <button id="btnSelectAll">Select All</button>
 <button id="btnDeselectAll">Deselect All</button>
+ <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+<input name="content" type="file" multiple  />
+<input type="submit"/>
+</form>
+ <img id="blah" src="#" alt="your image" />
 <body>
 <h1>Dummy Main Page</h1>
 <table border=1>
@@ -220,6 +266,7 @@ $(function() {
         <td>
             <h3 id="album-title"></h3>
             <div id="contents-container" />
+
         </td>
     </tr>
 </table>

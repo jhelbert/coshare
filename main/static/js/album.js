@@ -4,10 +4,11 @@
  * @name - string of function name
  * @id - integer that is database id
  */
-var Album = function(id) {
+var Album = function(id,name) {
     this.id  = id;
-    this.name = "STUBBED ALBUM NAME " + (this.id + 1);
+    this.name = name;
     this.is_auto = false;
+    this.output = []
 
     // TODO: using this variable lends to rep-exposure; fix it.
 
@@ -23,11 +24,9 @@ var Album = function(id) {
 
     this.get_contents = function() {
 
-        var output = [];
-        for (var i = 0; i < id + 1; ++i) {
-            output.push(new Content(i));
-        }
-        return output;
+
+        
+        return this.output;
 
         // TODO: interface with server
         // caching?
@@ -42,8 +41,9 @@ var Album = function(id) {
     }
 
     /** adds @new_content to the album, if not already present */
-    this.add_content = function(new_content) {
-        // currently does nothing
+    this.add_content = function(id,src) {
+        var content = new Content(id,src);
+        this.output.push(content);
 
         // TODO: interface with server
     }
