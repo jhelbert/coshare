@@ -8,7 +8,9 @@ var Album = function(id,name) {
     this.id  = id;
     this.name = name;
     this.is_auto = false;
+
     this.output = []
+
 
     // TODO: using this variable lends to rep-exposure; fix it.
 
@@ -24,9 +26,9 @@ var Album = function(id,name) {
 
     this.get_contents = function() {
 
-
         
         return this.output;
+
 
         // TODO: interface with server
         // caching?
@@ -51,6 +53,11 @@ var Album = function(id,name) {
     /** removes @content from this album, if present */
     this.remove_content = function(content) {
         // current does nothing
+        var index = this.contents.indexOf(content);
+        if (index >= 0) {
+            this.contents.splice(index, 1);
+        }
+
 
         // TODO: interface with server
     }
@@ -68,6 +75,10 @@ var Album = function(id,name) {
     }
 
     this.can_remove = function() {
+        return !this.is_auto;
+    }
+
+    this.can_edit_content = function() {
         return !this.is_auto;
     }
 }

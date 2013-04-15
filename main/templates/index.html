@@ -160,6 +160,12 @@ $(function() {
             $("#btnRemoveAlbum").attr("disabled", "disabled");
         }
 
+        if (e.album.can_edit_content()) {
+            $("#btnRemoveSelectedContent").removeAttr("disabled");
+        } else {
+            $("#btnRemoveSelectedContent").attr("disabled", "disabled");
+        }
+
         // refresh contents
         $("#contents-container .content").remove();
         var contents = e.album.get_contents();
@@ -171,6 +177,7 @@ $(function() {
                 var div = $("<div />")
                     .append(content.get_content())
                     .addClass("content")
+                    .attr("id", "content-" + content.id)
                     .click(function() {
                         model.toggle_content(content);
 
@@ -205,10 +212,15 @@ $(function() {
 
     model.addEventListener("remove_album", function(e) {
         $("#album-" + e.album.id).fadeOut();
-    })
+    });
+
+    model.addEventListener("remove_content", function(e) {
+        $("#content-" + e.content.id).fadeOut();
+    });
 
 
     // create stubbed out albums
+
     {% for playlist in playlists %}
         var album = new Album({{playlist.id}},"{{playlist.name}}");
          model.add_album(album);
@@ -217,6 +229,7 @@ $(function() {
         {% endfor %}
        
     {% endfor %}
+
 
     model.select_album(model.albums[0]);
 
@@ -244,6 +257,10 @@ $(function() {
     $("#btnDeselectAll").click(function() {
         model.deselect_all();
     });
+
+    $("#btnRemoveSelectedContent").click(function() {
+        model.remove_selected_contents_from_selected_album();
+    });
 });
 </script>
 </head>
@@ -252,12 +269,15 @@ $(function() {
 <button id="btnRemoveAlbum">Remove Album</button>
 <button id="btnSelectAll">Select All</button>
 <button id="btnDeselectAll">Deselect All</button>
+
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
 <input name="content" type="file" multiple  />
 <input type="submit"/>
 </form>
  <img id="blah" src="#" alt="your image" />
-<body>
+
+<button id="btnRemoveSelectedContent">Remove Selected Content</button>
+
 <h1>Dummy Main Page</h1>
 <table border=1>
     <tr>
