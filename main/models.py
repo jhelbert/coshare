@@ -2,11 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Content(models.Model):
-	image = models.ImageField(upload_to='content',null=True,blank=True)
-	description = models.CharField(max_length=1000)
+	image = models.ImageField(upload_to='static/content',null=True,blank=True)
+	description = models.CharField(max_length=1000,null=True,blank=True)
 	
 
 class Playlist(models.Model):
 	name = models.CharField(max_length=100)
 	content = models.ManyToManyField(Content)
-	metric = models.IntegerField()
+	metric = models.IntegerField(null=True,blank=True)
+	auto_all = models.BooleanField()
