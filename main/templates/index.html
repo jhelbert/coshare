@@ -326,7 +326,9 @@ $(function() {
 <button id="btnRemoveAlbum">Delete</button>
                       <div id="albums">
         </div>
-        <input id="new_plist" type="text"/>
+        <form action = "/new_plist/" method ="post">
+        <input name="name" id="new_plist" type="text"/>
+    </form>
             </ul>
           </div><!--/.well -->
         </div><!--/span-->
@@ -342,7 +344,7 @@ $(function() {
 <div>
     <br>
             <hr>
-            <table border=1>
+            <table>
     <tr>
 
         <td>
