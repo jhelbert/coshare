@@ -119,7 +119,7 @@ var Model = function() {
 
     // i'm really sorry about this name
     this.remove_selected_contents_from_selected_album = function() {
-        // ask me about this if it's confusing
+        // ask me about this if it's confusing. fuck javascript.
         var that = this;
         for (var i = 0; i < this.selected_contents.length; ++i) {
             (function(content) {
