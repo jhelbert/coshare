@@ -1,5 +1,31 @@
 <html>
 <head>
+    <title>CoShare - Content Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+
+      @media (max-width: 980px) {
+        /* Enable use of floated navbar text */
+        .navbar-text.pull-right {
+          float: none;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+      }
+    </style>
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+
 <!-- jQuery -->
 <link href="static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
 <script src="static/js/jquery-1.9.1.js"></script>
@@ -43,6 +69,7 @@
     .content {
         margin: 10px;
         text-align: center;
+        float:left;
     }
 
     .selected-content {
@@ -268,11 +295,49 @@ $(function() {
 
 <button id="btnRemoveSelectedContent">Remove Selected Content</button>
 
-<h1>Dummy Main Page</h1>
-<table border=1>
+ <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="landing_page.html">CoShare</a>
+          <div class="nav-collapse collapse">
+            <p class="navbar-text pull-right">
+              Logged in as <a href="" class="navbar-link">Username</a>
+            </p>
+            <ul class="nav">
+              <li><a href="landing_page.html">Home</a></li>
+              <li class="active"><a href="">Browse</a></li>
+              <li><a href="">About</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+                      <div id="albums">
+        </div>
+            </ul>
+          </div><!--/.well -->
+        </div><!--/span-->
+        <div class="span9">
+          <div class="hero-unit">
+            <p class="mosiac-button"><a href="" class="btn btn-primary btn-large">Select All</a>
+            <a href="" class="btn btn-primary btn-large">Select</a>
+            <a href="" class="btn btn-primary btn-large">Select</a>
+            <a href="" class="btn btn-primary btn-large">Select</a></p>
+            <hr>
+            <table border=1>
     <tr>
-        <td><div id="albums">
-        </div></td>
+
         <td>
             <h3 id="album-title"></h3>
             <div id="contents-container" />
@@ -280,5 +345,18 @@ $(function() {
         </td>
     </tr>
 </table>
+        </div>
+          </div>
+        </div><!--/span-->
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <p>© CoShare 2013</p>
+      </footer>
+
+    </div><!--/.fluid-container-->
+
 </body>
 </html>
