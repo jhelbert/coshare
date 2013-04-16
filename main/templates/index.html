@@ -42,7 +42,6 @@
     body {
         font: "Trebuchet MS", sans-serif;
         margin: 50px;
-        padding-top: 60px;
     }
 
     .album-name {
@@ -123,6 +122,11 @@ function add_objects(id) {
 
 $(function() {
     $('#new_plist').watermark('New Playlist');
+    $("#new_plist").keyup(function (e) {
+    if (e.keyCode == 13) {
+        new_plist(e.target.value);
+    }
+});
     // Code to run on page load
 
     // use isotope to display content
@@ -266,6 +270,13 @@ $(function() {
 
 
     model.select_album(model.albums[0]);
+    function new_plist(name) {
+        $("#new_plist")[0].value = "";
+        console.dir($("#new_plist"));
+    var album = new Album(100,name);
+         model.add_album(album);
+
+}
 
     // CRUD operations on albums
 
@@ -296,8 +307,13 @@ $(function() {
         model.remove_selected_contents_from_selected_album();
     });
 });
+
+
+
+
 </script>
 </head>
+
 
 
 <body>
@@ -306,7 +322,7 @@ $(function() {
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
 <input name="content" type="file" multiple  />
 <br>
-<input type="submit"/>
+<input class="btn btn-primary" type="submit"/>
 </form>
 </div>
 
@@ -339,14 +355,14 @@ $(function() {
         <div class="span3">
           <div class="well sidebar-nav" style="margin-top:110px">
             <ul class="nav nav-list">
-                <button id="btnNewAlbum">New</button>
-<button id="btnRenameAlbum">Rename</button>
-<button id="btnRemoveAlbum">Delete</button>
+               
+<button class="btn btn-primary" id="btnRenameAlbum">Rename</button>
+<button class="btn btn-primary" id="btnRemoveAlbum">Delete</button>
                       <div id="albums">
         </div>
-        <form action = "/new_plist/" method ="post">
+
         <input name="name" id="new_plist" type="text"/>
-    </form>
+
             </ul>
           </div><!--/.well -->
         </div><!--/span-->
