@@ -4,6 +4,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
+<!-- CONFLICT
+    <title>CoShare - Content Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+  
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+      </style>
+-->
 
 <!-- Le styles -->
 <link href="static/css/bootstrap.css" rel="stylesheet">
@@ -12,6 +26,7 @@
 <!-- jQuery -->
 <link href="static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
 <script src="static/js/jquery-1.9.1.js"></script>
+<script src="static/js/jquery.watermark.min.js"></script>
 <script src="static/js/jquery-ui-1.10.2.custom.js"></script>
 
 <!-- Isotope -->
@@ -25,7 +40,7 @@
 
 <style>
     body {
-        font: 62.5% "Trebuchet MS", sans-serif;
+        font: "Trebuchet MS", sans-serif;
         margin: 50px;
         padding-top: 60px;
     }
@@ -104,7 +119,7 @@ function add_objects(id) {
 }
 
 $(function() {
-    
+    $('#new_plist').watermark('New Playlist');
     // Code to run on page load
 
     // use isotope to display content
@@ -280,19 +295,18 @@ $(function() {
 });
 </script>
 </head>
-<button id="btnNewAlbum">New Album</button>
-<button id="btnRenameAlbum">Rename Album</button>
-<button id="btnRemoveAlbum">Remove Album</button>
-<button id="btnSelectAll">Select All</button>
-<button id="btnDeselectAll">Deselect All</button>
 
+
+<body>
+    <div id="upload" style="float:right">
+        <h4>Upload</h4>
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
 <input name="content" type="file" multiple  />
+<br>
 <input type="submit"/>
 </form>
+</div>
 
-
-<button id="btnRemoveSelectedContent">Remove Selected Content</button>
 
  <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
@@ -320,26 +334,37 @@ $(function() {
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span3">
-          <div class="well sidebar-nav">
+          <div class="well sidebar-nav" style="margin-top:110px">
             <ul class="nav nav-list">
+                <button id="btnNewAlbum">New</button>
+<button id="btnRenameAlbum">Rename</button>
+<button id="btnRemoveAlbum">Delete</button>
                       <div id="albums">
         </div>
+        <input id="new_plist" type="text"/>
             </ul>
           </div><!--/.well -->
         </div><!--/span-->
         <div class="span9">
           <div class="hero-unit">
-            <p class="mosiac-button"><a href="" class="btn btn-primary btn-large">Select All</a>
-            <a href="" class="btn btn-primary btn-large">Select</a>
-            <a href="" class="btn btn-primary btn-large">Select</a>
-            <a href="" class="btn btn-primary btn-large">Select</a></p>
+                        <h3 align="center" style="line-height:100%" id="album-title"></h3>
+
+                        <div align="center">
+           <button class="btn btn-primary" id="btnSelectAll">Select All</button>
+<button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
+<button class="btn btn-primary" id="btnRemoveSelectedContent">Remove Selected Content</button>
+</div>
+<div>
+    <br>
             <hr>
             <table border=1>
     <tr>
 
         <td>
-            <h3 id="album-title"></h3>
+
+
             <div id="contents-container" />
+
 
         </td>
     </tr>
@@ -348,7 +373,7 @@ $(function() {
           </div>
         </div><!--/span-->
       </div><!--/row-->
-
+</div>
       <hr>
 
       <footer>
