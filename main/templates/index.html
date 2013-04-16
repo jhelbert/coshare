@@ -1,28 +1,27 @@
 <html>
 <head>
+<title>CoShare - Content Manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+<!-- CONFLICT
     <title>CoShare - Content Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <!-- Le styles -->
     <link href="static/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
   
       .sidebar-nav {
         padding: 9px 0;
       }
+      </style>
+-->
 
-      @media (max-width: 980px) {
-        /* Enable use of floated navbar text */
-        .navbar-text.pull-right {
-          float: none;
-          padding-left: 5px;
-          padding-right: 5px;
-        }
-      }
-    </style>
-    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+<!-- Le styles -->
+<link href="static/css/bootstrap.css" rel="stylesheet">
+<link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
 
 <!-- jQuery -->
 <link href="static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
@@ -40,10 +39,10 @@
 <script src="static/js/model.js"></script>
 
 <style>
-
     body {
         font: "Trebuchet MS", sans-serif;
         margin: 50px;
+        padding-top: 60px;
     }
 
     .album-name {
@@ -69,15 +68,33 @@
         margin: 10px;
         text-align: center;
         float:left;
+        border: 5px solid transparent;
     }
 
     .selected-content {
-        padding: 10px;
-        background-color: yellow;
+        border-color: #39F;
+        border-radius: 10px;
     }
+
+    .selected-content img {
+            border-radius: 5px;
+    }
+
 
     td {
         vertical-align: top;
+    }
+    .sidebar-nav {
+        padding: 9px 0;
+    }
+
+    @media (max-width: 980px) {
+        /* Enable use of floated navbar text */
+        .navbar-text.pull-right {
+          float: none;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
     }
 </style>
 
@@ -111,16 +128,14 @@ $(function() {
     // contents-container with class="content" as the elements
     // ISOTOPE WAS BEING **SUPER** PENISY - so i gave up for a bit
     /*
-    $('#contents-container').isotope({
-        itemClass: ".content",
-        layoutMode: 'fitRows',
-    });
-*/
+        $('#contents-container').isotope({
+            itemClass: ".content",
+            layoutMode: 'fitRows',
+        });
+    */
 
     // instantiate model
     var model = new Model();
-    
-
 
     // listen for add_album event
     // occurs when a new album is added to the model
