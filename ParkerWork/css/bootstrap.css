@@ -141,6 +141,10 @@ input[type="submit"] {
   -webkit-appearance: button;
 }
 
+.mosaic-button{
+  float: left;
+}
+
 label,
 select,
 button,
@@ -626,6 +630,7 @@ img {
 
 .picture-collection{
   margin-left: 75px;
+  float:left;
 }
 
 .child-picture{
@@ -3134,7 +3139,7 @@ table th[class*="span"],
 .well {
   min-height: 20px;
   padding: 19px;
-  margin-right: 60px;
+  margin-right: 30px;
   margin-bottom: 20px;
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
@@ -4007,6 +4012,21 @@ input[type="submit"].btn.btn-mini {
   color: #999999;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
+}
+
+.album-header{
+  display: block;
+  padding: 3px 15px 3px 2px;
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 20px;
+  color: #999999;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.album{
+  margin-left: 20px;
 }
 
 .nav li + .nav-header {
@@ -6146,7 +6166,7 @@ a.badge:focus {
 }
 
 .hero-unit {
-  padding: 60px;
+  padding: 20px 60px 60px;
   margin-bottom: 30px;
   font-size: 18px;
   font-weight: 200;
