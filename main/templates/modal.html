@@ -3,14 +3,13 @@
 <html>
 <head>
 	<!-- JQuery -->
-	<link href="static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
-	<script src="static/js/jquery-1.9.1.js"></script>
-	<script src="static/js/jquery-ui-1.10.2.custom.js"></script>
-
+	<script src="../static/js/jquery-1.9.1.js"></script>
+	<link href="../static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
+	
 	<!-- Models -->
-	<script src="static/js/album.js"></script>
-	<script src="static/js/content.js"></script>
-	<script src="static/js/model.js"></script>
+	<script src="../static/js/album.js"></script>
+	<script src="../static/js/content.js"></script>
+	<script src="../static/js/model.js"></script>
 
 	<style>
 		.modalDialog {
@@ -29,10 +28,6 @@
 			pointer-events: none;
 		}
 
-		.modalDialog:target {
-			opacity:1;
-			pointer-events: auto;
-		}
 
 		.modalDialog > div {
 			width: 500px;
@@ -95,6 +90,12 @@
 
 		}
 
+		.descriptionInput {
+			width: 100%;
+			resize: none;
+			height: 100px;
+		}
+
 		.playlistList {
 			margin-left: 0px;
 			padding-left: 4px;
@@ -112,6 +113,10 @@
 
 		}
 
+		.hidden {
+			display: none;
+		}
+
 	</style>
 
 
@@ -119,6 +124,32 @@
 	
 	// Code to run when the page is loaded
 	$(function() {
+		$(".imageDescription").click(function() {
+			var text = $(".imageDescription").text();
+			text = text.trim();
+			$(".descriptionInput").text(text);
+			$(".descriptionInput").removeClass("hidden");
+			$(".imageDescription").addClass("hidden");
+			$(".descriptionInput").focus();
+		});
+
+		$(".descriptionInput").blur(function() {
+			var text = $(".descriptionInput").val();
+			text = text.trim();
+			$(".imageDescription").text(text);
+			$(".descriptionInput").addClass("hidden");
+			$(".imageDescription").removeClass("hidden");
+		});
+
+		$("#openModalButton").click(function() {
+			$("#openModal").css("opacity",1);
+			$("#openModal").css("pointer-events","auto");
+		});
+
+		$("#closeModal").click(function() {
+			$("#openModal").css("opacity",0);
+			$("#openModal").css("pointer-events","none");
+		});
 
 	});
 	</script>
@@ -127,11 +158,11 @@
 </head>
 
 <body>
-	<a href="#openModal">Open Modal</a>
+	<button id="openModalButton"> Open </button> 
 
 	<div id="openModal" class="modalDialog">
 		<div>
-			<a href="#close" title="Close" class="close">X</a>
+			<a href="#" id="closeModal" title="Close" class="close">X</a>
 			<div class="column wide">
 				<div class="imageHolder">
 
@@ -140,6 +171,8 @@
 				<p class="imageDescription">
 					This is the description of the following image. Right now the image is black, but otherwise it will contain the picture that was previously clicked on.
 				</p>
+
+				<textarea class="descriptionInput hidden"> </textarea>
 			</div>
 			<div class="column">
 				<h2> Playlists </h2>
@@ -149,7 +182,7 @@
 					<li>Playlist 3</li>
 					<li>Playlist 4</li>
 				</ul>
-				<button class="buttonStyle" onclick="editPlaylists()"> Edit </button>
+				<button class="buttonStyle"> Edit </button>
 			</div>
 		</div>
 	</div>
