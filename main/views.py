@@ -14,8 +14,12 @@ def mosaic(request):
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
-
-
+@csrf_exempt
+def new_plist(request):
+	name = request.POST.get('name')
+	plist = Playlist(name=name)
+	plist.save()
+	return HttpResponseRedirect('/')
 def main(request):
 	playlists = Playlist.objects.all()
 	query_all_playlist()
