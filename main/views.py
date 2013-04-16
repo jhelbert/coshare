@@ -7,6 +7,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
 
+def mosaic(request):
+	query_all_playlist()
+	return render_to_response('mosaic.html', 
+		{
+		},
+		context_instance=RequestContext(request))# Create your views here.
+
+
+
 def main(request):
 	playlists = Playlist.objects.all()
 	query_all_playlist()

@@ -58,17 +58,7 @@
 <script type="text/javascript">
 
 var selected_content_ids = [];
-function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
 
-                reader.onload = function (e) {
-                    $('#blah').attr('src', e.target.result);
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
 
 function add_objects(id) {
     var foo = "/add/?album=" + id;
@@ -274,7 +264,7 @@ $(function() {
 <input name="content" type="file" multiple  />
 <input type="submit"/>
 </form>
- <img id="blah" src="#" alt="your image" />
+
 
 <button id="btnRemoveSelectedContent">Remove Selected Content</button>
 

@@ -53,9 +53,9 @@ var Album = function(id,name) {
     /** removes @content from this album, if present */
     this.remove_content = function(content) {
         // current does nothing
-        var index = this.contents.indexOf(content);
+        var index = this.output.indexOf(content);
         if (index >= 0) {
-            this.contents.splice(index, 1);
+            this.output.splice(index, 1);
         }
 
 

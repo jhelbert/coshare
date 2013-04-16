@@ -8,6 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'main.views.main'),
+    url(r'^mosaic/$','main.views.mosaic'),
     # url(r'^coshare/', include('coshare.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
