@@ -11,6 +11,7 @@ var Album = function(id,name) {
     this.output = []
     staticNames = ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "All Content", "Tasks"];
 
+    /*
     (function () {
         for (string in staticNames){
             if (this.name == string){
@@ -18,7 +19,16 @@ var Album = function(id,name) {
             }
         }
         return this.userGenerated = true;
-    })();
+    })();*/
+
+    this.is_user_generated = function () {
+        for (i in staticNames){
+            if (this.name === staticNames[i]){
+                return false;
+            }
+        }
+        return true;
+    }
 
     // TODO: using this variable lends to rep-exposure; fix it.
 
