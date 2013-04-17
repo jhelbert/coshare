@@ -572,7 +572,7 @@ $(function() {
          model.add_album(album);
          album_map[{{playlist.id}}] = album;
         {% for content in playlist.content.all %}
-            album.add_content({{content.id}},"{{content.image}}");
+            album.add_content({{content.id}},"{{content.image}}",{{content.metric}});
         {% endfor %}
        
     {% endfor %}
@@ -687,7 +687,7 @@ $(function() {
 
 
 
-<body>
+<body style="background-color:#E0F3FF">
     <!-- Modal stuff -->
     <div id="openModal" class="modalDialog">
         <div>
@@ -713,7 +713,6 @@ $(function() {
     <!-- End modal -->
 
     <div id="upload" style="float:right">
-        <h4>Upload</h4>
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
 <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
 </div>
@@ -762,10 +761,10 @@ $(function() {
       </div>
     </div>
 
-    <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span3">
-          <div class="well sidebar-nav" style="margin-top:110px">
+    <div class="container-fluid" style="background-color:#E0F3FF">
+      <div class="row-fluid" style="background-color:#E0F3FF">
+        <div class="span3" style="background-color:#E0F3FF" >
+          <div class="well sidebar-nav" style="margin-top:110px;border:2px solid;">
             <ul class="nav nav-list">
                 <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'></div>
 
@@ -774,7 +773,7 @@ $(function() {
           </div><!--/.well -->
         </div><!--/span-->
         <div class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>
-          <div class="hero-unit">
+          <div class="hero-unit" style="border:2px solid;">
                         <h3 align="center" style="line-height:100%" id="album-title" ></h3>
 
                         <div align="center">
@@ -791,7 +790,10 @@ $(function() {
         <td>
 
 
-            <div id="contents-container" />
+            <div id="contents-container">
+
+                <iframe width="300" height="215" src="http://www.youtube.com/embed/h49zuxrDWCQ" frameborder="0" allowfullscreen></iframe>
+            </div>
 
 
         </td>

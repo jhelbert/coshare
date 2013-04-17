@@ -61,8 +61,8 @@ var Album = function(id,name) {
     }
 
     /** adds @new_content to the album, if not already present */
-    this.add_content = function(id,src) {
-        var content = new Content(id,src);
+    this.add_content = function(id,src,size) {
+        var content = new Content(id,src,size);
         this.output.push(content);
 
         // TODO: interface with server
