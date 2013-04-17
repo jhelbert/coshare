@@ -637,11 +637,12 @@ img {
   vertical-align: middle;
   margin-right: 10px;
   margin-top: 5px;
+  width: 50px;
+  height: 50px;
 }
 
 .container {
-  margin-right: 5%;
-  margin-left: 2%;
+  margin-left: 15%;
   *zoom: 1;
 }
 
@@ -766,7 +767,7 @@ a.text-success:focus {
   color: inherit;
   padding-top: 30px;
   padding-left: 60px;
-  text-rendering: optimizelegibility;
+  text-rendering: optimizelegibility;    <div class="container">
 }
 
 h1,
@@ -3137,6 +3138,7 @@ table th[class*="span"],
 }
 
 .well {
+
   min-height: 20px;
   padding: 19px;
   margin-right: 30px;
@@ -4618,6 +4620,10 @@ input[type="submit"].btn.btn-mini {
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
   width: 940px;
+}
+
+.content-container{
+  max-width: 1000px;
 }
 
 .navbar-fixed-top {

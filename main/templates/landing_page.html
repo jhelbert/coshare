@@ -26,6 +26,7 @@
         }
       }
     </style>
+
     <link href="css/bootstrap-responsive.css" rel="stylesheet">
 
     <!-- Fav and touch icons -->
@@ -54,6 +55,7 @@
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
               <li><a href="mosiac.html">Browse</a></li>
+              <li><a onclick="$('#uploadme').click();" href="#"> Upload</a></li>
               <li><a href="">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
@@ -61,28 +63,16 @@
       </div>
     </div>
 
-    <div class="pull-right">
-    <div class="well">
-        <ul class="nav nav-list">
-          <li class="nav-header">Updates:</li>
-          <li class="active update">Update 1</li>
-          <li class="active update">Update 2</li>
-          <li class="active update">Update 3</li>
-        </ul>
-    </div>
-
-    <div class="well">
+    <div class="content-container">
+    <div class="container">
+      <div class="well pull-right">
         <ul class="nav nav-list">
           <li class="nav-header">Children:</li>
-          <li class="active update"> <img src="jane.jpg" class="child-picture" alt="Another image" height="35" width="35">Jane</li>
-          <li class="active update"> <img src="jane.jpg" class="child-picture" alt="Another image" height="35" width="35">John</li>
+          <li class="active update"> <img src="jane.jpg" class="child-picture" alt="Another image">Jane</li>
+          <li class="active update"> <img src="jane.jpg" class="child-picture" alt="Another image">John</li>
         </ul>
     </div>
-  </div>
-
-    <div class="container">
       <h1>Smith Family</h1>
-      <div class="pull-left">
       <div class="pictureSection">Recently Added</div>
         <div class="picture-collection">
           <div class="floated_img">
@@ -107,7 +97,6 @@
           </div>
           <div> <a href="">See All</a></div>
         </div>
-      </div>
       <div class="pull-left">
       <div class="pictureSection">Recently Favorited</div>
         <div class="picture-collection">
@@ -133,7 +122,8 @@
           </div>
           <div> <a href="">See All</a></div>
         </div>
-      </div>
+        </div>
+        </div>
     </div> <!-- /container -->
 
     <hr>
@@ -141,6 +131,10 @@
     <footer>
         <p>© CoShare 2013</p>
     </footer>
+
+    <input type="file" style="visibility:hidden;" id="uploadme" />
+
+  </div>
 
     <!-- Le javascript
     ================================================== -->

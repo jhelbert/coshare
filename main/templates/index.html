@@ -493,16 +493,6 @@ $(function() {
     </div>
     <!-- End modal -->
 
-    <div id="upload" style="float:right">
-        <h4>Upload</h4>
- <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-<input name="content" type="file" multiple  />
-<br>
-<input class="btn btn-primary" type="submit"/>
-</form>
-</div>
-
-
  <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -519,6 +509,7 @@ $(function() {
             <ul class="nav">
               <li><a href="landing_page.html">Home</a></li>
               <li class="active"><a href="">Browse</a></li>
+              <li><a onclick="$('#uploadme').click();" href="#"> Upload</a></li>
               <li><a href="">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
