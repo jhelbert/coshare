@@ -754,7 +754,7 @@ $(function() {
     <div id="upload" style="float:right">
         <h4>Upload</h4>
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);"/>
+<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
 </div>
 
 <div id="example" class="modal hide fade in" style="display: none; ">  
@@ -785,7 +785,7 @@ $(function() {
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="/home/">CoShare</a>
+          <a class="brand" href="/home/" >CoShare</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
               Logged in as <a href="" class="navbar-link">Username</a>
@@ -794,7 +794,7 @@ $(function() {
               <li><a href="/home/">Home</a></li>
               <li class="active"><a href="">Browse</a></li>
               <li><a onclick="$('#uploadme').click();" href="#"> Upload</a></li>
-              <li><a href="">About</a></li>
+              <li><a onclick="introJs().start()">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -809,16 +809,16 @@ $(function() {
                
 <button class="btn btn-primary" id="btnRenameAlbum">Rename</button>
 <button class="btn btn-primary" id="btnRemoveAlbum">Delete</button>
-                      <div id="albums">
+                      <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
         </div>
 
         <input name="name" id="new_plist" type="text"/>
 
           </div><!--/.well -->
         </div><!--/span-->
-        <div class="span9">
-          <div class="hero-unit" data-intro="Hello step 1" data-step="1">
-                        <h3 align="center" style="line-height:100%" id="album-title"></h3>
+        <div class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>
+          <div class="hero-unit">
+                        <h3 align="center" style="line-height:100%" id="album-title" ></h3>
 
                         <div align="center">
            <button class="btn btn-primary" id="btnSelectAll">Select All</button>
