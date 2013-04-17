@@ -69,6 +69,7 @@ def query_all_playlist():
 			all_playlist.content.add(content)
 	except:
 		pass
+
 @csrf_exempt
 def upload(request):
 
@@ -95,9 +96,29 @@ def add(request):
 def open_modal(request):
 	imageID = request.POST.get('id')
 	imageID = str(imageID)
+	print imageID
 	all_content = Content.objects.all()
 	res = {}
 	res["des"] = ""
+	photos = {}
+	playlistList = []
+
+	all_playlist = Playlist.objects.all()
+		
+	for plist in all_playlist:
+		for content in plist.content.all():
+			if str(content.id) == imageID:
+				playlistList.append(plist.name)
+				c = plist.content.all()
+				max_num = min(3,len(c))
+				photos[plist.name] = []
+				for i in range(0,max_num):
+					photos[plist.name].append(c[i].image.url)
+				break
+
+	res["playlists"] = playlistList
+	res["photos"] = photos
+
 	for content in all_content:
 		if imageID == str(content.id):
 			res["des"] = content.description
