@@ -56,10 +56,6 @@
         padding: 5px;
     }
 
-    #icon{
-     margin-right: 5px;
-    }
-
     .album-name:hover {
         cursor: pointer;
     }
@@ -137,8 +133,8 @@
 
 
     .modalDialog > div {
-        width: 500px;
-        height: 400px;
+        width: 550px;
+        height: 450px;
         position: relative;
         margin: 10% auto;
         padding: 5px 20px 13px 20px;
@@ -171,7 +167,7 @@
 
     .column {
         float:left;
-        width: 150px;
+        width: 180px;
         margin-left: 25px;
         margin-right: 25px;
     }
@@ -221,6 +217,42 @@
     .hidden {
         display: none;
     }
+
+    .favorited{
+        width: 35%;
+        margin-left: 60%;
+        margin-right: 10%;
+        margin-bottom: 5px;
+        margin-top: -20px;
+    }
+
+
+    .previewPhoto{
+        display: inline-block;
+        list-style-type: none;
+        margin-left: 0px;
+    }
+
+    .innerUI {
+        height: 45px;
+        display: inline-block;
+        width: 52px;
+        float: left;
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+
+    .thumbnail {
+        height: 40px;
+    }
+
+    .outerUI {
+        width: 100%;
+        margin-left: 0px;
+
+    }
+
+    
 </style>
 
 <script type="text/javascript">
@@ -297,9 +329,7 @@ $(function() {
     // occurs when a new album is added to the model
     // also used on load
     model.addEventListener("add_album", function(e) {
-        
-        if (e.album.userGenerated==true){
-            var album_div = $("<div/>")
+        var album_div = $("<div/>")
             .addClass("album-name")
             .addClass("ui-widget-content")
             .attr("id", "album-" + e.album.id)
@@ -307,33 +337,17 @@ $(function() {
             .click(function() {
                 model.select_album(e.album);
             });
-            $("#dynamic-albums").append(album_div);
-            }
-        else{
-            var icon = document.createElement("img");
-            icon.setAttribute("id", "icon")
-            icon.setAttribute("src", "static/assets/img/static_playlist_icon.png");
-            icon.setAttribute("alt", "static playlist");
-
-            var album_div = $("<div/>")
-            .addClass("album-name")
-            .addClass("ui-widget-content")
-            .attr("id", "album-" + e.album.id)
-            .click(function() {
-                model.select_album(e.album);
-            });
-            album_div.append(icon);
-            album_div.append(e.album.get_name()); 
-
-            console.dir(album_div);
-            $("#static-albums").append(album_div);
-            }
-            model.addEventListener("rename_album", function(e2) {
+            
+        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
+    
+        $("#albums").append(album_div);
+        model.addEventListener("rename_album", function(e2) {
             if (e2.album.equals(e.album)) {
                 album_div.text(e2.album.get_name());
                 $("#album-title").text(e2.album.get_name());
-            }});
+            }
         });
+    });
 
     // listen for select_albym event
     // occurs when User selects an album to view
@@ -411,12 +425,14 @@ $(function() {
         $("#content").text("content from " + e.album.get_name());
 
         $(".content").dblclick(function() {
+            $(".playlistList").empty();
             $("#openModal").css("opacity",1);
             $("#openModal").css("pointer-events","auto");
             var image = $(this).children("img").attr("src");
             var id_val = $(this).attr("id-num");
             $(".imageHolder").attr("src",image);
             $(".imageHolder").attr("id-num",id_val);
+            $
             // Add playlists info to list
             $.ajax({
                 type: "POST",
@@ -424,11 +440,25 @@ $(function() {
                 data: {id: id_val}
             }).done(function( msg ) {
                 // upload picture description
-                var description = msg["des"]
+                var description = msg["des"];
+                var pls = msg["playlists"];
+                var photo_table = msg["photos"];
+                console.log(photo_table);
                 if (description == "") {
                     description = "No Description";
                 }
                 $(".imageDescription").text(description);
+
+                for (var i = 0; i < pls.length; i++) {
+                    var plName = pls[i];
+                    var uiElement = $("<ui class='outerUI'> <h5>" + plName + "</h5></ui>");
+                    var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+                    for (var j=0; j < photo_table[plName].length; j++) {
+                        ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
+                    }
+                    uiElement.append(ulPhoto);
+                    $(".playlistList").append(uiElement);
+                }
             });
 
         });
@@ -500,7 +530,9 @@ $(function() {
         model.remove_selected_contents_from_selected_album();
     });
 
+    /*
     $(".content").dblclick(function() {
+        $(".playlistList").empty();
         $("#openModal").css("opacity",1);
         $("#openModal").css("pointer-events","auto");
         var image = $(this).children("img").attr("src");
@@ -514,15 +546,30 @@ $(function() {
             url: "/open_modal_view/",
             data: {id: id_val}
         }).done(function( msg ) {
-            description = msg["des"]
+            var description = msg["des"];
+            var pls = msg["playlists"];
+            var photo_table = msg["photos"];
+            console.log(photo_table);
             if (description == "") {
                 description = "No Description";
             }
             $(".imageDescription").text(description);
+
+            for (var i = 0; i < pls.length; i++) {
+                var plName = pls[i];
+                var uiElement = $("<ui class='outerUI'> " + plName + "</ui>");
+                var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+                for (var j=0; j < photo_table[plName].length; j++) {
+                    ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
+                }
+                uiElement.append(ulPhoto);
+                $(".playlistList").append(uiElement);
+            }
         });
 
     });
 
+    */
     $(".imageDescription").click(function() {
         var text = $(".imageDescription").text();
         text = text.trim();
@@ -568,6 +615,10 @@ $(function() {
         $("#openModal").css("pointer-events","none");
     });
 
+    $(".favorited").click(function() {
+        $(this).toggleClass("btn-success");
+    })
+
     // Drag and drop
     $(".album-name").droppable({
         activeClass: "ui-state-default",
@@ -602,15 +653,7 @@ $(function() {
     });
     */
 });
- 
- function close_preview_modal() {
 
-    var images=document.getElementById('example').getElementsByTagName('img');var l = images.length;
-        for (var i = 0; i < l; i++) {
-            images[0].parentNode.removeChild(images[0]);
-        }
-    $("#example").hide();
-}
 
 
 
@@ -638,24 +681,26 @@ $(function() {
             <a href="#" id="closeModal" title="Close" class="close">X</a>
             <div class="column wide">
                 <img class="imageHolder" src=""></img>
-
+                <button class="btn favorited"> Favorited </button>
+                <br>
                 <p class="imageDescription">
                 This is the description of the following image. Right now the image is black, but otherwise it will contain the picture that was previously clicked on.
                 </p>
 
                 <textarea class="descriptionInput hidden"> </textarea>
             </div>
-            <div class="column">
+            <div class="column" id="rightCol">
                 <h2> Playlists </h2>
                     <ul class="playlistList">
                     </ul>
             </div>
+            
         </div>
     </div>
     <!-- End modal -->
 
     <div id="upload" style="float:right">
-
+        <h4>Upload</h4>
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
 <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);"/>
 </div>
@@ -669,7 +714,7 @@ $(function() {
 </div>  
 <div class="modal-footer">  
 <input class="btn btn-primary" type="submit"/>
-<a href="#" class="btn" data-dismiss="modal" onclick="close_preview_modal()">Close</a>  
+<a href="#" class="btn" data-dismiss="modal" onclick="$('#example').hide();">Close</a>  
 </div>  
 </div>  
  
@@ -696,8 +741,8 @@ $(function() {
             <ul class="nav">
               <li><a href="/home/">Home</a></li>
               <li class="active"><a href="">Browse</a></li>
-              <li><a  style="color:lightblue"onclick="$('#uploadme').click();" href="#"> Upload</a></li>
-
+              <li><a onclick="$('#uploadme').click();" href="#"> Upload</a></li>
+              <li><a href="">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -707,15 +752,12 @@ $(function() {
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span3">
-          <div class="well sidebar-nav" style="margin-top:30px">
+          <div class="well sidebar-nav" style="margin-top:110px">
             <ul class="nav nav-list">
                
 <button class="btn btn-primary" id="btnRenameAlbum">Rename</button>
 <button class="btn btn-primary" id="btnRemoveAlbum">Delete</button>
-        <div id="albums">
-            <div id="static-albums"></div>
-            <hr>
-            <div id="dynamic-albums"></div>
+                      <div id="albums">
         </div>
 
         <input name="name" id="new_plist" type="text"/>
@@ -741,9 +783,7 @@ $(function() {
         <td>
 
 
-            <div id="contents-container">
-                <iframe width="320" height="215" src="http://www.youtube.com/embed/h49zuxrDWCQ" frameborder="0" allowfullscreen></iframe>
-            </div>
+            <div id="contents-container" />
 
 
         </td>
