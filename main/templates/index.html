@@ -301,8 +301,6 @@ $(function() {
             .click(function() {
                 model.select_album(e.album);
             });
-            
-        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
     
         $("#albums").append(album_div);
         model.addEventListener("rename_album", function(e2) {
