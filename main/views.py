@@ -17,6 +17,12 @@ def mosaic(request):
 		context_instance=RequestContext(request))# Create your views here.
 
 
+def home(request):
+	return render_to_response('landing_page.html', 
+		{
+		},
+		context_instance=RequestContext(request))# Create your views here.
+
 def get_recently_added():
 	recently_added_plist = Playlist.objects.get(name="Recently Added")
 	print "got ra plist"

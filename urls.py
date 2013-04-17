@@ -19,4 +19,5 @@ urlpatterns = patterns('',
     url(r'^upload/','main.views.upload'),
     url(r'^add/','main.views.add'),
     url(r'^new_plist/','main.views.new_plist'),
+    url(r'^home/','main.views.home')
 )+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
