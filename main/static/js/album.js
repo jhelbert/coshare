@@ -8,9 +8,17 @@ var Album = function(id,name) {
     this.id  = id;
     this.name = name;
     this.is_auto = false;
-
     this.output = []
+    staticNames = ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "All Content", "Tasks"];
 
+    (function () {
+        for (string in staticNames){
+            if (this.name == string){
+                return this.userGenerated = false;
+            }
+        }
+        return this.userGenerated = true;
+    })();
 
     // TODO: using this variable lends to rep-exposure; fix it.
 
