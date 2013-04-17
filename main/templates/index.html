@@ -48,7 +48,7 @@
         margin: 50px;
     }
 
-    .album-name {
+    #albums .album-name {
         font-family: Arial;
         margin:0.5em;
         background-color: #CCC;
@@ -79,6 +79,7 @@
     .content img {
         border-radius: 5px;
         border: 0px;
+        cursor: pointer;
     }
 
     .selected-content {
@@ -101,6 +102,14 @@
           padding-left: 5px;
           padding-right: 5px;
         }
+    }
+
+    .helper {
+        color: white;
+        background-color: red;
+        font-size: 16pt;
+        padding: 5px;
+        border-radius: 999px;
     }
 
     .modalDialog {
@@ -227,7 +236,6 @@ function add_objects(id) {
 
 })
             .text("Add");
-  console.log(foo);
   var add_to_album = album_map[id];
   for (key in selected_content_map) {
     add_to_album.add_content(key,selected_content_map[key]);
@@ -266,6 +274,7 @@ $(function() {
     model.addEventListener("add_album", function(e) {
         var album_div = $("<div/>")
             .addClass("album-name")
+            .addClass("ui-widget-content")
             .attr("id", "album-" + e.album.id)
             .text(e.album.get_name())
             .click(function() {
@@ -335,18 +344,14 @@ $(function() {
                     .attr("id", "content-" + content.id)
                     .click(function() {
                         model.toggle_content(content);
-
                     });
                 $("#contents-container").append(div);
 
                 model.addEventListener("select_content", function(e2) {
                     if (e2.content.equals(content)) {
                         div.addClass("selected-content");
-                        console.dir(e2.content.id);
                         selected_content_ids.push(e2.content.id);
-                        selected_content_map[e2.content.id] = e2.content.get_content().src.split("/media/")[1];
-                        console.dir(e2.content.get_content().src);
-                        console.log(selected_content_ids);
+                        selected_content_map[e2.content.id] = e2.content.get_content().src.split("/media/")[1];;
                     }
                 });
                 model.addEventListener("deselect_content", function(e2) {
@@ -393,7 +398,6 @@ $(function() {
     model.select_album(model.albums[0]);
     function new_plist(name) {
         $("#new_plist")[0].value = "";
-        console.dir($("#new_plist"));
     var album = new Album(100,name);
          model.add_album(album);
 
@@ -466,18 +470,62 @@ $(function() {
         }
     });
 
-
-
     $("#closeModal").click(function() {
         $("#openModal").css("opacity",0);
         $("#openModal").css("pointer-events","none");
     });
+
+    // Drag and drop
+    $(".album-name").droppable({
+        activeClass: "ui-state-default",
+        hoverClass: "ui-state-hover",
+        accept: ".content",
+        drop: function( event, ui ) {
+            $( this ).find( ".placeholder" ).remove();
+            $( "<li></li>" ).text( ui.draggable.text() ).appendTo( this );
+        },
+    });
+
+    $(".content").draggable({
+        activeClass: "ui-state-highlight",
+        revert: true,
+        start: function(event, ui) {
+            $(this).addClass('noclick');
+        },
+        helper: function( event ) {
+            return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
+        },
+        distance: 20,
+        cursorAt: { top: -15, left: -25 },
+    });
+
+    /*
+    $("#albums").selectable({
+        selected: function(event, ui) {
+            console.log("selected");
+            console.dir(event);
+            console.dir(ui);
+        },
+    });
+    */
 });
 
 
 
 
 </script>
+
+<!--
+<style>
+  #albums .ui-selecting { background: #FECA40; }
+  #albums .ui-selected { background: #F39814; color: white; }
+  #albums { list-style-type: none; margin: 0; padding: 0; }
+  #albums .album-name { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; cursor: pointer;}
+  </style>
+
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+-->
 </head>
 
 
@@ -549,7 +597,7 @@ $(function() {
                       <div id="albums">
         </div>
 
-        <input name="name" class="album-name" id="new_plist" type="text"/>
+        <input name="name" id="new_plist" type="text"/>
 
             </ul>
           </div><!--/.well -->
