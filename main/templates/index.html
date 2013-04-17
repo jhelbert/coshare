@@ -325,6 +325,7 @@ $(function() {
                     .append(content.get_content())
                     .addClass("content")
                     .attr("id", "content-" + content.id)
+                    .attr("id-num", content.id)
                     .click(function() {
                         model.toggle_content(content);
 
@@ -349,6 +350,30 @@ $(function() {
             })(contents[i]);
         }
         $("#content").text("content from " + e.album.get_name());
+
+        $(".content").dblclick(function() {
+            $("#openModal").css("opacity",1);
+            $("#openModal").css("pointer-events","auto");
+            var image = $(this).children("img").attr("src");
+            var id_val = $(this).attr("id-num");
+            $(".imageHolder").attr("src",image);
+            $(".imageHolder").attr("id-num",id_val);
+            // Add playlists info to list
+            $.ajax({
+                type: "POST",
+                url: "/open_modal_view/",
+                data: {id: id_val}
+            }).done(function( msg ) {
+                // upload picture description
+                var description = msg["des"]
+                if (description == "") {
+                    description = "No Description";
+                }
+                $(".imageDescription").text(description);
+            });
+
+        });
+
     });
 
     model.addEventListener("deselect_album", function(e) {
@@ -420,13 +445,29 @@ $(function() {
         $("#openModal").css("opacity",1);
         $("#openModal").css("pointer-events","auto");
         var image = $(this).children("img").attr("src");
+        var id_val = $(this).attr("id-num").toString();
         $(".imageHolder").attr("src",image);
+        $(".imageHolder").attr("id-num",id_val);
+
+        // Add playlists info to list
+        $.ajax({
+            type: "POST",
+            url: "/open_modal_view/",
+            data: {id: id_val}
+        }).done(function( msg ) {
+            description = msg["des"]
+            if (description == "") {
+                description = "No Description";
+            }
+            $(".imageDescription").text(description);
+        });
+
     });
 
     $(".imageDescription").click(function() {
         var text = $(".imageDescription").text();
         text = text.trim();
-        $(".descriptionInput").text(text);
+        $(".descriptionInput").val(text);
         $(".descriptionInput").removeClass("hidden");
         $(".imageDescription").addClass("hidden");
         $(".descriptionInput").focus();
@@ -441,6 +482,15 @@ $(function() {
         $(".imageDescription").text(text);
         $(".descriptionInput").addClass("hidden");
         $(".imageDescription").removeClass("hidden");
+        var id_val = $(".imageHolder").attr("id-num").toString();
+        // send new text value to the server
+        $.ajax({
+            type: "POST",
+            url: "/save_description/",
+            data: { id: id_val, description: text}
+        }).done(function( msg ) {
+            console.log("message");
+        });
     });
 
     $(".descriptionInput").bind('keypress',function(e) {

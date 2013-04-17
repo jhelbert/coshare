@@ -11,6 +11,9 @@ urlpatterns = patterns('',
     url(r'^mosaic/$','main.views.mosaic'),
     # url(r'^coshare/', include('coshare.foo.urls')),
 
+    url(r'^open_modal_view/', 'main.views.open_modal'),
+    url(r'^save_description/', 'main.views.change_description'),
+
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

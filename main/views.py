@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
+import json
 
 def mosaic(request):
 	query_all_playlist()
@@ -55,3 +56,33 @@ def add(request):
 		print "C:%s" % c
 		album.content.add(Content.objects.get(id=c))
 	return HttpResponseRedirect('/')
+
+
+@csrf_exempt
+def open_modal(request):
+	imageID = request.POST.get('id')
+	imageID = str(imageID)
+	all_content = Content.objects.all()
+	res = {}
+	res["des"] = ""
+	for content in all_content:
+		if imageID == str(content.id):
+			res["des"] = content.description
+			return HttpResponse(json.dumps(res),content_type="application/json")
+
+	return HttpResponse(json.dumps(res),content_type="application/json")
+			
+	
+
+
+@csrf_exempt
+def change_description(request):
+	imageID = request.POST.get('id')
+	imageID = str(imageID)
+	newDes = request.POST.get('description')
+	for content in Content.objects.all():
+		if imageID == str(content.id):
+			content.description = str(newDes)
+			content.save()
+	return HttpResponse("done")
+
