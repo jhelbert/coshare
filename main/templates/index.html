@@ -212,7 +212,9 @@
 <script type="text/javascript">
 
 var selected_content_ids = [];
+var selected_content_map = {};
 
+var album_map = {}
 
 function add_objects(id) {
     var foo = "/add/?album=" + id;
@@ -226,7 +228,12 @@ function add_objects(id) {
 })
             .text("Add");
   console.log(foo);
-  window.location = foo;
+  var add_to_album = album_map[id];
+  for (key in selected_content_map) {
+    add_to_album.add_content(key,selected_content_map[key]);
+  }
+  
+  //window.location = foo;
 }
 
 $(function() {
@@ -282,6 +289,7 @@ $(function() {
     // this is the album selected
     model.addEventListener("select_album", function(e) {
         selected_content_ids = [];
+        selected_content_map = {};
         selected_album = e.album.id;
         // refresh title
         $("#album-title").text(e.album.get_name());
@@ -336,6 +344,8 @@ $(function() {
                         div.addClass("selected-content");
                         console.dir(e2.content.id);
                         selected_content_ids.push(e2.content.id);
+                        selected_content_map[e2.content.id] = e2.content.get_content().src.split("/media/")[1];
+                        console.dir(e2.content.get_content().src);
                         console.log(selected_content_ids);
                     }
                 });
@@ -343,6 +353,7 @@ $(function() {
                     if (e2.content.equals(content)) {
                         div.removeClass("selected-content");
                         var index = selected_content_ids.indexOf(e2.content.id);
+                        delete selected_content_map[e2.content.id];
                         selected_content_ids.splice(index,1);
                     }
                 });
@@ -371,6 +382,7 @@ $(function() {
     {% for playlist in playlists %}
         var album = new Album({{playlist.id}},"{{playlist.name}}");
          model.add_album(album);
+         album_map[{{playlist.id}}] = album;
         {% for content in playlist.content.all %}
             album.add_content({{content.id}},"{{content.image}}");
         {% endfor %}

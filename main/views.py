@@ -6,14 +6,27 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
+import datetime
 
 def mosaic(request):
 	query_all_playlist()
+	get_recently_added()
 	return render_to_response('mosaic.html', 
 		{
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
+
+def get_recently_added():
+	recently_added_plist = Playlist.objects.get(name="Recently Added")
+	print "got ra plist"
+	recently_added_plist.content.clear()
+	content = Content.objects.all()
+	for c in content:
+		if c.uploaded_date:
+			if c.uploaded_date + datetime.timedelta(days=2) > datetime.datetime.today():
+				recently_added_plist.content.add(c)
+	print "done with get recently added"
 @csrf_exempt
 def new_plist(request):
 	name = request.POST.get('name')
@@ -21,6 +34,7 @@ def new_plist(request):
 	plist.save()
 	return HttpResponseRedirect('/')
 def main(request):
+	get_recently_added()
 	playlists = Playlist.objects.all()
 	query_all_playlist()
 	return render_to_response('index.html', 
