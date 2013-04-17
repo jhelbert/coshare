@@ -30,6 +30,9 @@
 <script src="static/js/jquery.watermark.min.js"></script>
 <script src="static/js/jquery-ui-1.10.2.custom.js"></script>
 <script src="/static/js/bootstrap-modal.js"></script>
+
+<script src="static/js/bootstrap.min.js"> </script>
+<link href-"static/css/bootstrap.min.css" rel="stylesheet">
 <!-- Isotope -->
 <script src="static/js/jquery.isotope.min.js"></script>
 <link href="static/css/isotope.css" rel="stylesheet">
@@ -49,11 +52,20 @@
         margin: 50px;
     }
 
-    #albums .album-name {
-        font-family: Arial;
-        margin:0.5em;
+    .album-name {
         background-color: #CCC;
+        /* font-size: 16pt;*/
+    }
+
+    #new_plist, .album-name {
         padding: 5px;
+        width: 90%;
+        padding: 5px;
+        margin: 5px;
+    }
+
+    #new_plist {
+        padding: 15 10 15 5px;
     }
 
     .album-name:hover {
@@ -61,7 +73,16 @@
     }
 
     .selected-album {
-        background-color: red;
+        background-color: black;
+        color: white;
+    }
+
+    .droppable-album {
+        background-color: gray;
+    }
+
+    .hover-drop-album {
+        background-color: #5BB75b;
     }
 
     .selected-auto-album {
@@ -86,7 +107,6 @@
     .selected-content {
         border-color: #006DCC;
     }
-
     
 
     td {
@@ -252,7 +272,7 @@
 
     }
 
-    
+
 </style>
 
 <script type="text/javascript">
@@ -329,17 +349,70 @@ $(function() {
     // occurs when a new album is added to the model
     // also used on load
     model.addEventListener("add_album", function(e) {
-        var album_div = $("<div/>")
+        console.dir(e.album);
+        
+        var album_div = $("<div />");
+        if (e.album.is_user_generated()) {
+            album_div
             .addClass("album-name")
-            .addClass("ui-widget-content")
             .attr("id", "album-" + e.album.id)
             .text(e.album.get_name())
             .click(function() {
                 model.select_album(e.album);
             });
+
+        if (e.album.is_user_generated()) {
+            album_div.droppable({
+                    //activeClass: "ui-state-default",
+                    activeClass: "droppable-album",
+                    hoverClass: "hover-drop-album",
+                    accept: ".content",
+                    drop: function( event, ui ) {
+                        /*
+                        console.log("running");
+
+                        album_div.popover({
+                            title: "wasup",
+                            html: "<div>wasup</div>",
+                            delay: 500,
+                        })
+                        .popover("toggle")
+                        */
+                    },
+            });
+        }
             
-        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
+//        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
     
+            $("#dynamic-albums").append(album_div);
+            }
+        else{
+            var icon = document.createElement("img");
+            icon.setAttribute("id", "icon")
+            icon.setAttribute("src", "static/assets/img/static_playlist_icon.png");
+            icon.setAttribute("alt", "static playlist");
+
+            album_div
+            .addClass("album-name")
+            //.addClass("ui-widget-content")
+            .attr("id", "album-" + e.album.id)
+            .click(function() {
+                model.select_album(e.album);
+            });
+            album_div.append(icon);
+            album_div.append(e.album.get_name()); 
+
+            console.dir(album_div);
+            $("#static-albums").append(album_div);
+            }
+            model.addEventListener("rename_album", function(e2) {
+
+                if (e2.album.equals(e.album)) {
+                    album_div.text(e2.album.get_name());
+                    $("#album-title").text(e2.album.get_name());
+                }});
+            
+            
         $("#albums").append(album_div);
         model.addEventListener("rename_album", function(e2) {
             if (e2.album.equals(e.album)) {
@@ -367,6 +440,7 @@ $(function() {
         } else {
             $("#album-" + e.album.id).addClass("selected-album");
         }
+            
 
         // show/hide relevant pictures
         if (e.album.can_rename()) {
@@ -461,6 +535,17 @@ $(function() {
                 }
             });
 
+        }).draggable({
+            revert: true,
+            start: function(event, ui) {
+                $(this).addClass('noclick');
+            },
+            helper: function( event ) {
+                return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
+            },
+            distance: 20,
+            cursorAt: { top: 0, left: -25 },
+            cursor: "default",
         });
 
     });
@@ -619,39 +704,6 @@ $(function() {
         $(this).toggleClass("btn-success");
     })
 
-    // Drag and drop
-    $(".album-name").droppable({
-        activeClass: "ui-state-default",
-        hoverClass: "ui-state-hover",
-        accept: ".content",
-        drop: function( event, ui ) {
-            $( this ).find( ".placeholder" ).remove();
-            $( "<li></li>" ).text( ui.draggable.text() ).appendTo( this );
-        },
-    });
-
-    $(".content").draggable({
-        activeClass: "ui-state-highlight",
-        revert: true,
-        start: function(event, ui) {
-            $(this).addClass('noclick');
-        },
-        helper: function( event ) {
-            return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
-        },
-        distance: 20,
-        cursorAt: { top: -15, left: -25 },
-    });
-
-    /*
-    $("#albums").selectable({
-        selected: function(event, ui) {
-            console.log("selected");
-            console.dir(event);
-            console.dir(ui);
-        },
-    });
-    */
 });
 
 
@@ -702,7 +754,7 @@ $(function() {
     <div id="upload" style="float:right">
         <h4>Upload</h4>
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);"/>
+<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
 </div>
 
 <div id="example" class="modal hide fade in" style="display: none; ">  
@@ -733,7 +785,7 @@ $(function() {
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="/home/">CoShare</a>
+          <a class="brand" href="/home/" >CoShare</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
               Logged in as <a href="" class="navbar-link">Username</a>
@@ -742,7 +794,7 @@ $(function() {
               <li><a href="/home/">Home</a></li>
               <li class="active"><a href="">Browse</a></li>
               <li><a onclick="$('#uploadme').click();" href="#"> Upload</a></li>
-              <li><a href="">About</a></li>
+              <li><a onclick="introJs().start()">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -757,17 +809,16 @@ $(function() {
                
 <button class="btn btn-primary" id="btnRenameAlbum">Rename</button>
 <button class="btn btn-primary" id="btnRemoveAlbum">Delete</button>
-                      <div id="albums">
+                      <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
         </div>
 
         <input name="name" id="new_plist" type="text"/>
 
-            </ul>
           </div><!--/.well -->
         </div><!--/span-->
-        <div class="span9">
-          <div class="hero-unit" data-intro="Hello step 1" data-step="1">
-                        <h3 align="center" style="line-height:100%" id="album-title"></h3>
+        <div class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>
+          <div class="hero-unit">
+                        <h3 align="center" style="line-height:100%" id="album-title" ></h3>
 
                         <div align="center">
            <button class="btn btn-primary" id="btnSelectAll">Select All</button>

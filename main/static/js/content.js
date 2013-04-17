@@ -17,7 +17,7 @@ var Content = function(id,src) {
         // use stubbed image for now
         var output = new Image();
         output.src = "/media/" + src;
-        output.height = 100;
+        output.height = 150;
         return output;
 
         // TODO: interface with backend
