@@ -68,10 +68,6 @@
         padding: 15 10 15 5px;
     }
 
-    #icon{
-     margin-right: 5px;
-    }
-
     .album-name:hover {
         cursor: pointer;
     }
@@ -157,8 +153,8 @@
 
 
     .modalDialog > div {
-        width: 500px;
-        height: 400px;
+        width: 550px;
+        height: 450px;
         position: relative;
         margin: 10% auto;
         padding: 5px 20px 13px 20px;
@@ -191,7 +187,7 @@
 
     .column {
         float:left;
-        width: 150px;
+        width: 180px;
         margin-left: 25px;
         margin-right: 25px;
     }
@@ -241,6 +237,41 @@
     .hidden {
         display: none;
     }
+
+    .favorited{
+        width: 35%;
+        margin-left: 60%;
+        margin-right: 10%;
+        margin-bottom: 5px;
+        margin-top: -20px;
+    }
+
+
+    .previewPhoto{
+        display: inline-block;
+        list-style-type: none;
+        margin-left: 0px;
+    }
+
+    .innerUI {
+        height: 45px;
+        display: inline-block;
+        width: 52px;
+        float: left;
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+
+    .thumbnail {
+        height: 40px;
+    }
+
+    .outerUI {
+        width: 100%;
+        margin-left: 0px;
+
+    }
+
 
 </style>
 
@@ -337,13 +368,16 @@ $(function() {
                     hoverClass: "hover-drop-album",
                     accept: ".content",
                     drop: function( event, ui ) {
+                        /*
                         console.log("running");
+
                         album_div.popover({
                             title: "wasup",
                             html: "<div>wasup</div>",
                             delay: 500,
                         })
                         .popover("toggle")
+                        */
                     },
             });
         }
@@ -377,7 +411,16 @@ $(function() {
                     album_div.text(e2.album.get_name());
                     $("#album-title").text(e2.album.get_name());
                 }});
+            
+            
+        $("#albums").append(album_div);
+        model.addEventListener("rename_album", function(e2) {
+            if (e2.album.equals(e.album)) {
+                album_div.text(e2.album.get_name());
+                $("#album-title").text(e2.album.get_name());
+            }
         });
+    });
 
     // listen for select_albym event
     // occurs when User selects an album to view
@@ -456,12 +499,14 @@ $(function() {
         $("#content").text("content from " + e.album.get_name());
 
         $(".content").dblclick(function() {
+            $(".playlistList").empty();
             $("#openModal").css("opacity",1);
             $("#openModal").css("pointer-events","auto");
             var image = $(this).children("img").attr("src");
             var id_val = $(this).attr("id-num");
             $(".imageHolder").attr("src",image);
             $(".imageHolder").attr("id-num",id_val);
+            $
             // Add playlists info to list
             $.ajax({
                 type: "POST",
@@ -469,11 +514,25 @@ $(function() {
                 data: {id: id_val}
             }).done(function( msg ) {
                 // upload picture description
-                var description = msg["des"]
+                var description = msg["des"];
+                var pls = msg["playlists"];
+                var photo_table = msg["photos"];
+                console.log(photo_table);
                 if (description == "") {
                     description = "No Description";
                 }
                 $(".imageDescription").text(description);
+
+                for (var i = 0; i < pls.length; i++) {
+                    var plName = pls[i];
+                    var uiElement = $("<ui class='outerUI'> <h5>" + plName + "</h5></ui>");
+                    var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+                    for (var j=0; j < photo_table[plName].length; j++) {
+                        ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
+                    }
+                    uiElement.append(ulPhoto);
+                    $(".playlistList").append(uiElement);
+                }
             });
 
         }).draggable({
@@ -556,7 +615,9 @@ $(function() {
         model.remove_selected_contents_from_selected_album();
     });
 
+    /*
     $(".content").dblclick(function() {
+        $(".playlistList").empty();
         $("#openModal").css("opacity",1);
         $("#openModal").css("pointer-events","auto");
         var image = $(this).children("img").attr("src");
@@ -570,15 +631,30 @@ $(function() {
             url: "/open_modal_view/",
             data: {id: id_val}
         }).done(function( msg ) {
-            description = msg["des"]
+            var description = msg["des"];
+            var pls = msg["playlists"];
+            var photo_table = msg["photos"];
+            console.log(photo_table);
             if (description == "") {
                 description = "No Description";
             }
             $(".imageDescription").text(description);
+
+            for (var i = 0; i < pls.length; i++) {
+                var plName = pls[i];
+                var uiElement = $("<ui class='outerUI'> " + plName + "</ui>");
+                var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+                for (var j=0; j < photo_table[plName].length; j++) {
+                    ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
+                }
+                uiElement.append(ulPhoto);
+                $(".playlistList").append(uiElement);
+            }
         });
 
     });
 
+    */
     $(".imageDescription").click(function() {
         var text = $(".imageDescription").text();
         text = text.trim();
@@ -624,6 +700,10 @@ $(function() {
         $("#openModal").css("pointer-events","none");
     });
 
+    $(".favorited").click(function() {
+        $(this).toggleClass("btn-success");
+    })
+
 });
 
 
@@ -653,21 +733,29 @@ $(function() {
             <a href="#" id="closeModal" title="Close" class="close">X</a>
             <div class="column wide">
                 <img class="imageHolder" src=""></img>
-
+                <button class="btn favorited"> Favorited </button>
+                <br>
                 <p class="imageDescription">
                 This is the description of the following image. Right now the image is black, but otherwise it will contain the picture that was previously clicked on.
                 </p>
 
                 <textarea class="descriptionInput hidden"> </textarea>
             </div>
-            <div class="column">
+            <div class="column" id="rightCol">
                 <h2> Playlists </h2>
                     <ul class="playlistList">
                     </ul>
             </div>
+            
         </div>
     </div>
     <!-- End modal -->
+
+    <div id="upload" style="float:right">
+        <h4>Upload</h4>
+ <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);"/>
+</div>
 
 <div id="example" class="modal hide fade in" style="display: none; ">  
 <div class="modal-header">  
@@ -721,10 +809,7 @@ $(function() {
                
 <button class="btn btn-primary" id="btnRenameAlbum">Rename</button>
 <button class="btn btn-primary" id="btnRemoveAlbum">Delete</button>
-        <div id="albums">
-            <div id="static-albums"></div>
-            <hr>
-            <div id="dynamic-albums"></div>
+                      <div id="albums">
         </div>
 
         <input name="name" id="new_plist" type="text"/>
