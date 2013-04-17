@@ -361,7 +361,6 @@ $(function() {
                 model.select_album(e.album);
             });
 
-        if (e.album.is_user_generated()) {
             album_div.droppable({
                     //activeClass: "ui-state-default",
                     activeClass: "droppable-album",
@@ -380,12 +379,10 @@ $(function() {
                         */
                     },
             });
+        
         }
             
 //        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
-    
-            $("#dynamic-albums").append(album_div);
-            }
         else{
             var icon = document.createElement("img");
             icon.setAttribute("id", "icon")
@@ -407,19 +404,11 @@ $(function() {
             }
             model.addEventListener("rename_album", function(e2) {
 
-                if (e2.album.equals(e.album)) {
-                    album_div.text(e2.album.get_name());
-                    $("#album-title").text(e2.album.get_name());
-                }});
-            
-            
+        if (e2.album.equals(e.album)) {
+            album_div.text(e2.album.get_name());
+            $("#album-title").text(e2.album.get_name());
+        }});
         $("#albums").append(album_div);
-        model.addEventListener("rename_album", function(e2) {
-            if (e2.album.equals(e.album)) {
-                album_div.text(e2.album.get_name());
-                $("#album-title").text(e2.album.get_name());
-            }
-        });
     });
 
     // listen for select_albym event
@@ -751,12 +740,6 @@ $(function() {
     </div>
     <!-- End modal -->
 
-    <div id="upload" style="float:right">
-        <h4>Upload</h4>
- <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
-</div>
-
 <div id="example" class="modal hide fade in" style="display: none; ">  
 <div class="modal-header">  
 <h3 align="center">Upload Preview</h3>  
@@ -802,16 +785,16 @@ $(function() {
     </div>
 
     <div class="container-fluid">
-        <input name="content" type="file" multiple  id="uploadme"  onchange="readURL(this);"/>
       <div class="row-fluid">
         <div class="span3">
           <div class="well sidebar-nav" style="margin-top:110px">
             <ul class="nav nav-list">
-               
-<button class="btn btn-primary" id="btnRenameAlbum">Rename</button>
-<button class="btn btn-primary" id="btnRemoveAlbum">Delete</button>
-                      <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
-        </div>
+                <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
+
+                    <div id="static-albums"></div>
+                    <hr>
+                    <div id="dynamic-albums"></div>
+                </div>
 
         <input name="name" id="new_plist" type="text"/>
 
