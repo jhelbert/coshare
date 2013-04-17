@@ -25,10 +25,11 @@
 
 <!-- jQuery -->
 <link href="static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
+
 <script src="static/js/jquery-1.9.1.js"></script>
 <script src="static/js/jquery.watermark.min.js"></script>
 <script src="static/js/jquery-ui-1.10.2.custom.js"></script>
-
+<script src="/static/js/bootstrap-modal.js"></script>
 <!-- Isotope -->
 <script src="static/js/jquery.isotope.min.js"></script>
 <link href="static/css/isotope.css" rel="stylesheet">
@@ -220,6 +221,26 @@
 
 <script type="text/javascript">
 
+function readURL(input) {
+            if (input.files && input.files[0]) {
+                for (var i = 0, f; f = input.files[i]; i++) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var output = new Image();
+                    console.dir(input.files);
+                    output.src = e.target.result;
+                    output.height = "150";
+                    $('#blah').append(output);
+                }
+
+                reader.readAsDataURL(f);
+
+                }   
+            }
+            $("#example").show();
+        }
+
 var selected_content_ids = [];
 var selected_content_map = {};
 
@@ -342,6 +363,7 @@ $(function() {
                     .append(content.get_content())
                     .addClass("content")
                     .attr("id", "content-" + content.id)
+                    .attr("id-num", content.id)
                     .click(function() {
                         model.toggle_content(content);
                     });
@@ -365,6 +387,30 @@ $(function() {
             })(contents[i]);
         }
         $("#content").text("content from " + e.album.get_name());
+
+        $(".content").dblclick(function() {
+            $("#openModal").css("opacity",1);
+            $("#openModal").css("pointer-events","auto");
+            var image = $(this).children("img").attr("src");
+            var id_val = $(this).attr("id-num");
+            $(".imageHolder").attr("src",image);
+            $(".imageHolder").attr("id-num",id_val);
+            // Add playlists info to list
+            $.ajax({
+                type: "POST",
+                url: "/open_modal_view/",
+                data: {id: id_val}
+            }).done(function( msg ) {
+                // upload picture description
+                var description = msg["des"]
+                if (description == "") {
+                    description = "No Description";
+                }
+                $(".imageDescription").text(description);
+            });
+
+        });
+
     });
 
     model.addEventListener("deselect_album", function(e) {
@@ -436,13 +482,29 @@ $(function() {
         $("#openModal").css("opacity",1);
         $("#openModal").css("pointer-events","auto");
         var image = $(this).children("img").attr("src");
+        var id_val = $(this).attr("id-num").toString();
         $(".imageHolder").attr("src",image);
+        $(".imageHolder").attr("id-num",id_val);
+
+        // Add playlists info to list
+        $.ajax({
+            type: "POST",
+            url: "/open_modal_view/",
+            data: {id: id_val}
+        }).done(function( msg ) {
+            description = msg["des"]
+            if (description == "") {
+                description = "No Description";
+            }
+            $(".imageDescription").text(description);
+        });
+
     });
 
     $(".imageDescription").click(function() {
         var text = $(".imageDescription").text();
         text = text.trim();
-        $(".descriptionInput").text(text);
+        $(".descriptionInput").val(text);
         $(".descriptionInput").removeClass("hidden");
         $(".imageDescription").addClass("hidden");
         $(".descriptionInput").focus();
@@ -457,6 +519,15 @@ $(function() {
         $(".imageDescription").text(text);
         $(".descriptionInput").addClass("hidden");
         $(".imageDescription").removeClass("hidden");
+        var id_val = $(".imageHolder").attr("id-num").toString();
+        // send new text value to the server
+        $.ajax({
+            type: "POST",
+            url: "/save_description/",
+            data: { id: id_val, description: text}
+        }).done(function( msg ) {
+            console.log("message");
+        });
     });
 
     $(".descriptionInput").bind('keypress',function(e) {
@@ -556,11 +627,27 @@ $(function() {
     <div id="upload" style="float:right">
         <h4>Upload</h4>
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-<input name="content" type="file" multiple  />
-<br>
-<input class="btn btn-primary" type="submit"/>
-</form>
+<input name="content" type="file" multiple  onchange="readURL(this);"/>
 </div>
+
+<div id="example" class="modal hide fade in" style="display: none; ">  
+<div class="modal-header">  
+<h3>Upload Preview</h3>  
+</div>  
+<div class="modal-body">  
+<div id="blah"></div>              
+</div>  
+<div class="modal-footer">  
+<input class="btn btn-primary" type="submit"/>
+<a href="#" class="btn" data-dismiss="modal" onclick="$('#example').hide();">Close</a>  
+</div>  
+</div>  
+ 
+</div>  
+<div id="blah"/>
+<br>
+
+</form>
 
 
  <div class="navbar navbar-inverse navbar-fixed-top">
@@ -571,14 +658,15 @@ $(function() {
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="landing_page.html">CoShare</a>
+          <a class="brand" href="/home/">CoShare</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
               Logged in as <a href="" class="navbar-link">Username</a>
             </p>
             <ul class="nav">
-              <li><a href="landing_page.html">Home</a></li>
+              <li><a href="/home/">Home</a></li>
               <li class="active"><a href="">Browse</a></li>
+              <li><a onclick="$('#uploadme').click();" href="#"> Upload</a></li>
               <li><a href="">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
