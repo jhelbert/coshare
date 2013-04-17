@@ -49,11 +49,22 @@
         margin: 50px;
     }
 
-    #albums .album-name {
-        font-family: Arial;
-        margin:0.5em;
+    .album-name {
         background-color: #CCC;
+        font-size: 16pt;
+    }
+
+    
+
+    #new_plist, .album-name {
         padding: 5px;
+        width: 90%;
+        padding: 5px;
+        margin: 5px;
+    }
+
+    #new_plist {
+        padding: 15 10 15 5px;
     }
 
     .album-name:hover {
@@ -61,7 +72,16 @@
     }
 
     .selected-album {
-        background-color: red;
+        background-color: black;
+        color: white;
+    }
+
+    .droppable-album {
+        background-color: gray;
+    }
+
+    .hover-drop-album {
+        background-color: #5BB75b;
     }
 
     .selected-auto-album {
@@ -86,7 +106,6 @@
     .selected-content {
         border-color: #006DCC;
     }
-
     
 
     td {
@@ -217,6 +236,7 @@
     .hidden {
         display: none;
     }
+
 </style>
 
 <script type="text/javascript">
@@ -293,16 +313,27 @@ $(function() {
     // occurs when a new album is added to the model
     // also used on load
     model.addEventListener("add_album", function(e) {
-        var album_div = $("<div/>")
+        var album_div = $("<div />")
             .addClass("album-name")
-            .addClass("ui-widget-content")
             .attr("id", "album-" + e.album.id)
             .text(e.album.get_name())
             .click(function() {
                 model.select_album(e.album);
             });
+        if (!e.album.is_auto) {
+            album_div.droppable({
+                    //activeClass: "ui-state-default",
+                    activeClass: "droppable-album",
+                    hoverClass: "hover-drop-album",
+                    accept: ".content",
+                    drop: function( event, ui ) {
+                        // actually 
+                    },
+                });
+        }
+        
             
-        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
+//        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
     
         $("#albums").append(album_div);
         model.addEventListener("rename_album", function(e2) {
@@ -331,6 +362,7 @@ $(function() {
         } else {
             $("#album-" + e.album.id).addClass("selected-album");
         }
+            
 
         // show/hide relevant pictures
         if (e.album.can_rename()) {
@@ -409,6 +441,17 @@ $(function() {
                 $(".imageDescription").text(description);
             });
 
+        }).draggable({
+            revert: true,
+            start: function(event, ui) {
+                $(this).addClass('noclick');
+            },
+            helper: function( event ) {
+                return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
+            },
+            distance: 20,
+            cursorAt: { top: 0, left: -25 },
+            cursor: "default",
         });
 
     });
@@ -546,39 +589,6 @@ $(function() {
         $("#openModal").css("pointer-events","none");
     });
 
-    // Drag and drop
-    $(".album-name").droppable({
-        activeClass: "ui-state-default",
-        hoverClass: "ui-state-hover",
-        accept: ".content",
-        drop: function( event, ui ) {
-            $( this ).find( ".placeholder" ).remove();
-            $( "<li></li>" ).text( ui.draggable.text() ).appendTo( this );
-        },
-    });
-
-    $(".content").draggable({
-        activeClass: "ui-state-highlight",
-        revert: true,
-        start: function(event, ui) {
-            $(this).addClass('noclick');
-        },
-        helper: function( event ) {
-            return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
-        },
-        distance: 20,
-        cursorAt: { top: -15, left: -25 },
-    });
-
-    /*
-    $("#albums").selectable({
-        selected: function(event, ui) {
-            console.log("selected");
-            console.dir(event);
-            console.dir(ui);
-        },
-    });
-    */
 });
 
 
@@ -682,12 +692,11 @@ $(function() {
                
 <button class="btn btn-primary" id="btnRenameAlbum">Rename</button>
 <button class="btn btn-primary" id="btnRemoveAlbum">Delete</button>
-                      <div id="albums">
-        </div>
+<div id="albums" >
+</div>
+<input name="name" id="new_plist" type="text" />
+        
 
-        <input name="name" id="new_plist" type="text"/>
-
-            </ul>
           </div><!--/.well -->
         </div><!--/span-->
         <div class="span9">
