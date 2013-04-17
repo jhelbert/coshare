@@ -140,6 +140,10 @@ var Model = function() {
         */
     }
 
+    this.get_num_selected_contents = function() {
+        return this.selected_contents.length;
+    }
+
     // Event Management
 
     this.allHandlers = new Array();
