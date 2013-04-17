@@ -138,5 +138,6 @@ def change_description(request):
 		if imageID == str(content.id):
 			content.description = str(newDes)
 			content.save()
-	return HttpResponse("done")
+			return HttpResponse("done")
+	return HttpResponse("error")
 
