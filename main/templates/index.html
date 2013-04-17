@@ -529,7 +529,7 @@ $(function() {
     <div id="upload" style="float:right">
         <h4>Upload</h4>
  <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-<input name="content" type="file" multiple  onchange="readURL(this);"/>
+<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);"/>
 </div>
 
 <div id="example" class="modal hide fade in" style="display: none; ">  

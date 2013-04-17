@@ -24,15 +24,18 @@ def home(request):
 		context_instance=RequestContext(request))# Create your views here.
 
 def get_recently_added():
-	recently_added_plist = Playlist.objects.get(name="Recently Added")
-	print "got ra plist"
-	recently_added_plist.content.clear()
-	content = Content.objects.all()
-	for c in content:
-		if c.uploaded_date:
-			if c.uploaded_date + datetime.timedelta(days=2) > datetime.datetime.today():
-				recently_added_plist.content.add(c)
-	print "done with get recently added"
+	try:
+		recently_added_plist = Playlist.objects.get(name="Recently Added")
+		print "got ra plist"
+		recently_added_plist.content.clear()
+		content = Content.objects.all()
+		for c in content:
+			if c.uploaded_date:
+				if c.uploaded_date + datetime.timedelta(days=2) > datetime.datetime.today():
+					recently_added_plist.content.add(c)
+		print "done with get recently added"
+	except:
+		pass
 @csrf_exempt
 def new_plist(request):
 	name = request.POST.get('name')
@@ -50,11 +53,13 @@ def main(request):
 		context_instance=RequestContext(request))# Create your views here.
 
 def query_all_playlist():
-	all_playlist = Playlist.objects.get(auto_all=True)
-	all_content = Content.objects.all()
-	for content in all_content:
-		all_playlist.content.add(content)
-
+	try:
+		all_playlist = Playlist.objects.get(auto_all=True)
+		all_content = Content.objects.all()
+		for content in all_content:
+			all_playlist.content.add(content)
+	except:
+		pass
 @csrf_exempt
 def upload(request):
 

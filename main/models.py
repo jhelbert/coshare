@@ -8,7 +8,7 @@ class Content(models.Model):
 
 class Playlist(models.Model):
 	name = models.CharField(max_length=100)
-	content = models.ManyToManyField(Content)
+	content = models.ManyToManyField(Content,null=True,blank=True)
 	metric = models.IntegerField(null=True,blank=True)
 	auto_all = models.BooleanField()
 	def __unicode__(self):
