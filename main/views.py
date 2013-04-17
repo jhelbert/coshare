@@ -37,6 +37,14 @@ def get_recently_added():
 		print "done with get recently added"
 	except:
 		pass
+
+def mobile(request):
+	return render_to_response('mobile.html', 
+		{
+
+		},
+		context_instance=RequestContext(request))# Create your views here.
+
 @csrf_exempt
 def new_plist(request):
 	name = request.POST.get('name')
@@ -88,24 +96,8 @@ def open_modal(request):
 	imageID = request.POST.get('id')
 	imageID = str(imageID)
 	all_content = Content.objects.all()
-	all_playlist = Playlist.objects.all()
 	res = {}
 	res["des"] = ""
-	photos = {}
-	playlistList = []
-
-	for plist in all_playlist:
-		for content in plist.content.all():
-			if str(content.id) == imageID:
-				playlistList.append(plist.name)
-				c = plist.content.all()
-				max_num = min(3,len(c))
-				photos[plist.name] = []
-				for i in range(0,max_num):
-					photos[plist.name].append(c[i].image.url)
-				break
-	res["playlists"] = playlistList
-	res["photos"] = photos
 	for content in all_content:
 		if imageID == str(content.id):
 			res["des"] = content.description
@@ -113,6 +105,8 @@ def open_modal(request):
 
 	return HttpResponse(json.dumps(res),content_type="application/json")
 			
+	
+
 
 @csrf_exempt
 def change_description(request):
