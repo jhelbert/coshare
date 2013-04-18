@@ -9,11 +9,7 @@ var Album = function(id,name) {
     this.name = name;
     this.is_auto = false;
     this.output = []
-<<<<<<< HEAD
     staticNames = ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "Favorites", "All Content", "Tasks"];
-=======
-    staticNames = ["Recently Favorited", "Recently Added", "All Added", "Favorites", "All Content", "Tasks"];
->>>>>>> 953320664c89c1f37e985ae9e8f0d47b19c26846
 
     /*
     (function () {
