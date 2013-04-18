@@ -53,6 +53,11 @@ section {
   display: block;
 }
 
+footer{
+  position: absolute;
+  bottom:0;
+}
+
 audio,
 canvas,
 video {
@@ -4017,8 +4022,9 @@ input[type="submit"].btn.btn-mini {
 }
 
 .album-header{
+
   display: block;
-  padding: 3px 15px 3px 2px;
+  padding: 2px 15px 3px 2px;
   font-size: 15px;
   font-weight: bold;
   line-height: 20px;

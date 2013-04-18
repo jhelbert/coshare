@@ -53,13 +53,12 @@
           <a class="brand" href="">CoShare</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
-              Logged in as <a href="" class="navbar-link">Username</a>
+              Logged in as <a href="" class="navbar-link">Jim Smith</a>
             </p>
             <ul class="nav">
               <li class="active"><a href="/home">Home</a></li>
               <li><a href="/">Browse</a></li>
               <li><a onclick="$('#uploadme').click();" href="#"> Upload</a></li>
-              <li><a href="">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -76,7 +75,7 @@
         </ul>
     </div>
       <h1>Smith Family</h1>
-      <div class="pictureSection">Recently Added<a href="" style="margin-left:300px">See All</a></div>
+        <div class="pictureSection">Recently Added</div>
 
         <div class="picture-collection">
           {% for image in recently_added_1 %}
@@ -84,9 +83,10 @@
             <img src="/media/{{image.image}}" alt="Some image" height="120" width="120">
           </div>
           {% endfor %}
-          
         </div>
+        
         <br>
+        
         <div class="picture-collection">
           {% for image in recently_added_2 %}
           <div class="floated_img">
@@ -94,9 +94,8 @@
           </div>
           {% endfor %}
         </div>
-        <p>
-      <div class="pull-left">
-      <div class="pictureSection">Recently Favorited<a href="" style="margin-left:250px">See All</a></div>
+        <a href="mosaic.html">See All</a>
+      <div class="pictureSection">Recently Favorited</div>
 
         <div class="picture-collection">
           {% for image in favs_1 %}
@@ -114,9 +113,8 @@
           </div>
           {% endfor %}
         </div>
-        </div>
-        </div>
-    </div> <!-- /container -->
+        <a href="mosaic.html">See All</a>
+        </div> <!-- /container -->
 
     <hr>
 
@@ -124,7 +122,10 @@
         <p>© CoShare 2013</p>
     </footer>
 
-    <input type="file" style="visibility:hidden;" id="uploadme" />
+    <div id="upload" style="float:right">
+ <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
+</div>
 
   </div>
 
