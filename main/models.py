@@ -6,6 +6,8 @@ class Content(models.Model):
 	description = models.CharField(max_length=1000,null=True,blank=True)
 	uploaded_date = models.DateTimeField(auto_now_add=True,blank=True,null=True)
 	metric = models.IntegerField(default=12)
+	def __unicode__(self):
+		return str(self.image)
 
 class Playlist(models.Model):
 	name = models.CharField(max_length=100)
