@@ -52,6 +52,10 @@
         margin: 50px;
     }
 
+    #icon{
+        margin-right: 5px;
+    }
+
     .album-name {
         background-color: #CCC;
         /* font-size: 16pt;*/
@@ -391,6 +395,8 @@ $(function() {
             icon.setAttribute("id", "icon")
             icon.setAttribute("src", "static/assets/img/static_playlist_icon.png");
             icon.setAttribute("alt", "static playlist");
+            icon.setAttribute("height", "25");
+            icon.setAttribute("width", "25");
 
             album_div
             .addClass("album-name")
@@ -413,13 +419,13 @@ $(function() {
                 }});
             
             
-        $("#albums").append(album_div);
-        model.addEventListener("rename_album", function(e2) {
-            if (e2.album.equals(e.album)) {
-                album_div.text(e2.album.get_name());
-                $("#album-title").text(e2.album.get_name());
-            }
-        });
+        // $("#albums").append(album_div);
+        // model.addEventListener("rename_album", function(e2) {
+        //     if (e2.album.equals(e.album)) {
+        //         album_div.text(e2.album.get_name());
+        //         $("#album-title").text(e2.album.get_name());
+        //     }
+        // });
     });
 
     // listen for select_albym event
@@ -769,7 +775,7 @@ $(function() {
           <a class="brand" href="/home/" >CoShare</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
-              Logged in as <a href="" class="navbar-link">Username</a>
+              Logged in as <a href="" class="navbar-link">Jim Smith</a>
             </p>
             <ul class="nav">
               <li><a href="/home/">Home</a></li>
@@ -787,7 +793,14 @@ $(function() {
         <div class="span3" style="background-color:#E0F3FF" >
           <div class="well sidebar-nav" style="margin-top:110px;border:2px solid;">
             <ul class="nav nav-list">
-                <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'></div>
+                <li class="album-header" margin-left="10px">Albums</li>
+                <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
+
+                <div id="static-albums"></div>
+                <hr>
+                <div id="dynamic-albums"></div>
+
+                </div>
 
         <input name="name" id="new_plist" type="text"/>
 
