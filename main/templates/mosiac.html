@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<!-- saved from url=(0054)http://twitter.github.io/bootstrap/examples/fluid.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>CoShare - Content Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+
+      @media (max-width: 980px) {
+        /* Enable use of floated navbar text */
+        .navbar-text.pull-right {
+          float: none;
+          padding-left: 5px;
+          padding-right: 5px;
+        }
+      }
+    </style>
+    <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="assets/ico/favicon.png">
+
+
+    <link href="static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
+<script src="static/js/jquery-1.9.1.js"></script>
+<script src="static/js/jquery-ui-1.10.2.custom.js"></script>
+
+<!-- Isotope -->
+<script src="static/js/jquery.isotope.min.js"></script>
+<link href="static/css/isotope.css" rel="stylesheet">
+
+<!-- Models -->
+<script src="static/js/album.js"></script>
+<script src="static/js/content.js"></script>
+<script src="static/js/model.js"></script>
+
+<style>
+
+    body {
+        font: 62.5% "Trebuchet MS", sans-serif;
+        margin: 50px;
+    }
+
+    .album-name {
+        font-family: Arial;
+        margin:0.5em;
+        background-color: #CCC;
+        padding: 5px;
+    }
+
+    .album-name:hover {
+        cursor: pointer;
+    }
+
+    .selected-album {
+        background-color: red;
+    }
+
+    .selected-auto-album {
+        background-color: pink;
+    }
+
+    .content {
+        margin: 10px;
+        text-align: center;
+    }
+
+    .selected-content {
+        padding: 10px;
+        background-color: yellow;
+    }
+
+    td {
+        vertical-align: top;
+    }
+</style>
+
+<script type="text/javascript">
+
+var selected_content_ids = [];
+
+
+function add_objects(id) {
+    var foo = "/add/?album=" + id;
+            for (var i = 0; i < selected_content_ids.length;i++) {
+                foo += "&eles=" + selected_content_ids[i];
+            }
+        var link = $("<a/>")
+            .attr('href', function() {
+    return foo;
+
+})
+            .text("Add");
+  console.log(foo);
+  window.location = foo;
+}
+
+$(function() {
+    
+    // Code to run on page load
+
+    // use isotope to display content
+    // this indicates that the div with id="contents-container"
+    // houses the pictures and isotope treats the divs within
+    // contents-container with class="content" as the elements
+    // ISOTOPE WAS BEING **SUPER** PENISY - so i gave up for a bit
+    /*
+    $('#contents-container').isotope({
+        itemClass: ".content",
+        layoutMode: 'fitRows',
+    });
+*/
+
+    // instantiate model
+    var model = new Model();
+    
+
+
+    // listen for add_album event
+    // occurs when a new album is added to the model
+    // also used on load
+    model.addEventListener("add_album", function(e) {
+        var album_div = $("<div/>")
+            .addClass("album-name")
+            .attr("id", "album-" + e.album.id)
+            .text(e.album.get_name())
+            .click(function() {
+                model.select_album(e.album);
+            });
+            
+        album_div.append("<button id style='margin-left:15px;float:right' onclick='add_objects("+ e.album.id +  ")'> + </button> ");
+    
+        $("#albums").append(album_div);
+        model.addEventListener("rename_album", function(e2) {
+            if (e2.album.equals(e.album)) {
+                album_div.text(e2.album.get_name());
+                $("#album-title").text(e2.album.get_name());
+            }
+        });
+    });
+
+    // listen for select_albym event
+    // occurs when User selects an album to view
+    // e is an event object with an e.album attribute
+    // this is the album selected
+    model.addEventListener("select_album", function(e) {
+        selected_content_ids = [];
+        selected_album = e.album.id;
+        // refresh title
+        $("#album-title").text(e.album.get_name());
+
+        // update display
+        // TODO: fix rep exposure
+        if (e.album.is_auto) {
+            $("#album-" + e.album.id).addClass("selected-auto-album");
+        } else {
+            $("#album-" + e.album.id).addClass("selected-album");
+        }
+
+        // show/hide relevant pictures
+        if (e.album.can_rename()) {
+            $("#btnRenameAlbum").removeAttr("disabled");
+        } else {
+            $("#btnRenameAlbum").attr("disabled", "disabled");
+        }
+
+        if (e.album.can_remove()) {
+            $("#btnRemoveAlbum").removeAttr("disabled");
+        } else {
+            $("#btnRemoveAlbum").attr("disabled", "disabled");
+        }
+
+        if (e.album.can_edit_content()) {
+            $("#btnRemoveSelectedContent").removeAttr("disabled");
+        } else {
+            $("#btnRemoveSelectedContent").attr("disabled", "disabled");
+        }
+
+        // refresh contents
+        $("#contents-container .content").remove();
+        var contents = e.album.get_contents();
+        for (var i in contents) {
+            // FUCK JAVASCRIPT -- it doesn't even have block level scoping???
+            // whatever. use this closure to ensure the meaning of i doesn't suck.
+            (function(content) {
+
+                var div = $("<div />")
+                    .append(content.get_content())
+                    .addClass("content")
+                    .attr("id", "content-" + content.id)
+                    .click(function() {
+                        model.toggle_content(content);
+
+                    });
+                $("#contents-container").append(div);
+
+                model.addEventListener("select_content", function(e2) {
+                    if (e2.content.equals(content)) {
+                        div.addClass("selected-content");
+                        console.dir(e2.content.id);
+                        selected_content_ids.push(e2.content.id);
+                        console.log(selected_content_ids);
+                    }
+                });
+                model.addEventListener("deselect_content", function(e2) {
+                    if (e2.content.equals(content)) {
+                        div.removeClass("selected-content");
+                        var index = selected_content_ids.indexOf(e2.content.id);
+                        selected_content_ids.splice(index,1);
+                    }
+                });
+            })(contents[i]);
+        }
+        $("#content").text("content from " + e.album.get_name());
+    });
+
+    model.addEventListener("deselect_album", function(e) {
+        $("#album-" + e.album.id)
+            .removeClass("selected-album")
+            .removeClass("selected-auto-album");
+    });
+
+    model.addEventListener("remove_album", function(e) {
+        $("#album-" + e.album.id).fadeOut();
+    });
+
+    model.addEventListener("remove_content", function(e) {
+        $("#content-" + e.content.id).fadeOut();
+    });
+
+
+    // create stubbed out albums
+
+    {% for playlist in playlists %}
+        var album = new Album({{playlist.id}},"{{playlist.name}}");
+         model.add_album(album);
+        {% for content in playlist.content.all %}
+            album.add_content({{content.id}},"{{content.image}}");
+        {% endfor %}
+       
+    {% endfor %}
+
+
+    model.select_album(model.albums[0]);
+
+    // CRUD operations on albums
+
+    // crea
+    $("#btnNewAlbum").click(function() {
+        // add stubbed out
+        model.add_album(new Album(new Date().getTime() % 100));
+    });
+
+    $("#btnRenameAlbum").click(function() {
+        model.rename_selected_album();
+    });
+
+    $("#btnRemoveAlbum").click(function() {
+        model.remove_selected_album();
+    });
+
+    // Select/Deselect All
+    $("#btnSelectAll").click(function() {
+        model.select_all();
+    });
+
+    $("#btnDeselectAll").click(function() {
+        model.deselect_all();
+    });
+
+    $("#btnRemoveSelectedContent").click(function() {
+        model.remove_selected_contents_from_selected_album();
+    });
+});
+</script>
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="landing_page.html">CoShare</a>
+          <div class="nav-collapse collapse">
+            <p class="navbar-text pull-right">
+              Logged in as <a href="" class="navbar-link">Username</a>
+            </p>
+            <ul class="nav">
+              <li><a href="landing_page.html">Home</a></li>
+              <li class="active"><a href="">Browse</a></li>
+              <li><a href="">About</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="album-header">Albums</li>
+              <li class="album">Album 1</li>
+              <li class="album">Album 2</li>
+              <li class="album">Album 3</li>
+            </ul>
+          </div><!--/.well -->
+        </div><!--/span-->
+        <div class="span9">
+          <div class="hero-unit">
+            <p class="mosiac-button"><a href="" class="btn btn-primary btn-large">Select All</a>
+            <button class="btn btn-primary btn-large" id="btnNewAlbum">New Album</button>
+<button class="btn btn-primary btn-large" id="btnRenameAlbum">Rename Album</button>
+<button class="btn btn-primary btn-large" id="btnRemoveAlbum">Remove Album</button>
+<button class="btn btn-primary btn-large" id="btnSelectAll">Select All</button>
+<button class="btn btn-primary btn-large" id="btnDeselectAll">Deselect All</button>
+
+ <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+
+<button class="btn btn-primary btn-large" id="btnRemoveSelectedContent">Remove Selected Content</button>
+            
+<input name="content" type="file" multiple  />
+<input  class="btn btn-primary btn-large"type="submit"/>
+</form>
+
+<hr>
+
+            <img src="/static/jane.jpg" alt="Some image" height="150" width="150">
+            <img src="/static/john.jpg" alt="Some image" height="150" width="150">
+            <img src="/static/jane.jpg" alt="Some image" height="150" width="150">
+            <img src="/static/john.jpg" alt="Some image" height="150" width="150">
+            <img src="/static/jane.jpg" alt="Some image" height="150" width="150">
+        </div>
+          </div>
+        </div><!--/span-->
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <p>© CoShare 2013</p>
+      </footer>
+
+    </div><!--/.fluid-container-->
+
+    <script src="./Bootstrap, from Twitter_files/jquery.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-transition.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-alert.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-modal.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-dropdown.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-scrollspy.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-tab.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-tooltip.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-popover.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-button.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-collapse.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-carousel.js"></script>
+    <script src="./Bootstrap, from Twitter_files/bootstrap-typeahead.js"></script>
+
+  
+
+</body></html>

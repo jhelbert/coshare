@@ -1,0 +1,4 @@
+*.pyc
+*.DS_Store
+coshare
+main/migrations/*
