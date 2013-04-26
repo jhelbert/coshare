@@ -1,27 +1,16 @@
-<html>
-<head>
-<title>CoShare - Content Manager</title>
+{% extends "base.html" %}
+
+{% block title %}
+CoShare - Content Manager
+{% endblock %}
+
+{% block head %}
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
-<!-- CONFLICT
-    <title>CoShare - Content Manager</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <link href="static/css/bootstrap.css" rel="stylesheet">
-    <style type="text/css">
-  
-      .sidebar-nav {
-        padding: 9px 0;
-      }
-      </style>
--->
 
 <!-- Le styles -->
-<link href="static/css/bootstrap.css" rel="stylesheet">
-<link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
 
 <!-- jQuery -->
 <link href="static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
@@ -41,10 +30,6 @@
 <script src="static/js/album.js"></script>
 <script src="static/js/content.js"></script>
 <script src="static/js/model.js"></script>
-
-<!-- Intro.js -->
-<script src="/static/js/intro.min.js"></script>
-<link href="static/css/introjs.css" rel="stylesheet">
 
 <style>
     body {
@@ -288,7 +273,6 @@ function readURL(input) {
 
                 reader.onload = function (e) {
                     var output = new Image();
-                    console.dir(input.files);
                     output.src = e.target.result;
                     output.height = "150";
                     $('#blah').append(output);
@@ -353,7 +337,6 @@ $(function() {
     // occurs when a new album is added to the model
     // also used on load
     model.addEventListener("add_album", function(e) {
-        console.dir(e.album);
         
         var album_div = $("<div />");
         if (e.album.is_user_generated()) {
@@ -372,16 +355,6 @@ $(function() {
                     hoverClass: "hover-drop-album",
                     accept: ".content",
                     drop: function( event, ui ) {
-                        /*
-                        console.log("running");
-
-                        album_div.popover({
-                            title: "wasup",
-                            html: "<div>wasup</div>",
-                            delay: 500,
-                        })
-                        .popover("toggle")
-                        */
                     },
             });
         }
@@ -408,7 +381,6 @@ $(function() {
             album_div.append(icon);
             album_div.append(e.album.get_name()); 
 
-            console.dir(album_div);
             $("#static-albums").append(album_div);
             }
             model.addEventListener("rename_album", function(e2) {
@@ -439,7 +411,6 @@ $(function() {
         // refresh title
         $("#album-title").text(e.album.get_name());
         if (e.album.get_name() == "All Content") {
-            console.log($("#youtube"));
             $("#youtube")[0].style.display = "block";
             $("#youtube")[0].style.float = "right";
         }
@@ -532,7 +503,6 @@ $(function() {
                 var description = msg["des"];
                 var pls = msg["playlists"];
                 var photo_table = msg["photos"];
-                console.log(photo_table);
                 if (description == "") {
                     description = "No Description";
                 }
@@ -697,22 +667,9 @@ $(function() {
 
 
 </script>
+{% endblock %}
 
-<!--
-<style>
-  #albums .ui-selecting { background: #FECA40; }
-  #albums .ui-selected { background: #F39814; color: white; }
-  #albums { list-style-type: none; margin: 0; padding: 0; }
-  #albums .album-name { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; cursor: pointer;}
-  </style>
-
-  <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" />
-  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
--->
-</head>
-
-
-
+{% block content %}
 <body style="background-color:#E0F3FF">
     <!-- Modal stuff -->
     <div id="openModal" class="modalDialog">
@@ -764,29 +721,7 @@ $(function() {
 </form>
 
 
- <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="brand" href="/home/" >CoShare</a>
-          <div class="nav-collapse collapse">
-            <p class="navbar-text pull-right">
-              Logged in as <a href="" class="navbar-link">Jim Smith</a>
-            </p>
-            <ul class="nav">
-              <li><a href="/home/">Home</a></li>
-              <li class="active"><a href="">Browse</a></li>
-              <li><a onclick="$('#uploadme').click();" href="#"> Upload</a></li>
-              <li><a onclick="introJs().start()">Help</a></li>
-            </ul>
-          </div><!--/.nav-collapse -->
-        </div>
-      </div>
-    </div>
+ 
 
     <div class="container-fluid" style="background-color:#E0F3FF">
       <div class="row-fluid" style="background-color:#E0F3FF">
@@ -840,13 +775,9 @@ $(function() {
 </div>
       <hr>
 
-      <footer>
-        <p>© CoShare 2013</p>
-      </footer>
-
     </div><!--/.fluid-container-->
+{% endblock %}
 
-</body>
-</html>
+
 
 

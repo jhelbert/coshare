@@ -9,15 +9,6 @@ from django.http import HttpResponseRedirect
 import json
 import datetime
 
-def mosaic(request):
-	query_all_playlist()
-	get_recently_added()
-	return render_to_response('mosaic.html', 
-		{
-		},
-		context_instance=RequestContext(request))# Create your views here.
-
-
 def home(request):
 	query_all_playlist()
 	get_recently_added()

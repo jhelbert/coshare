@@ -8,7 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     url(r'^$', 'main.views.main'),
-    url(r'^mosaic/$','main.views.mosaic'),
+    # url(r'^mosaic/$','main.views.mosaic'),
     # url(r'^coshare/', include('coshare.foo.urls')),
 
     url(r'^open_modal_view/', 'main.views.open_modal'),
