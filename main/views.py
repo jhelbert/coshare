@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 import json
 import datetime
 
-def home(request):
+def main(request):
 	query_all_playlist()
 	get_recently_added()
 
@@ -22,7 +22,7 @@ def home(request):
 	favs = fav_plist.content.all()
 	fav_1 = favs[:4]
 	fav_2 = favs[4:8]
-	return render_to_response('landing_page.html', 
+	return render_to_response('index.html', 
 		{
 			"recently_added_1":recently_added_1,
 			"recently_added_2":recently_added_2,
@@ -58,11 +58,12 @@ def new_plist(request):
 	plist = Playlist(name=name)
 	plist.save()
 	return HttpResponseRedirect('/')
-def main(request):
+
+def browse(request):
 	get_recently_added()
 	playlists = Playlist.objects.all()
 	query_all_playlist()
-	return render_to_response('index.html', 
+	return render_to_response('browse.html', 
 		{
 		 "playlists":playlists
 		},
