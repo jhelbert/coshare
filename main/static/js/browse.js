@@ -1,25 +1,3 @@
-{% extends "base.html" %}
-
-{% block title %}
-CoShare - Content Manager
-{% endblock %}
-
-{% block head %}
-
-<link href="/static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
-
-<script src="/static/js/jquery.watermark.min.js"></script>
-
-<!-- Models -->
-<script src="/static/js/album.js"></script>
-<script src="/static/js/content.js"></script>
-<script src="/static/js/model.js"></script>
-
-<link href="{{STATIC_URL}}/css/browse.css" rel="stylesheet">
-
-
-<script type="text/javascript">
-
 var selected_content_ids = [];
 var selected_content_map = {};
 
@@ -119,6 +97,13 @@ $(function() {
     selected_album = e.album.id;
         // refresh title
         $("#album-title").text(e.album.get_name());
+        if (e.album.get_name() == "All Content") {
+          $("#youtube")[0].style.display = "block";
+          $("#youtube")[0].style.float = "right";
+        }
+        else {
+          $("#youtube")[0].style.display = "none";
+        }
 
         // update display
         // TODO: fix rep exposure
@@ -255,13 +240,12 @@ model.addEventListener("remove_content", function(e) {
 // create stubbed out albums
 
 {% for playlist in playlists %}
-var album = new Album({{playlist.id}},"{{playlist.name}}");
-model.add_album(album);
-album_map[{{playlist.id}}] = album;
-{% for content in playlist.content.all %}
-album.add_content({{content.id}},"{{content.image}}",{{content.metric}});
-{% endfor %}
-
+  var album = new Album({{playlist.id}},"{{playlist.name}}");
+  model.add_album(album);
+  album_map[{{playlist.id}}] = album;
+  {% for content in playlist.content.all %}
+    album.add_content({{content.id}},"{{content.image}}",{{content.metric}});
+  {% endfor %}
 {% endfor %}
 
 
@@ -364,97 +348,3 @@ function new_plist(name) {
     })
 
   });
-</script>
-{% endblock %}
-
-{% block content %}
-<body>
-  <!-- Modal stuff -->
-  <div id="openModal" class="modalDialog">
-    <div>
-      <a href="#" id="closeModal" title="Close" class="close">X</a>
-      <div id="leftCol" class="column wide">
-        <img class="imageHolder" src=""></img>
-        <button class="btn favorited"> Favorited </button>
-        <br>
-        <h5> Description </h5>
-        <p class="imageDescription">
-
-        </p>
-
-        <textarea class="descriptionInput hidden"> </textarea>
-      </div>
-      <div class="column" id="rightCol">
-        <h4> Playlist Membership </h4>
-        <ul class="playlistList">
-        </ul>
-      </div>
-      
-    </div>
-  </div>
-  <!-- End modal -->
-
-  <div id="upload" style="float:right">
-   <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-    <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
-  </div>
-
-  <div id="example" class="modal hide fade in" style="display: none; ">  
-    <div class="modal-header">  
-      <h3 align="center">Upload Preview</h3>  
-    </div>  
-    <div class="modal-body">  
-      <div id="blah"></div>              
-    </div>  
-    <div class="modal-footer">  
-      <input class="btn btn-primary" type="submit"/>
-      <a href="#" class="btn" data-dismiss="modal" onclick="$('#example').hide();">Close</a>  
-    </div>  
-  </div>  
-</div>  
-<div id="blah"/>
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span3">
-      <div class="well sidebar-nav" style="margin-top:110px;border:2px solid;">
-        <ul class="nav nav-list">
-          <li class="album-header" margin-left="10px">Albums</li>
-          <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
-            <div id="static-albums"></div>
-            <hr>
-            <div id="dynamic-albums"></div>
-          </div>
-          <input name="name" id="new_plist" type="text"/>
-
-        </div><!--/.well -->
-      </div><!--/span-->
-      <div class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>
-        <div class="hero-unit" style="border:2px solid;">
-          <h3 align="center" style="line-height:100%" id="album-title" ></h3>
-
-          <div align="center">
-           <button class="btn btn-primary" id="btnSelectAll">Select All</button>
-           <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
-           <button class="btn btn-primary" id="btnRemoveSelectedContent">Remove Selected Content</button>
-         </div>
-         <div>
-          <br>
-          <hr>
-          <table>
-            <tr>
-              <td>
-                <div id="contents-container">
-                </div>
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %}
-
-
-
-

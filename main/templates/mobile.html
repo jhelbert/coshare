@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
 
-<!-- Le styles -->
-<link href="/static/css/bootstrap.css" rel="stylesheet">
 <style type="text/css">
 body {
   padding-top: 60px;
@@ -26,19 +24,19 @@ body {
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
-          <a class="brand" href="">CoShare</a>
-        </div>
-      </div>
+      <a class="brand" href="">CoShare</a>
     </div>
+  </div>
+</div>
 
-    <div class="content-container" align="center">
-      <div id="upload">
-        <h3>Upload</h3>
-        <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-          <input width="150px" name="content" type="file" multiple id="uploadme"  onchange="readURL(this);" />
-        </div>
-      </div>
-      <input type="file" style="visibility:hidden;" id="uploadme" />
-
+<div class="content-container" align="center">
+  <div id="upload">
+    <h3>Upload</h3>
+    <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+      <input width="150px" name="content" type="file" multiple id="uploadme"  onchange="readURL(this);" />
     </div>
-    {% endblock %}
+  </div>
+  <input type="file" style="visibility:hidden;" id="uploadme" />
+
+</div>
+{% endblock %}
