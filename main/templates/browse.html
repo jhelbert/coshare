@@ -42,6 +42,7 @@ $(function() {
 Use the pardigm of an event driving everything.
 Capture the raw input event and IMMEDIATELY translate
 it into a high level event in the model.
+The model will propagate the appropriate effects.s
 
   */
 
@@ -50,13 +51,12 @@ it into a high level event in the model.
 
   // get albums from django
   {% for playlist in playlists %}
-  var album = new Album({{playlist.id}},"{{playlist.name}}");
-  model.add_album(album);
-  album_map[{{playlist.id}}] = album;
-  {% for content in playlist.content.all %}
-  album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
-  {% endfor %}
-
+    var album = new Album({{playlist.id}},"{{playlist.name}}");
+    model.add_album(album);
+    album_map[{{playlist.id}}] = album;
+    {% for content in playlist.content.all %}
+      album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
+    {% endfor %}
   {% endfor %}
 
   /************ ADD ALBUM LISTENER **********/
@@ -385,6 +385,10 @@ model.addEventListener("select_album", function(e) {
     }
   });
 
+  $("#contents-container").isotope({
+    itemSelector: ".content",
+  });
+
 });
 </script>
 {% endblock %}
@@ -472,14 +476,7 @@ model.addEventListener("select_album", function(e) {
          <div>
           <br>
           <hr>
-          <table>
-            <tr>
-              <td>
-                <div id="contents-container">
-                </div>
-              </td>
-            </tr>
-          </table>
+                <div id="contents-container" />
         </div>
       </div>
     </div>
