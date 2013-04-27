@@ -311,7 +311,6 @@ model.addEventListener("remove_content", function(e) {
 
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
-  console.log("SELECTING " + e.content.id)
   var content_div = $("#content-" + e.content.id);
   content_div.addClass("selected-content");
   var ignored_selectors = "#static-albums .album-name, .navbar, .selected-album"
