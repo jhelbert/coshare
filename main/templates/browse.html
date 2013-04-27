@@ -10,6 +10,10 @@ CoShare - Content Manager
 
 <script src="/static/js/jquery.watermark.min.js"></script>
 
+<!-- Isotope -->
+<script src="{{STATIC_URL}}/js/jquery.isotope.min.js"></script>
+<link href="{{STATIC_URL}}/css/isotope.css" rel="stylesheet">
+
 <!-- Models -->
 <script src="/static/js/album.js"></script>
 <script src="/static/js/content.js"></script>
@@ -24,23 +28,6 @@ var selected_content_ids = [];
 var selected_content_map = {};
 
 var album_map = {};
-
-function add_objects(id) {
-  var foo = "/add/?album=" + id;
-  for (var i = 0; i < selected_content_ids.length;i++) {
-    foo += "&eles=" + selected_content_ids[i];
-  }
-  var link = $("<a/>")
-  .attr('href', function() {
-    return foo;
-
-  })
-  .text("Add");
-  var add_to_album = album_map[id];
-  for (key in selected_content_map) {
-    add_to_album.add_content(key,selected_content_map[key]);
-  }
-}
 
 $(function() {
   $('#new_plist').watermark('New Album');
