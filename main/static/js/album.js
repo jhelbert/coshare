@@ -61,10 +61,19 @@ var Album = function(id,name) {
     }
 
     /** adds @new_content to the album, if not already present */
-    this.add_content = function(id,src,size) {
+    this.add_content = function(id,src,size,is_new) {
         var content = new Content(id,src,size);
         this.output.push(content);
-
+        console.log(id);
+        if (!is_new) {
+              $.ajax({
+                        type: "POST",
+                        url: "/ajax/add_content/",
+                        data: { album_id: this.id, pic_id:id }
+                }).done(function( msg ) {
+                    //refresh_last_modified(side);
+              });
+        }
         // TODO: interface with server
     }
 

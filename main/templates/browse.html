@@ -23,7 +23,7 @@ CoShare - Content Manager
 var selected_content_ids = [];
 var selected_content_map = {};
 
-var album_map = {}
+var album_map = {};
 
 function add_objects(id) {
   var foo = "/add/?album=" + id;
@@ -57,6 +57,11 @@ $(function() {
   // occurs when a new album is added to the model
   // also used on load
   model.addEventListener("add_album", function(e) {
+    var option = document.createElement("option");
+    option.text = e.album.get_name();
+    option.value = e.album.id;
+    var select = document.getElementById("playlist_list");
+    select.appendChild(option);
 
     var album_div = $("<div />");
     if (e.album.is_user_generated()) {
@@ -67,6 +72,8 @@ $(function() {
       .click(function() {
         model.select_album(e.album);
       });
+
+
 
       if (e.album.is_user_generated()) {
         album_div.droppable({
@@ -81,6 +88,8 @@ $(function() {
 
       $("#dynamic-albums").append(album_div);
     }
+
+
     else{
       var icon = document.createElement("img");
       icon.setAttribute("id", "icon")
@@ -259,7 +268,7 @@ var album = new Album({{playlist.id}},"{{playlist.name}}");
 model.add_album(album);
 album_map[{{playlist.id}}] = album;
 {% for content in playlist.content.all %}
-album.add_content({{content.id}},"{{content.image}}",{{content.metric}});
+album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
 {% endfor %}
 
 {% endfor %}
@@ -270,6 +279,13 @@ function new_plist(name) {
   $("#new_plist")[0].value = "";
   var album = new Album(100,name);
   model.add_album(album);
+  $.ajax({
+                        type: "POST",
+                        url: "/ajax/add_album/",
+                        data: { name:name }
+                }).done(function( msg ) {
+                    //refresh_last_modified(side);
+              });
 
 }
 
@@ -369,6 +385,7 @@ function new_plist(name) {
 
 {% block content %}
 <body>
+  <div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
   <!-- Modal stuff -->
   <div id="openModal" class="modalDialog">
     <div>
@@ -397,6 +414,7 @@ function new_plist(name) {
   <div id="upload" style="float:right">
    <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
     <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
+  
   </div>
 
   <div id="example" class="modal hide fade in" style="display: none; ">  
@@ -404,15 +422,23 @@ function new_plist(name) {
       <h3 align="center">Upload Preview</h3>  
     </div>  
     <div class="modal-body">  
-      <div id="blah"></div>              
+      <div id="blah" align="center"></div>              
+      <div align="center" style="margin-top:30px">
+          Add To Album:
+          <select id="playlist_list" name="playlist">
+            <option value="1">None</option> 
+          </select>
+      </div>
     </div>  
     <div class="modal-footer">  
-      <input class="btn btn-primary" type="submit"/>
-      <a href="#" class="btn" data-dismiss="modal" onclick="$('#example').hide();">Close</a>  
+      <input class="btn btn-primary" type="submit" style="width:80px"/>
+      <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);">Close</a>  
     </div>  
   </div>  
+
 </div>  
-<div id="blah"/>
+</form>
+<div id="blah2"/>
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
@@ -454,6 +480,7 @@ function new_plist(name) {
   </div>
 </div>
 {% endblock %}
+
 
 
 

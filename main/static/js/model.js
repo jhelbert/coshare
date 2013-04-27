@@ -24,6 +24,7 @@ var Model = function() {
     this.add_album = function(album,name) {
         this.albums.push(album);
         this.fireEvent("add_album", {album: album, name:name});
+        
     }
 
     this.remove_selected_album = function() {

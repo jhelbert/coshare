@@ -88,13 +88,41 @@ def query_all_playlist():
 
 @csrf_exempt
 def upload(request):
+	playlist_id = request.POST.get('playlist')
+	
+	playlist = None
+	if playlist_id != -1:
+		playlist = Playlist.objects.get(id=playlist_id)
 
 	for uploaded_content in request.FILES.getlist('content'):
 		print uploaded_content
 		new_content = Content()
 		file_content = ContentFile(uploaded_content.read()) 
 		new_content.image.save(uploaded_content.name, file_content)
-	return HttpResponseRedirect('/')
+		if playlist:
+			playlist.content.add(new_content)
+			playlist.save()
+	return HttpResponseRedirect('/browse/')
+
+@csrf_exempt
+def add_album(request):
+	name = request.POST.get('name')
+	print name
+	new_playlist = Playlist(name=name)
+	new_playlist.save()
+	return HttpResponse('OK')
+
+@csrf_exempt
+def add_content(request):
+	album_id = request.POST.get('album_id')
+	pic_id = request.POST.get('pic_id')
+	playlist = Playlist.objects.get(id=int(album_id))
+	print 'got plist'
+	content = Content.objects.get(id=int(pic_id))
+	print 'got content'
+	playlist.content.add(content)
+	playlist.save()
+	return HttpResponse('OK')
 
 
 @csrf_exempt
