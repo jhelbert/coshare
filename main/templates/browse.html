@@ -168,7 +168,7 @@ model.addEventListener("select_album", function(e) {
         }
 
         // refresh contents
-        $("#contents-container .content").remove();
+        $("#contents-container").isotope('remove', $("#contents-container .content"));
         var contents = e.album.get_contents();
         for (var i in contents) {
             // FUCK JAVASCRIPT -- it doesn't even have block level scoping???
