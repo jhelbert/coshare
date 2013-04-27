@@ -17,6 +17,7 @@ var Content = function(id,src,size) {
         // use stubbed image for now
         var output = new Image();
         output.src = "/media/" + src;
+        output.draggable = false;
         // output.height = size*10;
 
         return output;

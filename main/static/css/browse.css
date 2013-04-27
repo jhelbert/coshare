@@ -28,15 +28,17 @@
 }
 
 .droppable-album {
-    background-color: gray;
+    border: 3pt dashed green;
 }
 
 .hover-drop-album {
     background-color: #5BB75b;
+    background-color: yellow;
 }
 
-.selected-auto-album {
-    background-color: pink;
+.droppable-new-album {
+    border: 5px dashed green !important;
+    font-size: 
 }
 
 .content {

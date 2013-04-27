@@ -36,27 +36,49 @@ $(function() {
   /***************************************/
   /************* COSMETICS ***************/
   /***************************************/
-  $('#new_plist').watermark('New Album');
-  $("#new_plist").keyup(function (e) {
-    if (e.keyCode == 13) {
-      new_plist(e.target.value);
-    }
-  });
+  function new_plist(name) {
+    $("#new_plist")[0].value = "";
+    var album = new Album(100,name);
+    model.add_album(album);
+    $.ajax({
+      type: "POST",
+      url: "/ajax/add_album/",
+      data: { name:name }
+    }).done(function( msg ) {
+    });
+
+  }
+  $('#new_plist')
+    .watermark('New Album')
+    .keyup(function (e) {
+      if (e.keyCode == 13) {
+        new_plist(e.target.value);
+      }
+    })
+    .droppable({
+      activeClass: "droppable-new-album",
+      hoverClass: "hover-drop-new-album",
+      accept: ".content",
+      drop: function( event, ui ) {
+        alert("insert workflow for creating new album from selection");
+      },
+    });
+
 
   /*
   $("#contents-container").isotope({
     itemSelector: ".content",
   });
-  */
+*/
 
-  var container = document.querySelector("#contents-container")
-  var pckry = new Packery(container, {
-    itemSelector: ".content",
-  });
+var container = document.querySelector("#contents-container")
+var pckry = new Packery(container, {
+  itemSelector: ".content",
+});
 
-  /******************************************/
-  /**** Register Listeners to the Model *****/
-  /******************************************/
+/******************************************/
+/**** Register Listeners to the Model *****/
+/******************************************/
 
   /*
 
@@ -65,28 +87,27 @@ Capture the raw input event and IMMEDIATELY translate
 it into a high level event in the model.
 The model will propagate the appropriate effects.s
 
-  */
+*/
 
   // instantiate model
   var model = new Model();
 
   /************ ADD ALBUM LISTENER **********/
   model.addEventListener("add_album", function(e) {
-    
+
     if (e.album.get_name() == "Favorites") {
       favorites_album = e.album;
-      console.dir(favorites_album);
     }
-  
+
 
     var album_div = $("<div />");
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
-    option.text = e.album.get_name();
+      option.text = e.album.get_name();
 
-    option.value = e.album.id;
-    var select = document.getElementById("playlist_list");
-    select.appendChild(option);
+      option.value = e.album.id;
+      var select = document.getElementById("playlist_list");
+      select.appendChild(option);
       album_div
       .addClass("album-name")
       .attr("id", "album-" + e.album.id)
@@ -94,17 +115,6 @@ The model will propagate the appropriate effects.s
       .click(function() {
         model.select_album(e.album);
       });
-
-      if (e.album.is_user_generated()) {
-        album_div.droppable({
-                    //activeClass: "ui-state-default",
-                    activeClass: "droppable-album",
-                    hoverClass: "hover-drop-album",
-                    accept: ".content",
-                    drop: function( event, ui ) {
-                    },
-                  });
-      }
 
       $("#dynamic-albums").append(album_div);
     }
@@ -120,208 +130,227 @@ The model will propagate the appropriate effects.s
 
       album_div
       .addClass("album-name")
-            //.addClass("ui-widget-content")
-            .attr("id", "album-" + e.album.id)
-            .click(function() {
-              model.select_album(e.album);
-            });
-            album_div.append(icon);
-            album_div.append(e.album.get_name()); 
+      .attr("id", "album-" + e.album.id)
+      .click(function() {
+        model.select_album(e.album);
+      });
+      album_div.append(icon);
+      album_div.append(e.album.get_name()); 
 
-            $("#static-albums").append(album_div);
-          }
-          model.addEventListener("rename_album", function(e2) {
+      $("#static-albums").append(album_div);
+    }
+    model.addEventListener("rename_album", function(e2) {
 
-            if (e2.album.equals(e.album)) {
-              album_div.text(e2.album.get_name());
-              $("#album-title").text(e2.album.get_name());
-            }});
-        });
+      if (e2.album.equals(e.album)) {
+        album_div.text(e2.album.get_name());
+        $("#album-title").text(e2.album.get_name());
+      }});
+    var album_div = $("#album-" + e.album.id)
+    if (e.album.is_user_generated()) {
+      make_droppable(album_div);
+    } else {
+      album_div.droppable();
+    }
+});
+
+var make_droppable = function(album_div) {
+  album_div.droppable({
+        activeClass: "droppable-album",
+        hoverClass: "hover-drop-album",
+        accept: ".content",
+        drop: function( event, ui ) {
+        },
+      });
+}
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
+
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
-        // refresh title
-        $("#album-title").text(e.album.get_name());
+  // refresh title
+  $("#album-title").text(e.album.get_name());
 
-        // update display
-        // TODO: fix rep exposure
-        if (e.album.is_auto) {
-          $("#album-" + e.album.id).addClass("selected-auto-album");
-        } else {
-          $("#album-" + e.album.id).addClass("selected-album");
+  // update display
+  // TODO: fix rep exposure
+  if (e.album.is_auto) {
+    $("#album-" + e.album.id).addClass("selected-auto-album");
+  } else {
+    $("#album-" + e.album.id).addClass("selected-album");
+  }
+
+  
+  // disable droppability
+  $("#album-" + e.album.id).droppable("destroy");
+
+
+  // show/hide relevant pictures
+  // TODO: these buttons don't exist anymore.
+  if (e.album.can_rename()) {
+    $("#btnRenameAlbum").removeAttr("disabled");
+  } else {
+    $("#btnRenameAlbum").attr("disabled", "disabled");
+  }
+
+  if (e.album.can_remove()) {
+    $("#btnRemoveAlbum").removeAttr("disabled");
+  } else {
+    $("#btnRemoveAlbum").attr("disabled", "disabled");
+  }
+
+  if (e.album.can_edit_content()) {
+    $("#btnRemoveSelectedContent").removeAttr("disabled");
+  } else {
+    $("#btnRemoveSelectedContent").attr("disabled", "disabled");
+  }
+
+  // refresh contents
+  //$("#contents-container").isotope('remove', $("#contents-container .content"));
+  //$("#contents-container").packery('remove', $("#contents-container .content"));
+  $("#contents-container .content").each(function(i,v) {
+    pckry.remove(v);
+  });
+  pckry.layout();
+  var contents = e.album.get_contents();
+  for (var i in contents) {
+    // FUCK JAVASCRIPT -- it doesn't even have block level scoping???
+    // whatever. use this closure to ensure the meaning of i doesn't suck.
+    (function(content) {
+
+      var inner = content.get_content();
+      var div = $("<div />")
+      .append(inner)
+      .addClass("content")
+      .attr("id", "content-" + content.id)
+      .attr("id-num", content.id)
+      .click(function() {
+        model.toggle_content(content);
+      });
+
+      $("#contents-container").append(div);
+      pckry.appended(div.get());
+
+
+      model.addEventListener("select_content", function(e2) {
+        if (e2.content.equals(content)) {
+          div.addClass("selected-content");
+          selected_content_ids.push(e2.content.id);
+          selected_content_map[e2.content.id] = e2.content.get_content().src.split("/media/")[1];;
         }
-        
-
-        // show/hide relevant pictures
-        if (e.album.can_rename()) {
-          $("#btnRenameAlbum").removeAttr("disabled");
-        } else {
-          $("#btnRenameAlbum").attr("disabled", "disabled");
+      });
+      model.addEventListener("deselect_content", function(e2) {
+        if (e2.content.equals(content)) {
+          div.removeClass("selected-content");
+          var index = selected_content_ids.indexOf(e2.content.id);
+          delete selected_content_map[e2.content.id];
+          selected_content_ids.splice(index,1);
         }
+      });
+    })(contents[i]);
+  }
+  $("#contents-container").imagesLoaded(function() {
+    pckry.layout();
+  });
+  $("#content").text("content from " + e.album.get_name());
 
-        if (e.album.can_remove()) {
-          $("#btnRemoveAlbum").removeAttr("disabled");
-        } else {
-          $("#btnRemoveAlbum").attr("disabled", "disabled");
-        }
+  $(".content").dblclick(function() {
+    $(".alert").alert('close');
+    $(".playlistList").empty();
+    $("#openModal").css("opacity",1);
+    $("#openModal").css("pointer-events","auto");
+    var image = $(this).children("img").attr("src");
 
-        if (e.album.can_edit_content()) {
-          $("#btnRemoveSelectedContent").removeAttr("disabled");
-        } else {
-          $("#btnRemoveSelectedContent").attr("disabled", "disabled");
-        }
+    var id_val = $(this).attr("id-num");
+    $(".imageHolder").attr("src",image);
+    $(".imageHolder").attr("id-num",id_val);
 
-        // refresh contents
-        //$("#contents-container").isotope('remove', $("#contents-container .content"));
-        //$("#contents-container").packery('remove', $("#contents-container .content"));
-        $("#contents-container .content").each(function(i,v) {
-          pckry.remove(v);
-        });
-        pckry.layout();
-        var contents = e.album.get_contents();
-        for (var i in contents) {
-            // FUCK JAVASCRIPT -- it doesn't even have block level scoping???
-            // whatever. use this closure to ensure the meaning of i doesn't suck.
-            (function(content) {
-
-              var inner = content.get_content();
-              var div = $("<div />")
-              .append(inner)
-              .addClass("content")
-              .attr("id", "content-" + content.id)
-              .attr("id-num", content.id)
-              .click(function() {
-                model.toggle_content(content);
-              });
-
-              $("#contents-container").append(div);
-              pckry.appended(div.get());
-              
-
-              model.addEventListener("select_content", function(e2) {
-                if (e2.content.equals(content)) {
-                  div.addClass("selected-content");
-                  selected_content_ids.push(e2.content.id);
-                  selected_content_map[e2.content.id] = e2.content.get_content().src.split("/media/")[1];;
-                }
-              });
-              model.addEventListener("deselect_content", function(e2) {
-                if (e2.content.equals(content)) {
-                  div.removeClass("selected-content");
-                  var index = selected_content_ids.indexOf(e2.content.id);
-                  delete selected_content_map[e2.content.id];
-                  selected_content_ids.splice(index,1);
-                }
-              });
-            })(contents[i]);
+      // Add playlists info to list
+      $.ajax({
+        type: "POST",
+        url: "/open_modal_view/",
+        data: {id: id_val}
+      }).done(function( msg ) {
+          // upload picture description
+          var description = msg["des"];
+          var pls = msg["playlists"];
+          var photo_table = msg["photos"];
+          if (description == "") {
+            description = "No Description";
           }
-          $("#contents-container").imagesLoaded(function() {
-            pckry.layout();
-          });
-          $("#content").text("content from " + e.album.get_name());
+          $(".imageDescription").text(description);
 
-          $(".content").dblclick(function() {
-            $(".alert").alert('close');
-            $(".playlistList").empty();
-            $("#openModal").css("opacity",1);
-            $("#openModal").css("pointer-events","auto");
-            var image = $(this).children("img").attr("src");
-
-            var id_val = $(this).attr("id-num");
-            $(".imageHolder").attr("src",image);
-            $(".imageHolder").attr("id-num",id_val);
-            
-            // Add playlists info to list
-            $.ajax({
-              type: "POST",
-              url: "/open_modal_view/",
-              data: {id: id_val}
-            }).done(function( msg ) {
-                // upload picture description
-                var description = msg["des"];
-                var pls = msg["playlists"];
-                var photo_table = msg["photos"];
-                if (description == "") {
-                  description = "No Description";
-                }
-                $(".imageDescription").text(description);
-
-                for (var i = 0; i < pls.length; i++) {
-                  var plName = pls[i];
-                  var uiElement = $("<ui class='outerUI'> <h5>" + plName + "</h5></ui>");
-                  var ulPhoto = $("<ul class='previewPhoto'> </ul>");
-                  for (var j=0; j < photo_table[plName].length; j++) {
-                    ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
-                  }
-                  uiElement.append(ulPhoto);
-                  $(".playlistList").append(uiElement);
-                }
-              });
-
-          }).draggable({
-            revert: true,
-            start: function(event, ui) {
-              $("#dynamic-albums").addClass("green-border");
-              $("#static-albums, #content-well, .navbar").fadeTo(250, 0.2);
-            },
-            helper: function( event ) {
-              return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
-            },
-            stop: function(event, ui) {
-              $("#dynamic-albums").removeClass("green-border");
-              $("#static-albums, #content-well, .navbar").fadeTo(250, 1);
-            },
-            distance: 20,
-            cursorAt: { top: 0, left: -25 },
-            cursor: "default",
-          });
-
+          for (var i = 0; i < pls.length; i++) {
+            var plName = pls[i];
+            var uiElement = $("<ui class='outerUI'> <h5>" + plName + "</h5></ui>");
+            var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+            for (var j=0; j < photo_table[plName].length; j++) {
+              ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
+            }
+            uiElement.append(ulPhoto);
+            $(".playlistList").append(uiElement);
+          }
         });
 
-  /******** DESELECT ALBUM LISTENER *********/
-  model.addEventListener("deselect_album", function(e) {
-    $("#album-" + e.album.id)
-    .removeClass("selected-album")
-    .removeClass("selected-auto-album");
-  });
+    });
+});
 
-  /********** REMOVE ALBUM LISTENER *********/
-  model.addEventListener("remove_album", function(e) {
-    $("#album-" + e.album.id).fadeOut();
-  });
+/******** DESELECT ALBUM LISTENER *********/
+model.addEventListener("deselect_album", function(e) {
+  var album_div = $("#album-" + e.album.id)
+  if (e.album.is_user_generated()) {
+    make_droppable(album_div);
+  } else {
+    album_div.droppable();
+  }
+  album_div.removeClass("selected-album")
+  .removeClass("selected-auto-album");
+});
 
-  /********* REMOVE CONTENT LISTENER ********/
-  model.addEventListener("remove_content", function(e) {
-    $("#content-" + e.content.id).fadeOut();
-  });
+/********** REMOVE ALBUM LISTENER *********/
+model.addEventListener("remove_album", function(e) {
+  $("#album-" + e.album.id).fadeOut();
+});
+
+/********* REMOVE CONTENT LISTENER ********/
+model.addEventListener("remove_content", function(e) {
+  $("#content-" + e.content.id).fadeOut();
+});
+
+model.addEventListener("select_content", function(e) {
+  var ignored_selectors = "#static-albums .album-name, .navbar, .selected-album"
+  $("#content-" + e.content.id).draggable({
+    revert: true,
+    start: function(event, ui) {
+      $(ignored_selectors).fadeTo(250, 0.2);
+    },
+    helper: function( event ) {
+      return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
+    },
+    stop: function(event, ui) {
+      $(ignored_selectors).fadeTo(250, 1);
+    },
+    distance: 20,
+    cursorAt: { top: 0, left: -25 },
+    cursor: "default",
+  })});
+
+model.addEventListener("deselect_content", function(e) {
+  $("#content-" + e.content.id).draggable('destroy');
+});
 
   // get albums from django
   // MUST APPEAR AFTER LISTENERS ARE CREATED
   {% for playlist in playlists %}
-    var album = new Album({{playlist.id}},"{{playlist.name}}");
-    model.add_album(album);
-    album_map[{{playlist.id}}] = album;
-    {% for content in playlist.content.all %}
-      album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
-    {% endfor %}
+  var album = new Album({{playlist.id}},"{{playlist.name}}");
+  model.add_album(album);
+  album_map[{{playlist.id}}] = album;
+  {% for content in playlist.content.all %}
+  album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
+  {% endfor %}
   {% endfor %}
 
   model.select_album(model.albums[0]);
-  function new_plist(name) {
-    $("#new_plist")[0].value = "";
-    var album = new Album(100,name);
-    model.add_album(album);
-    $.ajax({
-      type: "POST",
-      url: "/ajax/add_album/",
-      data: { name:name }
-    }).done(function( msg ) {
-                    });
-
-  }
 
   // CRUD operations on albums
 
@@ -502,7 +531,7 @@ model.addEventListener("select_album", function(e) {
          <div>
           <br>
           <hr>
-                <div id="contents-container" />
+          <div id="contents-container" />
         </div>
       </div>
     </div>
