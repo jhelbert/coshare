@@ -99,7 +99,7 @@ def upload(request):
 		new_content = Content()
 		file_content = ContentFile(uploaded_content.read()) 
 		new_content.image.save(uploaded_content.name, file_content)
-		ext = filename[uploaded_content.name.find('.')+1:]
+		ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
 		if ext not in ["jpg",'jpeg','png','gif']:
 			new_content.is_video = True
 
