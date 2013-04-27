@@ -99,6 +99,11 @@ def upload(request):
 		new_content = Content()
 		file_content = ContentFile(uploaded_content.read()) 
 		new_content.image.save(uploaded_content.name, file_content)
+		ext = filename[uploaded_content.name.find('.')+1:]
+		if ext not in ["jpg",'jpeg','png','gif']:
+			new_content.is_video = True
+
+		new_content.save()
 		if playlist:
 			playlist.content.add(new_content)
 			playlist.save()

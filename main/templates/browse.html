@@ -22,8 +22,10 @@ CoShare - Content Manager
 
 var selected_content_ids = [];
 var selected_content_map = {};
+var image_info = [];
 
 var album_map = {};
+var favorites_album;
 
 function add_objects(id) {
   var foo = "/add/?album=" + id;
@@ -57,14 +59,21 @@ $(function() {
   // occurs when a new album is added to the model
   // also used on load
   model.addEventListener("add_album", function(e) {
-    var option = document.createElement("option");
-    option.text = e.album.get_name();
-    option.value = e.album.id;
-    var select = document.getElementById("playlist_list");
-    select.appendChild(option);
+    
+    if (e.album.get_name() == "Favorites") {
+      favorites_album = e.album;
+      console.dir(favorites_album);
+    }
+  
 
     var album_div = $("<div />");
     if (e.album.is_user_generated()) {
+      var option = document.createElement("option");
+    option.text = e.album.get_name();
+
+    option.value = e.album.id;
+    var select = document.getElementById("playlist_list");
+    select.appendChild(option);
       album_div
       .addClass("album-name")
       .attr("id", "album-" + e.album.id)
@@ -200,10 +209,11 @@ $(function() {
             $("#openModal").css("opacity",1);
             $("#openModal").css("pointer-events","auto");
             var image = $(this).children("img").attr("src");
+
             var id_val = $(this).attr("id-num");
             $(".imageHolder").attr("src",image);
             $(".imageHolder").attr("id-num",id_val);
-            $
+            
             // Add playlists info to list
             $.ajax({
               type: "POST",
@@ -377,6 +387,7 @@ function new_plist(name) {
 
     $(".favorited").click(function() {
       $(".favorited").toggleClass("btn-success");
+      //favorites_album.add_content()
     })
 
   });
