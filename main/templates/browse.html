@@ -63,16 +63,6 @@ The model will propagate the appropriate effects.s
   // instantiate model
   var model = new Model();
 
-  // get albums from django
-  {% for playlist in playlists %}
-    var album = new Album({{playlist.id}},"{{playlist.name}}");
-    model.add_album(album);
-    album_map[{{playlist.id}}] = album;
-    {% for content in playlist.content.all %}
-      album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
-    {% endfor %}
-  {% endfor %}
-
   /************ ADD ALBUM LISTENER **********/
   model.addEventListener("add_album", function(e) {
     
@@ -284,6 +274,17 @@ model.addEventListener("select_album", function(e) {
   model.addEventListener("remove_content", function(e) {
     $("#content-" + e.content.id).fadeOut();
   });
+
+  // get albums from django
+  // MUST APPEAR AFTER LISTENERS ARE CREATED
+  {% for playlist in playlists %}
+    var album = new Album({{playlist.id}},"{{playlist.name}}");
+    model.add_album(album);
+    album_map[{{playlist.id}}] = album;
+    {% for content in playlist.content.all %}
+      album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
+    {% endfor %}
+  {% endfor %}
 
   model.select_album(model.albums[0]);
   function new_plist(name) {
