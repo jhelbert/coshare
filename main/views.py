@@ -13,15 +13,23 @@ def main(request):
 	query_all_playlist()
 	get_recently_added()
 
-	recent_plist = Playlist.objects.get(name="Recently Added")
-	recently_added = recent_plist.content.all()
-	recently_added_1 = recently_added[:4]
-	recently_added_2 = recently_added[4:8]
+	try:
+		recent_plist = Playlist.objects.get(name="Recently Added")
+		recently_added = recent_plist.content.all()
+		recently_added_1 = recently_added[:4]
+		recently_added_2 = recently_added[4:8]
+	except:
+		recently_added_1 = None
+		recently_added_2 = None
+	try:
+		fav_plist = Playlist.objects.get(name="Recently Favorited")
+		favs = fav_plist.content.all()
+		fav_1 = favs[:4]
+		fav_2 = favs[4:8]
+	except:
+		fav_1 = None
+		fav_2 = None
 
-	fav_plist = Playlist.objects.get(name="Recently Favorited")
-	favs = fav_plist.content.all()
-	fav_1 = favs[:4]
-	fav_2 = favs[4:8]
 	return render_to_response('index.html', 
 		{
 			"recently_added_1":recently_added_1,
