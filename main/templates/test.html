@@ -1,0 +1,31 @@
+<html>
+<script src="../static/js/jquery-1.9.1.js"></script>
+<script src="../static/js/packery.min.js"></script>
+<style>
+#container {
+    max-width: 1000px;
+    border: 5px solid red;
+}
+
+.item {
+    border: 3px dashed green;
+    font-size: 48pt;
+}
+</style>
+<script>
+$(function() {
+    console.log("jquery working");
+    var packery = new Packery(document.querySelector("#container"), {
+        itemSelector: ".item",
+        gutter: 10,
+    });
+});
+</script>
+<body>
+<div id="container">
+    <div class="item">Apples</div>
+    <div class="item">Oranges</div>
+    <div class="item">Banana</div>
+</div>
+</body>
+</html>

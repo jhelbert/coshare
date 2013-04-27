@@ -10,9 +10,9 @@ CoShare - Content Manager
 
 <script src="/static/js/jquery.watermark.min.js"></script>
 
-<!-- Isotope -->
-<script src="{{STATIC_URL}}/js/jquery.isotope.min.js"></script>
-<link href="{{STATIC_URL}}/css/isotope.css" rel="stylesheet">
+<!-- packery -->
+<script src="{{STATIC_URL}}/js/packery.min.js"></script>
+<script src="{{STATIC_URL}}/js/jquery.imagesloaded.js"></script>
 
 <!-- Models -->
 <script src="/static/js/album.js"></script>
@@ -43,7 +43,14 @@ $(function() {
     }
   });
 
+  /*
   $("#contents-container").isotope({
+    itemSelector: ".content",
+  });
+  */
+
+  var container = document.querySelector("#contents-container")
+  var pckry = new Packery(container, {
     itemSelector: ".content",
   });
 
@@ -168,23 +175,31 @@ model.addEventListener("select_album", function(e) {
         }
 
         // refresh contents
-        $("#contents-container").isotope('remove', $("#contents-container .content"));
+        //$("#contents-container").isotope('remove', $("#contents-container .content"));
+        //$("#contents-container").packery('remove', $("#contents-container .content"));
+        $("#contents-container .content").each(function(i,v) {
+          pckry.remove(v);
+        });
+        pckry.layout();
         var contents = e.album.get_contents();
         for (var i in contents) {
             // FUCK JAVASCRIPT -- it doesn't even have block level scoping???
             // whatever. use this closure to ensure the meaning of i doesn't suck.
             (function(content) {
 
+              var inner = content.get_content();
               var div = $("<div />")
-              .append(content.get_content())
+              .append(inner)
               .addClass("content")
               .attr("id", "content-" + content.id)
               .attr("id-num", content.id)
               .click(function() {
                 model.toggle_content(content);
               });
-              //$("#contents-container").append(div);
-              $("#contents-container").isotope("insert", div);
+
+              $("#contents-container").append(div);
+              pckry.appended(div.get());
+              
 
               model.addEventListener("select_content", function(e2) {
                 if (e2.content.equals(content)) {
@@ -203,6 +218,9 @@ model.addEventListener("select_album", function(e) {
               });
             })(contents[i]);
           }
+          $("#contents-container").imagesLoaded(function() {
+            pckry.layout();
+          });
           $("#content").text("content from " + e.album.get_name());
 
           $(".content").dblclick(function() {
