@@ -46,6 +46,7 @@
     float:left;
     border: 5px solid transparent;
     border-radius: 10px;
+    width: 100px;
 }
 
 #contents-container {

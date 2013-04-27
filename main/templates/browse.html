@@ -33,6 +33,20 @@ var favorites_album;
 
 $(function() {
 
+  /***************************************/
+  /************* COSMETICS ***************/
+  /***************************************/
+  $('#new_plist').watermark('New Album');
+  $("#new_plist").keyup(function (e) {
+    if (e.keyCode == 13) {
+      new_plist(e.target.value);
+    }
+  });
+
+  $("#contents-container").isotope({
+    itemSelector: ".content",
+  });
+
   /******************************************/
   /**** Register Listeners to the Model *****/
   /******************************************/
@@ -179,7 +193,8 @@ model.addEventListener("select_album", function(e) {
               .click(function() {
                 model.toggle_content(content);
               });
-              $("#contents-container").append(div);
+              //$("#contents-container").append(div);
+              $("#contents-container").isotope("insert", div);
 
               model.addEventListener("select_content", function(e2) {
                 if (e2.content.equals(content)) {
@@ -372,21 +387,6 @@ model.addEventListener("select_album", function(e) {
 
   $(".favorited").click(function() {
     $(".favorited").toggleClass("btn-success");
-  });
-
-
-  /***************************************/
-  /************* COSMETICS ***************/
-  /***************************************/
-  $('#new_plist').watermark('New Album');
-  $("#new_plist").keyup(function (e) {
-    if (e.keyCode == 13) {
-      new_plist(e.target.value);
-    }
-  });
-
-  $("#contents-container").isotope({
-    itemSelector: ".content",
   });
 
 });
