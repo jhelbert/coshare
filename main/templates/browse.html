@@ -64,13 +64,6 @@ $(function() {
       },
     });
 
-
-  /*
-  $("#contents-container").isotope({
-    itemSelector: ".content",
-  });
-*/
-
 var container = document.querySelector("#contents-container")
 var pckry = new Packery(container, {
   itemSelector: ".content",
@@ -213,42 +206,38 @@ model.addEventListener("select_album", function(e) {
   });
   pckry.layout();
   var contents = e.album.get_contents();
-  for (var i in contents) {
-    // FUCK JAVASCRIPT -- it doesn't even have block level scoping???
-    // whatever. use this closure to ensure the meaning of i doesn't suck.
-    (function(content) {
+  $(contents).each(function(i, content) {
+    var inner = content.get_content();
+    var div = $("<div />")
+    .append(inner)
+    .addClass("content")
+    .attr("id", "content-" + content.id)
+    .attr("id-num", content.id)
+    .click(function() {
+      model.toggle_content(content);
+    });
 
-      var inner = content.get_content();
-      var div = $("<div />")
-      .append(inner)
-      .addClass("content")
-      .attr("id", "content-" + content.id)
-      .attr("id-num", content.id)
-      .click(function() {
-        model.toggle_content(content);
-      });
+    $("#contents-container").append(div);
+    pckry.appended(div.get());
 
-      $("#contents-container").append(div);
-      pckry.appended(div.get());
-
-
-      model.addEventListener("select_content", function(e2) {
-        if (e2.content.equals(content)) {
-          div.addClass("selected-content");
-          selected_content_ids.push(e2.content.id);
-          selected_content_map[e2.content.id] = e2.content.get_content().src.split("/media/")[1];;
-        }
-      });
-      model.addEventListener("deselect_content", function(e2) {
-        if (e2.content.equals(content)) {
-          div.removeClass("selected-content");
-          var index = selected_content_ids.indexOf(e2.content.id);
-          delete selected_content_map[e2.content.id];
-          selected_content_ids.splice(index,1);
-        }
-      });
-    })(contents[i]);
-  }
+    /*
+    model.addEventListener("select_content", function(e2) {
+      if (e2.content.equals(content)) {
+        div.addClass("selected-content");
+        selected_content_ids.push(e2.content.id);
+        selected_content_map[e2.content.id] = e2.content.get_content().src.split("/media/")[1];;
+      }
+    });
+    model.addEventListener("deselect_content", function(e2) {
+      if (e2.content.equals(content)) {
+        div.removeClass("selected-content");
+        var index = selected_content_ids.indexOf(e2.content.id);
+        delete selected_content_map[e2.content.id];
+        selected_content_ids.splice(index,1);
+      }
+    });
+    */
+  });
   $("#contents-container").imagesLoaded(function() {
     pckry.layout();
   });
@@ -314,10 +303,17 @@ model.addEventListener("remove_album", function(e) {
 
 /********* REMOVE CONTENT LISTENER ********/
 model.addEventListener("remove_content", function(e) {
-  $("#content-" + e.content.id).fadeOut();
+  $("#content-" + e.content.id).each(function(i, v) {
+    pckry.remove(v);
+  });
+  pckry.layout();
 });
 
+/****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
+  console.log("SELECTING " + e.content.id)
+  var content_div = $("#content-" + e.content.id);
+  content_div.addClass("selected-content");
   var ignored_selectors = "#static-albums .album-name, .navbar, .selected-album"
   $("#content-" + e.content.id).draggable({
     revert: true,
@@ -336,7 +332,10 @@ model.addEventListener("select_content", function(e) {
   })});
 
 model.addEventListener("deselect_content", function(e) {
-  $("#content-" + e.content.id).draggable('destroy');
+  var content_div = $("#content-" + e.content.id);
+  content_div
+    .draggable('destroy')
+    .removeClass("selected-content");
 });
 
   // get albums from django

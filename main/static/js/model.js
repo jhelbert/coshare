@@ -62,42 +62,36 @@ var Model = function() {
      */
     this.toggle_content = function(content) {
 
-        var is_selected = false;
-        var index;
-        for (var i in this.selected_contents) {
-            if (this.selected_contents[i].equals(content)) {
-                is_selected = true;
-                index = i;
-            }
-        }
-
-        if (is_selected) {
-            // remove from selection
-            this.selected_contents.splice(index, 1);
+        if (content.id in this.selected_contents) {
+            delete this.selected_contents[content.id]
             this.fireEvent("deselect_content", {content: content});
-            return false;
         } else {
-            this.selected_contents.push(content);
+            this.selected_contents[content.id] = content;
             this.fireEvent("select_content", {content: content});
-            return true;
         }
     }
 
     this.select_all = function() {
+
         var contents = this.selected_album.get_contents();
+        this.selected_contents = []
         for (var i in contents) {
+            var content = contents[i]
+            this.selected_contents[content.id] = content;
             // WARNING: requires event listeners to be idempotent
             this.fireEvent("select_content", {content: contents[i]});
         }
-        this.selected_contents = this.selected_album.get_contents();
     }
 
     this.deselect_all = function() {
         var contents = this.selected_contents;
         for (var i in contents) {
-            this.fireEvent("deselect_content", {content: contents[i]});
+            var content = contents[i]
+            this.selected_contents[content.id] = content;
+            // WARNING: requires event listeners to be idempotent
+            this.fireEvent("deselect_content", {content: content});
         }
-        this.selected_contents = [];
+        this.selected_contents = []
     }
 
     /**
@@ -120,13 +114,10 @@ var Model = function() {
 
     // i'm really sorry about this name
     this.remove_selected_contents_from_selected_album = function() {
-        // ask me about this if it's confusing. fuck javascript.
-        var that = this;
-        for (var i = 0; i < this.selected_contents.length; ++i) {
-            (function(content) {
-                that.selected_album.remove_content(content);
-                that.fireEvent("remove_content", {album: that.selected_album, content: content});
-            })(this.selected_contents[i]);
+        for (var i in this.selected_contents) {
+            var content = this.selected_contents[i];
+            this.selected_album.remove_content(content);
+            this.fireEvent("remove_content", {album: this.selected_album, content: content});
         }
     }
 
