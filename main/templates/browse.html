@@ -264,10 +264,15 @@ model.addEventListener("select_album", function(e) {
           }).draggable({
             revert: true,
             start: function(event, ui) {
-              $(this).addClass('noclick');
+              $("#dynamic-albums").addClass("green-border");
+              $("#static-albums, #content-well, .navbar").fadeTo(250, 0.2);
             },
             helper: function( event ) {
               return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
+            },
+            stop: function(event, ui) {
+              $("#dynamic-albums").removeClass("green-border");
+              $("#static-albums, #content-well, .navbar").fadeTo(250, 1);
             },
             distance: 20,
             cursorAt: { top: 0, left: -25 },
@@ -474,16 +479,18 @@ model.addEventListener("select_album", function(e) {
       <div class="well sidebar-nav" style="margin-top:110px;border:2px solid;">
         <ul class="nav nav-list">
           <li class="album-header" margin-left="10px">Albums</li>
-          <div id="albums"n data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
+          <div id="albums-container" data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
             <div id="static-albums"></div>
             <hr>
-            <div id="dynamic-albums"></div>
+            <div id="dynamic-albums">
+              <input name="name" id="new_plist" type="text"/>
+            </div>
           </div>
-          <input name="name" id="new_plist" type="text"/>
+          
 
         </div><!--/.well -->
       </div><!--/span-->
-      <div class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>
+      <div id="content-well" class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>
         <div class="hero-unit" style="border:2px solid;">
           <h3 align="center" style="line-height:100%" id="album-title" ></h3>
 
