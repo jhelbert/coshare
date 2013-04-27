@@ -30,19 +30,34 @@ var selected_content_map = {};
 var album_map = {};
 
 $(function() {
-  $('#new_plist').watermark('New Album');
-  $("#new_plist").keyup(function (e) {
-    if (e.keyCode == 13) {
-      new_plist(e.target.value);
-    }
-  });
+
+  /******************************************/
+  /**** Register Listeners to the Model *****/
+  /******************************************/
+
+  /*
+
+Use the pardigm of an event driving everything.
+Capture the raw input event and IMMEDIATELY translate
+it into a high level event in the model.
+
+  */
 
   // instantiate model
   var model = new Model();
 
-  // listen for add_album event
-  // occurs when a new album is added to the model
-  // also used on load
+  // get albums from django
+  {% for playlist in playlists %}
+  var album = new Album({{playlist.id}},"{{playlist.name}}");
+  model.add_album(album);
+  album_map[{{playlist.id}}] = album;
+  {% for content in playlist.content.all %}
+  album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
+  {% endfor %}
+
+  {% endfor %}
+
+  /************ ADD ALBUM LISTENER **********/
   model.addEventListener("add_album", function(e) {
     var option = document.createElement("option");
     option.text = e.album.get_name();
@@ -59,8 +74,6 @@ $(function() {
       .click(function() {
         model.select_album(e.album);
       });
-
-
 
       if (e.album.is_user_generated()) {
         album_div.droppable({
@@ -105,14 +118,11 @@ $(function() {
             }});
         });
 
-  // listen for select_albym event
-  // occurs when User selects an album to view
-  // e is an event object with an e.album attribute
-  // this is the album selected
-  model.addEventListener("select_album", function(e) {
-    selected_content_ids = [];
-    selected_content_map = {};
-    selected_album = e.album.id;
+/*********** SELECT ALBUM LISTENER ********/
+model.addEventListener("select_album", function(e) {
+  selected_content_ids = [];
+  selected_content_map = {};
+  selected_album = e.album.id;
         // refresh title
         $("#album-title").text(e.album.get_name());
 
@@ -233,140 +243,138 @@ $(function() {
 
         });
 
-model.addEventListener("deselect_album", function(e) {
-  $("#album-" + e.album.id)
-  .removeClass("selected-album")
-  .removeClass("selected-auto-album");
-});
+  /******** DESELECT ALBUM LISTENER *********/
+  model.addEventListener("deselect_album", function(e) {
+    $("#album-" + e.album.id)
+    .removeClass("selected-album")
+    .removeClass("selected-auto-album");
+  });
 
-model.addEventListener("remove_album", function(e) {
-  $("#album-" + e.album.id).fadeOut();
-});
+  /********** REMOVE ALBUM LISTENER *********/
+  model.addEventListener("remove_album", function(e) {
+    $("#album-" + e.album.id).fadeOut();
+  });
 
-model.addEventListener("remove_content", function(e) {
-  $("#content-" + e.content.id).fadeOut();
-});
+  /********* REMOVE CONTENT LISTENER ********/
+  model.addEventListener("remove_content", function(e) {
+    $("#content-" + e.content.id).fadeOut();
+  });
 
+  model.select_album(model.albums[0]);
+  function new_plist(name) {
+    $("#new_plist")[0].value = "";
+    var album = new Album(100,name);
+    model.add_album(album);
+    $.ajax({
+      type: "POST",
+      url: "/ajax/add_album/",
+      data: { name:name }
+    }).done(function( msg ) {
+                    });
 
-// create stubbed out albums
+  }
 
-{% for playlist in playlists %}
-var album = new Album({{playlist.id}},"{{playlist.name}}");
-model.add_album(album);
-album_map[{{playlist.id}}] = album;
-{% for content in playlist.content.all %}
-album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
-{% endfor %}
+  // CRUD operations on albums
 
-{% endfor %}
-
-
-model.select_album(model.albums[0]);
-function new_plist(name) {
-  $("#new_plist")[0].value = "";
-  var album = new Album(100,name);
-  model.add_album(album);
-  $.ajax({
-                        type: "POST",
-                        url: "/ajax/add_album/",
-                        data: { name:name }
-                }).done(function( msg ) {
-                    //refresh_last_modified(side);
-              });
-
-}
-
-    // CRUD operations on albums
-
-    // crea
-    $("#btnNewAlbum").click(function() {
-        // add stubbed out
-        model.add_album(new Album(new Date().getTime() % 100));
-      });
-
-    $("#btnRenameAlbum").click(function() {
-      model.rename_selected_album();
+  // crea
+  $("#btnNewAlbum").click(function() {
+      // add stubbed out
+      model.add_album(new Album(new Date().getTime() % 100));
     });
 
-    $("#btnRemoveAlbum").click(function() {
-      model.remove_selected_album();
-    });
+  $("#btnRenameAlbum").click(function() {
+    model.rename_selected_album();
+  });
 
-    // Select/Deselect All
-    $("#btnSelectAll").click(function() {
-      model.select_all();
-    });
+  $("#btnRemoveAlbum").click(function() {
+    model.remove_selected_album();
+  });
 
-    $("#btnDeselectAll").click(function() {
-      model.deselect_all();
-    });
+  // Select/Deselect All
+  $("#btnSelectAll").click(function() {
+    model.select_all();
+  });
 
-    $("#btnRemoveSelectedContent").click(function() {
-      model.remove_selected_contents_from_selected_album();
-    });
+  $("#btnDeselectAll").click(function() {
+    model.deselect_all();
+  });
 
-    
-    $(".imageDescription").click(function() {
-      var text = $(".imageDescription").text();
-      text = text.trim();
+  $("#btnRemoveSelectedContent").click(function() {
+    model.remove_selected_contents_from_selected_album();
+  });
+
+  
+  $(".imageDescription").click(function() {
+    var text = $(".imageDescription").text();
+    text = text.trim();
+    $(".alert").alert('close');
+    $(".descriptionInput").val(text);
+    $(".descriptionInput").removeClass("hidden");
+    $(".imageDescription").addClass("hidden");
+    $(".descriptionInput").focus();
+  });
+
+
+  // Both of below functions need support to update backend
+  
+  $(".descriptionInput").blur(function() {
+    var text = $(".descriptionInput").val();
+    text = text.trim();
+    $(".imageDescription").text(text);
+    $(".descriptionInput").addClass("hidden");
+    $(".imageDescription").removeClass("hidden");
+    var id_val = $(".imageHolder").attr("id-num").toString();
+    // send new text value to the server
+    $.ajax({
+      type: "POST",
+      url: "/save_description/",
+      data: { id: id_val, description: text}
+    }).done(function( msg ) {
       $(".alert").alert('close');
-      $(".descriptionInput").val(text);
-      $(".descriptionInput").removeClass("hidden");
-      $(".imageDescription").addClass("hidden");
-      $(".descriptionInput").focus();
+      if (msg != "error") {
+        var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
+
+        $("#leftCol").append(alertBox);
+      } else {
+        var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
+
+        $("#leftCol").append(alertBox);
+      }
     });
+  });
 
-
-    // Both of below functions need support to update backend
-    
-    $(".descriptionInput").blur(function() {
+  $(".descriptionInput").bind('keypress',function(e) {
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if (code ==13) {
       var text = $(".descriptionInput").val();
       text = text.trim();
       $(".imageDescription").text(text);
       $(".descriptionInput").addClass("hidden");
       $(".imageDescription").removeClass("hidden");
-      var id_val = $(".imageHolder").attr("id-num").toString();
-        // send new text value to the server
-        $.ajax({
-          type: "POST",
-          url: "/save_description/",
-          data: { id: id_val, description: text}
-        }).done(function( msg ) {
-          $(".alert").alert('close');
-          if (msg != "error") {
-            var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
-
-            $("#leftCol").append(alertBox);
-          } else {
-            var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
-
-            $("#leftCol").append(alertBox);
-          }
-        });
-      });
-
-    $(".descriptionInput").bind('keypress',function(e) {
-      var code = (e.keyCode ? e.keyCode : e.which);
-      if (code ==13) {
-        var text = $(".descriptionInput").val();
-        text = text.trim();
-        $(".imageDescription").text(text);
-        $(".descriptionInput").addClass("hidden");
-        $(".imageDescription").removeClass("hidden");
-      }
-    });
-
-    $("#closeModal").click(function() {
-      $("#openModal").css("opacity",0);
-      $("#openModal").css("pointer-events","none");
-      $(".alert").alert('close');
-    });
-
-    $(".favorited").click(function() {
-      $(".favorited").toggleClass("btn-success");
-    })
-
+    }
   });
+
+  $("#closeModal").click(function() {
+    $("#openModal").css("opacity",0);
+    $("#openModal").css("pointer-events","none");
+    $(".alert").alert('close');
+  });
+
+  $(".favorited").click(function() {
+    $(".favorited").toggleClass("btn-success");
+  })
+
+  /***************************************/
+  /************* COSMETICS ***************/
+  /***************************************/
+  $('#new_plist').watermark('New Album');
+  $("#new_plist").keyup(function (e) {
+    if (e.keyCode == 13) {
+      new_plist(e.target.value);
+    }
+  });
+
+});
 </script>
 {% endblock %}
 
@@ -401,7 +409,7 @@ function new_plist(name) {
   <div id="upload" style="float:right">
    <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
     <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
-  
+
   </div>
 
   <div id="example" class="modal hide fade in" style="display: none; ">  
@@ -411,10 +419,10 @@ function new_plist(name) {
     <div class="modal-body">  
       <div id="blah" align="center"></div>              
       <div align="center" style="margin-top:30px">
-          Add To Album:
-          <select id="playlist_list" name="playlist">
-            <option value="1">None</option> 
-          </select>
+        Add To Album:
+        <select id="playlist_list" name="playlist">
+          <option value="1">None</option> 
+        </select>
       </div>
     </div>  
     <div class="modal-footer">  

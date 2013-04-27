@@ -128,17 +128,6 @@ var Model = function() {
                 that.fireEvent("remove_content", {album: that.selected_album, content: content});
             })(this.selected_contents[i]);
         }
-        /*
-        for (var i in self.selected_contents) {
-            (function (x) {
-                console.log(x);
-                this.selected_album.remove_content(contents[x]);
-                this.fireEvent("remove_content", {album: this.selected_album, content: contents[i]});
-            })(i);
-        }
-        this.selected_contents = [];
-        console.log(this.selected_album.get_contents());
-        */
     }
 
     this.get_num_selected_contents = function() {

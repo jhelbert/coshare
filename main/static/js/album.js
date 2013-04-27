@@ -64,7 +64,6 @@ var Album = function(id,name) {
     this.add_content = function(id,src,size,is_new) {
         var content = new Content(id,src,size);
         this.output.push(content);
-        console.log(id);
         if (!is_new) {
               $.ajax({
                         type: "POST",

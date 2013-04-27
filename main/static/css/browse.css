@@ -48,6 +48,10 @@
     border-radius: 10px;
 }
 
+#contents-container {
+    width: 500px;
+}
+
 .content img {
     border-radius: 5px;
     border: 0px;
