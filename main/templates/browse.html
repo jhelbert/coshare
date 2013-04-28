@@ -243,6 +243,9 @@ model.addEventListener("select_album", function(e) {
   $("#content").text("content from " + e.album.get_name());
 
   $(".content").dblclick(function() {
+    if (last_clicked_content.height == 200) {
+      $(".favorited").addClass("btn-success")
+    }
     $(".alert").alert('close');
     
     $("#openModal").modal("show");

@@ -9,6 +9,7 @@
 var Content = function(id,src,size) {
     this.id = id;
     this.src = src;
+    this.height = size * 10;
 
     // TODO: create checkrep?
 
