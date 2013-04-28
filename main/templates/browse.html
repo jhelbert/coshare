@@ -253,9 +253,17 @@ model.addEventListener("select_album", function(e) {
     $("#openModal").modal("show");
     $(".albumList").empty();
     var image = $(this).children("img").attr("src");
+
+    console.log(image);
+    if (!image) {
+      image = $(this).children("video").attr("src");
+      console.log(image);
+    }
+
     var id_val = $(this).attr("id-num");
-    populateModal(image, id_val);
-  });
+    populateModal(image,id_val);
+
+    });
 });
 
 /******** DESELECT ALBUM LISTENER *********/
@@ -285,6 +293,7 @@ model.addEventListener("remove_content", function(e) {
 
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
+  last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div.addClass("selected-content");
   var ignored_selectors = "#static-albums .album-name, .navbar, .selected-album"
@@ -305,6 +314,7 @@ model.addEventListener("select_content", function(e) {
   })});
 
 model.addEventListener("deselect_content", function(e) {
+  last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div
     .draggable('destroy')
@@ -365,6 +375,11 @@ model.addEventListener("deselect_content", function(e) {
   var populateModal = function(image, id_val) {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
+
+    image_info = {};
+    image_info['src'] = image.substring(7);
+    image_info['id'] = id_val;
+    image_info['height'] = $(this).children("img").attr("height") / 10;
 
     // Add albums info to list
     $.ajax({
@@ -451,6 +466,14 @@ model.addEventListener("deselect_content", function(e) {
 
   $(".favorited").click(function() {
     $(".favorited").toggleClass("btn-success");
+    if ($(".favorited").attr('class') == "btn favorited btn-success") {
+       favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
+    }
+    else {
+      console.log("removing");
+      console.dir(last_clicked_content);
+      favorites_album.remove_content(last_clicked_content);
+    }
   });
 
 });
@@ -551,6 +574,7 @@ model.addEventListener("deselect_content", function(e) {
     </div>
   </div>
 </div>
+
 {% endblock %}
 
 

@@ -8,6 +8,7 @@
  */
 var Content = function(id,src,size) {
     this.id = id;
+    this.src = src;
 
     // TODO: create checkrep?
 
@@ -15,8 +16,18 @@ var Content = function(id,src,size) {
     this.get_content = function() {
 
         // use stubbed image for now
-        var output = new Image();
+        substrings = ['mov','MOV','mp4'];
+        var output;
+        if (new RegExp(substrings.join("|")).test(src)) {
+            output = document.createElement('video');
+    // At least one match
+        }
+        else {
+            output = new Image();
+        }
         output.src = "/media/" + src;
+        output.id = id;
+        output.height = size * 10;
         output.draggable = false;
         // output.height = size*10;
 
@@ -50,7 +61,7 @@ var Content = function(id,src,size) {
      *         false otherwise
      */
     this.equals = function(other) {
-        return this.id === other.id;
+        return this.src == other.src;
     }
     
 }
