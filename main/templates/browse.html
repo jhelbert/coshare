@@ -452,11 +452,15 @@ model.addEventListener("deselect_content", function(e) {
   $(".favorited").click(function() {
     $(".favorited").toggleClass("btn-success");
     if ($(".favorited").attr('class') == "btn favorited btn-success") {
+        last_clicked_content.output.height *= 1.5;
+        last_clicked_content.output.width *= 1.5;
        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
     }
     else {
       console.log("removing");
       console.dir(last_clicked_content);
+      last_clicked_content.output.height /= 1.5;
+        last_clicked_content.output.width /= 1.5;
       favorites_album.remove_content(last_clicked_content);
     }
   });

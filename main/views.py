@@ -8,6 +8,7 @@ from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
 import json
 import datetime
+import random
 
 def main(request):
 	query_all_album()
@@ -102,7 +103,8 @@ def upload(request):
 		ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
 		if ext not in ["jpg",'jpeg','png','gif']:
 			new_content.is_video = True
-
+		new_content.metric = int(random.random() * 6) + 8
+		new_content.save()
 		new_content.save()
 		if album:
 			album.content.add(new_content)
@@ -124,9 +126,13 @@ def add_content(request):
 	album = Album.objects.get(id=int(album_id))
 	print 'got plist'
 	content = Content.objects.get(id=int(pic_id))
+	if album.name == "Favorites":
+		content.metric = 20
+		content.save()
 	print 'got content'
 	album.content.add(content)
 	album.save()
+
 	return HttpResponse('OK')
 
 @csrf_exempt
@@ -136,6 +142,9 @@ def remove_content(request):
 	album = Album.objects.get(id=int(album_id))
 	print 'got plist'
 	content = Content.objects.get(id=int(pic_id))
+	if album.name == "Favorites":
+		content.metric = int(random.random() * 6) + 8
+		content.save()
 	print 'got content'
 	album.content.remove(content)
 	album.save()
