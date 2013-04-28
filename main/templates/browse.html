@@ -433,7 +433,7 @@ model.addEventListener("deselect_content", function(e) {
     // Get correct album
     var match;
     $(".album-name").each(function(index,element) {
-      if ($(element).html().toString() == albumName) {
+      if ($(element).text().toString() == albumName) {
         match = $(element);
       }
     });
