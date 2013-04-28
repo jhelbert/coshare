@@ -100,6 +100,7 @@ td {
     border-radius: 999px;
 }
 
+/*
 .modalDialog {
     position: fixed;
     font-family: Arial, Helvetica, sans-serif;
@@ -110,12 +111,8 @@ td {
     background: rgba(0,0,0,0.8);
     z-index: 99999;
     opacity:0;
-        /*
-        -webkit-transition: opacity 400ms ease-in;
-        -moz-transition: opacity 400ms ease-in;
-        transition: opacity 400ms ease-in;
-        */
-        pointer-events: none;
+        
+    pointer-events: none;
     }
 
 
@@ -130,8 +127,8 @@ td {
     }
 
     .close {
-        background: #606061;
-        color: #FFFFFF;
+        background: transparent;
+        color: red;
         line-height: 25px;
         position: absolute;
         right: -12px;
@@ -140,16 +137,15 @@ td {
         width: 24px;
         text-decoration: none;
         font-weight: bold;
+        opacity: .8;
         -webkit-border-radius: 12px;
         -moz-border-radius: 12px;
         border-radius: 12px;
-        -moz-box-shadow: 1px 1px 3px #000;
-        -webkit-box-shadow: 1px 1px 3px #000;
-        box-shadow: 1px 1px 3px #000;
+       
     }
 
+
     .close:hover { 
-        background: #00d9ff; 
     }
 
     .column {
@@ -162,16 +158,15 @@ td {
     .wide {
         width: 250px;
     }
-
+*/
     .imageHolder {
-        width: 80%;
-        margin: 10%;
+        width: 100%;
         border-radius: 10px;
         border-color: green;
         border-width: 2px;
         border-style: solid;
 
-    }
+    } 
 
     .imageDescription {
         width: 100%;
@@ -186,7 +181,7 @@ td {
 
     .albumList {
         margin-left: 0px;
-        padding-left: 4px;
+        padding-left: 0px;
         list-style: none;
     }
 
@@ -195,22 +190,26 @@ td {
         border-color: green;
         color: white;
         border-radius: 5px;
-        width: 40%;
-        margin-left: 30%;
-        margin-right: 30%;
+        
 
+    }
+
+    .buttonRight {
+        width: 45%;
+        margin-left: 55%;
     }
 
     .hidden {
         display: none;
     }
 
+    .modal-body {
+        max-height: 700px;
+    }
     .favorited{
-        width: 35%;
-        margin-left: 60%;
-        margin-right: 10%;
-        margin-bottom: 5px;
-        margin-top: -20px;
+        width: 45%;
+        margin-left: 55%;
+        margin-top: 5px;
     }
 
 

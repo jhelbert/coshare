@@ -158,7 +158,6 @@ var make_droppable = function(album_div) {
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
-
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
@@ -245,10 +244,11 @@ model.addEventListener("select_album", function(e) {
 
   $(".content").dblclick(function() {
     $(".alert").alert('close');
+    
+    $("#openModal").modal("show");
     $(".albumList").empty();
-    $("#openModal").css("opacity",1);
-    $("#openModal").css("pointer-events","auto");
     var image = $(this).children("img").attr("src");
+
     console.log(image);
     if (!image) {
       image = $(this).children("video").attr("src");
@@ -256,41 +256,7 @@ model.addEventListener("select_album", function(e) {
     }
 
     var id_val = $(this).attr("id-num");
-    $(".imageHolder").attr("src",image);
-    $(".imageHolder").attr("id-num",id_val);
-
-    image_info = {};
-    image_info['src'] = image.substring(7);
-    image_info['id'] = id_val;
-    image_info['height'] = $(this).children("img").attr("height") / 10;
-
-
-      // Add albums info to list
-      $.ajax({
-        type: "POST",
-        url: "/open_modal_view/",
-        data: {id: id_val}
-      }).done(function( msg ) {
-          // upload picture description
-          var description = msg["des"];
-          var pls = msg["albums"];
-          var photo_table = msg["photos"];
-          if (description == "") {
-            description = "No Description";
-          }
-          $(".imageDescription").text(description);
-
-          for (var i = 0; i < pls.length; i++) {
-            var plName = pls[i];
-            var uiElement = $("<ui class='outerUI'> <h5>" + plName + "</h5></ui>");
-            var ulPhoto = $("<ul class='previewPhoto'> </ul>");
-            for (var j=0; j < photo_table[plName].length; j++) {
-              ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
-            }
-            uiElement.append(ulPhoto);
-            $(".albumList").append(uiElement);
-          }
-        });
+    populateModal(image,id_val);
 
     });
 });
@@ -392,8 +358,94 @@ model.addEventListener("deselect_content", function(e) {
     model.remove_selected_contents_from_selected_album();
   });
 
-  
-  $(".imageDescription").click(function() {
+  $("#editButton").click(function() {
+    var state = $("#editButton").html()
+    if (state.toString() == "Save Changes") {
+      saveDescription();
+    } else {
+      editDescription();
+    }
+  });
+
+  var populateModal = function(image, id_val) {
+    $(".imageHolder").attr("src",image);
+    $(".imageHolder").attr("id-num",id_val);
+
+    image_info = {};
+    image_info['src'] = image.substring(7);
+    image_info['id'] = id_val;
+    image_info['height'] = $(this).children("img").attr("height") / 10;
+
+    // Add albums info to list
+    $.ajax({
+      type: "POST",
+      url: "/open_modal_view/",
+      data: {id: id_val}
+    }).done(function( msg ) {
+        // upload picture description
+        var description = msg["des"];
+        var pls = msg["albums"];
+        var photo_table = msg["photos"];
+        if (description == "") {
+          description = "No Description";
+        }
+        $(".imageDescription").text(description);
+
+        for (var i = 0; i < pls.length; i++) {
+          var plName = pls[i];
+          var titleElement = $("<h5>" + plName + "</h5>");
+          var uiElement = $("<ui style='cursor:hand;' class='outerUI'> </ui>");
+          uiElement.append(titleElement);
+          uiElement.click(function() {
+            var curName = $(this).children("h5").html();
+            albumClick(curName.toString());
+          });
+          var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+          for (var j=0; j < photo_table[plName].length; j++) {
+            ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
+          }
+          uiElement.append(ulPhoto);
+          $(".albumList").append(uiElement);
+        }
+      });
+  }
+
+  var albumClick = function(albumName) {
+    // Close Modal
+    $(".alert").alert('close');
+    $("#openModal").modal("hide");
+
+    // Get correct album
+    var match;
+    $(".album-name").each(function(index,element) {
+      if ($(element).html().toString() == albumName) {
+        match = $(element);
+      }
+    });
+    console.log("match", match);
+
+    // Get album object
+    var id = match.attr("id");
+    id = id.substring(6);
+    var album;
+    for (var i=0; i < model.albums.length; i++) {
+      var curID = model.albums[i]["id"];
+      console.log(curID,id);
+      if (curID.toString() == id.toString()) {
+        album = model.albums[i];
+        console.log("album",album);
+        break;
+      }
+    }
+
+    // Trigger event to load selected album
+    model.select_album(album);
+    
+
+  }
+
+
+  var editDescription = function() {
     var text = $(".imageDescription").text();
     text = text.trim();
     $(".alert").alert('close');
@@ -401,12 +453,11 @@ model.addEventListener("deselect_content", function(e) {
     $(".descriptionInput").removeClass("hidden");
     $(".imageDescription").addClass("hidden");
     $(".descriptionInput").focus();
-  });
+    $("#editButton").html('Save Changes');
+  };
 
 
-  // Both of below functions need support to update backend
-  
-  $(".descriptionInput").blur(function() {
+  var saveDescription = function() {
     var text = $(".descriptionInput").val();
     text = text.trim();
     $(".imageDescription").text(text);
@@ -429,8 +480,9 @@ model.addEventListener("deselect_content", function(e) {
 
         $("#leftCol").append(alertBox);
       }
+      $("#editButton").html('Edit');
     });
-  });
+  };
 
   $(".descriptionInput").bind('keypress',function(e) {
     var code = (e.keyCode ? e.keyCode : e.which);
@@ -444,9 +496,8 @@ model.addEventListener("deselect_content", function(e) {
   });
 
   $("#closeModal").click(function() {
-    $("#openModal").css("opacity",0);
-    $("#openModal").css("pointer-events","none");
     $(".alert").alert('close');
+    $("#openModal").modal("hide");
   });
 
   $(".favorited").click(function() {
@@ -472,30 +523,33 @@ model.addEventListener("deselect_content", function(e) {
 {% block content %}
 <body>
   <div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
-  <!-- Modal stuff -->
-  <div id="openModal" class="modalDialog">
-    <div>
-      <a href="#" id="closeModal" title="Close" class="close">X</a>
-      <div id="leftCol" class="column wide">
-        <img class="imageHolder" src=""></img>
-        <button class="btn favorited"> Favorited </button>
-        <br>
-        <h5> Description </h5>
-        <p class="imageDescription">
+  <!-- Modal copy, trying to port to bootstrap -->
+  <div id="openModal" class="modal hide fade" role="dialog">
+    <div class="modal-header">
+      <button id="closeModal" type="button" class="close">x</button>
+      <h4> Picture </h4>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="span3" id="leftCol">
+          <img class="imageHolder" src=""></img>
+          <button class="btn favorited"> Favorited </button>
+          <h5> Description </h5>
+          <p class="imageDescription">
 
-        </p>
+          </p>
 
-        <textarea class="descriptionInput hidden"> </textarea>
+          <textarea class="descriptionInput hidden"> </textarea>
+          <button class="btn btn-success buttonRight" id="editButton"> Edit </button>
+        </div>
+        <div class="span2" id="rightCol">
+          <h4> Album Membership </h4>
+          <ul class="albumList">
+          </ul>
+        </div>
       </div>
-      <div class="column" id="rightCol">
-        <h4> Album Membership </h4>
-        <ul class="albumList">
-        </ul>
-      </div>
-      
     </div>
   </div>
-  <!-- End modal -->
 
   <div id="upload" style="float:right">
    <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
