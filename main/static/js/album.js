@@ -80,9 +80,29 @@ var Album = function(id,name) {
     this.remove_content = function(content) {
         // current does nothing
         var index = this.output.indexOf(content);
+        var srcs = [];
+        for (var i = 0; i < this.output.length; i++) {
+            srcs.push(this.output[i].src);
+            if (content.src == this.output[i].src) {
+                this.output.splice(i, 1);
+                console.log(i);
+            }
+        }
+        console.log(srcs);
+        console.dir(this.output);
+        console.log(content);
+        console.log(index);
         if (index >= 0) {
             this.output.splice(index, 1);
         }
+
+        $.ajax({
+                        type: "POST",
+                        url: "/ajax/remove_content/",
+                        data: { album_id: this.id, id:content.id }
+                }).done(function( msg ) {
+                    //refresh_last_modified(side);
+              });
 
 
         // TODO: interface with server

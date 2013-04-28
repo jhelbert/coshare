@@ -8,6 +8,7 @@
  */
 var Content = function(id,src,size) {
     this.id = id;
+    this.src = src;
 
     // TODO: create checkrep?
 
@@ -25,6 +26,7 @@ var Content = function(id,src,size) {
             output = new Image();
         }
         output.src = "/media/" + src;
+        output.id = id;
         output.height = size * 10;
         output.draggable = false;
         // output.height = size*10;
@@ -59,7 +61,7 @@ var Content = function(id,src,size) {
      *         false otherwise
      */
     this.equals = function(other) {
-        return this.id === other.id;
+        return this.src == other.src;
     }
     
 }

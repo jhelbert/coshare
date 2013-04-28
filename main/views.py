@@ -129,6 +129,17 @@ def add_content(request):
 	album.save()
 	return HttpResponse('OK')
 
+@csrf_exempt
+def remove_content(request):
+	album_id = request.POST.get('album_id')
+	pic_id = request.POST.get('id')
+	album = Album.objects.get(id=int(album_id))
+	print 'got plist'
+	content = Content.objects.get(id=int(pic_id))
+	print 'got content'
+	album.content.remove(content)
+	album.save()
+	return HttpResponse('OK')
 
 @csrf_exempt
 def add(request):
