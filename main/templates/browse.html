@@ -20,6 +20,9 @@ CoShare - Content Manager
 <script src="/static/js/model.js"></script>
 
 <link href="{{STATIC_URL}}/css/browse.css" rel="stylesheet">
+<link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
+
+
 
 
 <script type="text/javascript">
@@ -94,32 +97,39 @@ The model will propagate the appropriate effects.s
 
 
     var album_div = $("<div />");
+    var icon = document.createElement("i");
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
 
+      if(e.album.name.indexOf("Content To editButton")==-1){
+        icon.setAttribute("class", "icon-folder-close");
+      }
+      else{
+        icon.setAttribute("class", "icon-tasks");
+      }
+
       option.value = e.album.id;
       var select = document.getElementById("album_list");
       select.appendChild(option);
+
+
       album_div
       .addClass("album-name")
       .attr("id", "album-" + e.album.id)
-      .text(e.album.get_name())
       .click(function() {
         model.select_album(e.album);
       });
+      album_div.append(icon);
+      album_div.append(e.album.get_name()); 
+      
 
       $("#dynamic-albums").append(album_div);
     }
 
 
     else{
-      var icon = document.createElement("img");
-      icon.setAttribute("id", "icon")
-      icon.setAttribute("src", "/static/assets/img/static_album_icon.png");
-      icon.setAttribute("alt", "static album");
-      icon.setAttribute("height", "25");
-      icon.setAttribute("width", "25");
+      icon.setAttribute("class", "icon-cog");
 
       album_div
       .addClass("album-name")
@@ -269,10 +279,12 @@ model.addEventListener("select_album", function(e) {
 /******** DESELECT ALBUM LISTENER *********/
 model.addEventListener("deselect_album", function(e) {
   var album_div = $("#album-" + e.album.id)
+  console.dir(e);
   if (e.album.is_user_generated()) {
     make_droppable(album_div);
   } else {
     album_div.droppable();
+
   }
   album_div.removeClass("selected-album")
   .removeClass("selected-auto-album");
@@ -542,7 +554,7 @@ model.addEventListener("deselect_content", function(e) {
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
-      <div class="well sidebar-nav" style="margin-top:110px;border:2px solid;">
+      <div class="well sidebar-nav" style="margin-top:110px;border:2px solid; color:grey">
         <ul class="nav nav-list">
           <li class="album-header" margin-left="10px">Albums</li>
           <div id="albums-container" data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
@@ -557,7 +569,7 @@ model.addEventListener("deselect_content", function(e) {
         </div><!--/.well -->
       </div><!--/span-->
       <div id="content-well" class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>
-        <div class="hero-unit" style="border:2px solid;">
+        <div class="hero-unit" style="border:2px solid; color:grey">
           <h3 align="center" style="line-height:100%" id="album-title" ></h3>
 
           <div align="center">

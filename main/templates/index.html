@@ -6,6 +6,7 @@ Welcome to CoShare!
 
 {% block head %}
 <link href="{{STATIC_URL}}/css/index.css" rel="stylesheet">
+<link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
 {% endblock %}
 
 {% block content %}
@@ -18,7 +19,7 @@ Welcome to CoShare!
       </ul>
     </div>
     <h1>Smith Family</h1>
-    <div class="pictureSection">Recently Added<a href="" style="margin-left:300px">See All</a></div>
+    <div class="pictureSection">Recently Added<a href="" style="margin-left:300px; text-decoration:none;">See All</a></div>
     <div>
       <div class="picture-collection">
         {% for image in recently_added_1 %}
@@ -39,7 +40,7 @@ Welcome to CoShare!
     </div>
 
     <div class="pull-left" style="float:left">
-      <div class="pictureSection">Recently Favorited<a href="" style="margin-left:250px">See All</a></div>
+      <div class="pictureSection">Recently Favorited<a href="" style="margin-left:250px; text-decoration:none;">See All</a></div>
 
       <div class="picture-collection">
         {% for image in favs_1 %}

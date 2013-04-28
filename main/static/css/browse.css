@@ -3,8 +3,7 @@
 }
 
 .album-name {
-    background-color: #CCC;
-    /* font-size: 16pt;*/
+    /*background-color: #CCC;*/
 }
 
 #new_plist, .album-name {
@@ -23,7 +22,7 @@
 }
 
 .selected-album {
-    background-color: black;
+    background-color: #ccc;
     color: white;
 }
 
@@ -84,6 +83,13 @@ td {
       padding-left: 5px;
       padding-right: 5px;
   }
+}
+
+#content-well{
+    min-height: 95%;
+    height: auto !important;
+    height: 95%;
+    margin: 0 auto -4em;
 }
 
 .helper {
