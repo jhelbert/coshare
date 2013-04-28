@@ -1,4 +1,4 @@
-from main.models import Content,Playlist
+from main.models import Content,Album
 from django.shortcuts import render_to_response
 from django import forms
 from django.template import RequestContext
@@ -10,11 +10,11 @@ import json
 import datetime
 
 def main(request):
-	query_all_playlist()
+	query_all_album()
 	get_recently_added()
 
 	try:
-		recent_plist = Playlist.objects.get(name="Recently Added")
+		recent_plist = Album.objects.get(name="Recently Added")
 		recently_added = recent_plist.content.all()
 		recently_added_1 = recently_added[:4]
 		recently_added_2 = recently_added[4:8]
@@ -22,7 +22,7 @@ def main(request):
 		recently_added_1 = None
 		recently_added_2 = None
 	try:
-		fav_plist = Playlist.objects.get(name="Recently Favorited")
+		fav_plist = Album.objects.get(name="Recently Favorited")
 		favs = fav_plist.content.all()
 		fav_1 = favs[:4]
 		fav_2 = favs[4:8]
@@ -41,7 +41,7 @@ def main(request):
 
 def get_recently_added():
 	try:
-		recently_added_plist = Playlist.objects.get(name="Recently Added")
+		recently_added_plist = Album.objects.get(name="Recently Added")
 		print "got ra plist"
 		recently_added_plist.content.clear()
 		content = Content.objects.all()
@@ -63,36 +63,36 @@ def mobile(request):
 @csrf_exempt
 def new_plist(request):
 	name = request.POST.get('name')
-	plist = Playlist(name=name)
+	plist = Album(name=name)
 	plist.save()
 	return HttpResponseRedirect('/')
 
 def browse(request):
 	get_recently_added()
-	playlists = Playlist.objects.all()
-	query_all_playlist()
+	albums = Album.objects.all()
+	query_all_album()
 	return render_to_response('browse.html', 
 		{
-		 "playlists":playlists
+		 "albums":albums
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
-def query_all_playlist():
+def query_all_album():
 	try:
-		all_playlist = Playlist.objects.get(auto_all=True)
+		all_album = Album.objects.get(auto_all=True)
 		all_content = Content.objects.all()
 		for content in all_content:
-			all_playlist.content.add(content)
+			all_album.content.add(content)
 	except:
 		pass
 
 @csrf_exempt
 def upload(request):
-	playlist_id = request.POST.get('playlist')
+	album_id = request.POST.get('album')
 	
-	playlist = None
-	if playlist_id != -1:
-		playlist = Playlist.objects.get(id=playlist_id)
+	album = None
+	if album_id != -1:
+		album = Album.objects.get(id=album_id)
 
 	for uploaded_content in request.FILES.getlist('content'):
 		print uploaded_content
@@ -104,29 +104,29 @@ def upload(request):
 			new_content.is_video = True
 
 		new_content.save()
-		if playlist:
-			playlist.content.add(new_content)
-			playlist.save()
+		if album:
+			album.content.add(new_content)
+			album.save()
 	return HttpResponseRedirect('/browse/')
 
 @csrf_exempt
 def add_album(request):
 	name = request.POST.get('name')
 	print name
-	new_playlist = Playlist(name=name)
-	new_playlist.save()
+	new_album = Album(name=name)
+	new_album.save()
 	return HttpResponse('OK')
 
 @csrf_exempt
 def add_content(request):
 	album_id = request.POST.get('album_id')
 	pic_id = request.POST.get('pic_id')
-	playlist = Playlist.objects.get(id=int(album_id))
+	album = Album.objects.get(id=int(album_id))
 	print 'got plist'
 	content = Content.objects.get(id=int(pic_id))
 	print 'got content'
-	playlist.content.add(content)
-	playlist.save()
+	album.content.add(content)
+	album.save()
 	return HttpResponse('OK')
 
 
@@ -134,7 +134,7 @@ def add_content(request):
 def add(request):
 	content =  request.GET.getlist('eles')
 	content = tuple(content)
-	album = Playlist.objects.get(id=request.GET.get('album'))
+	album = Album.objects.get(id=request.GET.get('album'))
 	for c in content:
 		print "C:%s" % c
 		album.content.add(Content.objects.get(id=c))
@@ -150,14 +150,14 @@ def open_modal(request):
 	res = {}
 	res["des"] = ""
 	photos = {}
-	playlistList = []
+	albumList = []
 
-	all_playlist = Playlist.objects.all()
+	all_album = Album.objects.all()
 		
-	for plist in all_playlist:
+	for plist in all_album:
 		for content in plist.content.all():
 			if str(content.id) == imageID:
-				playlistList.append(plist.name)
+				albumList.append(plist.name)
 				c = plist.content.all()
 				max_num = min(3,len(c))
 				photos[plist.name] = []
@@ -165,7 +165,7 @@ def open_modal(request):
 					photos[plist.name].append(c[i].image.url)
 				break
 
-	res["playlists"] = playlistList
+	res["albums"] = albumList
 	res["photos"] = photos
 
 	for content in all_content:

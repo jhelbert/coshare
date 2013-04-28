@@ -99,7 +99,7 @@ The model will propagate the appropriate effects.s
       option.text = e.album.get_name();
 
       option.value = e.album.id;
-      var select = document.getElementById("playlist_list");
+      var select = document.getElementById("album_list");
       select.appendChild(option);
       album_div
       .addClass("album-name")
@@ -116,8 +116,8 @@ The model will propagate the appropriate effects.s
     else{
       var icon = document.createElement("img");
       icon.setAttribute("id", "icon")
-      icon.setAttribute("src", "/static/assets/img/static_playlist_icon.png");
-      icon.setAttribute("alt", "static playlist");
+      icon.setAttribute("src", "/static/assets/img/static_album_icon.png");
+      icon.setAttribute("alt", "static album");
       icon.setAttribute("height", "25");
       icon.setAttribute("width", "25");
 
@@ -245,7 +245,7 @@ model.addEventListener("select_album", function(e) {
 
   $(".content").dblclick(function() {
     $(".alert").alert('close');
-    $(".playlistList").empty();
+    $(".albumList").empty();
     $("#openModal").css("opacity",1);
     $("#openModal").css("pointer-events","auto");
     var image = $(this).children("img").attr("src");
@@ -254,7 +254,7 @@ model.addEventListener("select_album", function(e) {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
 
-      // Add playlists info to list
+      // Add albums info to list
       $.ajax({
         type: "POST",
         url: "/open_modal_view/",
@@ -262,7 +262,7 @@ model.addEventListener("select_album", function(e) {
       }).done(function( msg ) {
           // upload picture description
           var description = msg["des"];
-          var pls = msg["playlists"];
+          var pls = msg["albums"];
           var photo_table = msg["photos"];
           if (description == "") {
             description = "No Description";
@@ -277,7 +277,7 @@ model.addEventListener("select_album", function(e) {
               ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
             }
             uiElement.append(ulPhoto);
-            $(".playlistList").append(uiElement);
+            $(".albumList").append(uiElement);
           }
         });
 
@@ -339,11 +339,11 @@ model.addEventListener("deselect_content", function(e) {
 
   // get albums from django
   // MUST APPEAR AFTER LISTENERS ARE CREATED
-  {% for playlist in playlists %}
-  var album = new Album({{playlist.id}},"{{playlist.name}}");
+  {% for album in albums %}
+  var album = new Album({{album.id}},"{{album.name}}");
   model.add_album(album);
-  album_map[{{playlist.id}}] = album;
-  {% for content in playlist.content.all %}
+  album_map[{{album.id}}] = album;
+  {% for content in album.content.all %}
   album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
   {% endfor %}
   {% endfor %}
@@ -464,7 +464,7 @@ model.addEventListener("deselect_content", function(e) {
       </div>
       <div class="column" id="rightCol">
         <h4> Album Membership </h4>
-        <ul class="playlistList">
+        <ul class="albumList">
         </ul>
       </div>
       
@@ -486,7 +486,7 @@ model.addEventListener("deselect_content", function(e) {
       <div id="blah" align="center"></div>              
       <div align="center" style="margin-top:30px">
         Add To Album:
-        <select id="playlist_list" name="playlist">
+        <select id="album_list" name="album">
           <option value="1">None</option> 
         </select>
       </div>

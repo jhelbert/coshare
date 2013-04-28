@@ -107,7 +107,7 @@ var Model = function() {
         this.fireEvent("select_album", {album: album});
 
         // TODO: manage content selection
-        // what if we are selecting the current playlist again?
+        // what if we are selecting the current album again?
         this.selected_contents = [];
     }
 

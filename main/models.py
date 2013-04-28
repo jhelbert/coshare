@@ -10,7 +10,7 @@ class Content(models.Model):
 	def __unicode__(self):
 		return str(self.image)
 
-class Playlist(models.Model):
+class Album(models.Model):
 	name = models.CharField(max_length=100)
 	content = models.ManyToManyField(Content,null=True,blank=True)
 	metric = models.IntegerField(null=True,blank=True)
