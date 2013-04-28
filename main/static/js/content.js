@@ -15,8 +15,17 @@ var Content = function(id,src,size) {
     this.get_content = function() {
 
         // use stubbed image for now
-        var output = new Image();
+        substrings = ['mov','MOV','mp4'];
+        var output;
+        if (new RegExp(substrings.join("|")).test(src)) {
+            output = document.createElement('video');
+    // At least one match
+        }
+        else {
+            output = new Image();
+        }
         output.src = "/media/" + src;
+        output.height = size * 10;
         output.draggable = false;
         // output.height = size*10;
 
