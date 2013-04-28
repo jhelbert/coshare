@@ -531,6 +531,23 @@ model.addEventListener("deselect_content", function(e) {
     }
   });
 
+  $("#deletePicture").click(function() {
+    var confirmBox = confirm("Deleting will remove this photo from all albums, as well as from your account. Do you want to continue?");
+    if (confirmBox == true) {
+      console.log("deletePhoto");
+      $("#openModal").modal("hide");
+      // Delete from backend, and update page
+    } else {
+      // do nothing
+      console.log("cancel");
+    }
+  });
+
+  // TODO: Right function to remove photo from database and update page appropriately 
+  var deletePicture = function() {
+
+  }
+
 });
 </script>
 {% endblock %}
@@ -564,7 +581,12 @@ model.addEventListener("deselect_content", function(e) {
         </div>
       </div>
     </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deletePicture"> Delete </button>
+    </div>
   </div>
+
+  
 
   <div id="upload" style="float:right">
    <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
