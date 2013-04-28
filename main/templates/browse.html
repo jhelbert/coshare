@@ -168,7 +168,6 @@ var make_droppable = function(album_div) {
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
-
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
@@ -254,12 +253,11 @@ model.addEventListener("select_album", function(e) {
   $("#content").text("content from " + e.album.get_name());
 
   $(".content").dblclick(function() {
+    if (last_clicked_content.height == 200) {
+      $(".favorited").addClass("btn-success")
+    }
     $(".alert").alert('close');
     
-    /*
-    $("#openModal").css("opacity",1);
-    $("#openModal").css("pointer-events","auto");
-    */
     $("#openModal").modal("show");
     $(".albumList").empty();
     var image = $(this).children("img").attr("src");
@@ -410,7 +408,13 @@ model.addEventListener("deselect_content", function(e) {
 
         for (var i = 0; i < pls.length; i++) {
           var plName = pls[i];
-          var uiElement = $("<ui class='outerUI'> <h5>" + plName + "</h5></ui>");
+          var titleElement = $("<h5>" + plName + "</h5>");
+          var uiElement = $("<ui style='cursor:hand;' class='outerUI'> </ui>");
+          uiElement.append(titleElement);
+          uiElement.click(function() {
+            var curName = $(this).children("h5").html();
+            albumClick(curName.toString());
+          });
           var ulPhoto = $("<ul class='previewPhoto'> </ul>");
           for (var j=0; j < photo_table[plName].length; j++) {
             ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
@@ -420,6 +424,41 @@ model.addEventListener("deselect_content", function(e) {
         }
       });
   }
+
+  var albumClick = function(albumName) {
+    // Close Modal
+    $(".alert").alert('close');
+    $("#openModal").modal("hide");
+
+    // Get correct album
+    var match;
+    $(".album-name").each(function(index,element) {
+      if ($(element).html().toString() == albumName) {
+        match = $(element);
+      }
+    });
+    console.log("match", match);
+
+    // Get album object
+    var id = match.attr("id");
+    id = id.substring(6);
+    var album;
+    for (var i=0; i < model.albums.length; i++) {
+      var curID = model.albums[i]["id"];
+      console.log(curID,id);
+      if (curID.toString() == id.toString()) {
+        album = model.albums[i];
+        console.log("album",album);
+        break;
+      }
+    }
+
+    // Trigger event to load selected album
+    model.select_album(album);
+    
+
+  }
+
 
   var editDescription = function() {
     var text = $(".imageDescription").text();
@@ -479,11 +518,15 @@ model.addEventListener("deselect_content", function(e) {
   $(".favorited").click(function() {
     $(".favorited").toggleClass("btn-success");
     if ($(".favorited").attr('class') == "btn favorited btn-success") {
+        last_clicked_content.output.height *= 1.5;
+        last_clicked_content.output.width *= 1.5;
        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
     }
     else {
       console.log("removing");
       console.dir(last_clicked_content);
+      last_clicked_content.output.height /= 1.5;
+        last_clicked_content.output.width /= 1.5;
       favorites_album.remove_content(last_clicked_content);
     }
   });

@@ -73,12 +73,10 @@ var Album = function(id,name) {
                     //refresh_last_modified(side);
               });
         }
-        // TODO: interface with server
     }
 
     /** removes @content from this album, if present */
     this.remove_content = function(content) {
-        // current does nothing
         var index = this.output.indexOf(content);
         var srcs = [];
         for (var i = 0; i < this.output.length; i++) {
@@ -101,11 +99,9 @@ var Album = function(id,name) {
                         url: "/ajax/remove_content/",
                         data: { album_id: this.id, id:content.id }
                 }).done(function( msg ) {
-                    //refresh_last_modified(side);
               });
 
 
-        // TODO: interface with server
     }
 
     /** 

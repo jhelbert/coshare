@@ -9,6 +9,7 @@
 var Content = function(id,src,size) {
     this.id = id;
     this.src = src;
+    this.height = size * 10;
 
     // TODO: create checkrep?
 
@@ -30,10 +31,10 @@ var Content = function(id,src,size) {
         output.height = size * 10;
         output.draggable = false;
         // output.height = size*10;
+        this.output = output
 
         return output;
 
-        // TODO: interface with backend
         // request image object each time it's needed?
         // cache it?
     }

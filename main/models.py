@@ -9,6 +9,7 @@ class Content(models.Model):
 	is_video = models.BooleanField()
 	def __unicode__(self):
 		return str(self.image)
+	
 
 class Album(models.Model):
 	name = models.CharField(max_length=100)
@@ -17,3 +18,5 @@ class Album(models.Model):
 	auto_all = models.BooleanField()
 	def __unicode__(self):
 		return self.name
+
+
