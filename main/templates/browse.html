@@ -618,53 +618,24 @@ model.addEventListener("deselect_content", function(e) {
   <div class="row-fluid">
     <div class="span3">
       <div class="well sidebar-nav" style="margin-top:52px;border:2px solid; color:grey">
-          <div id="albums-container" data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
-            <ul id="automatic-albums" class="nav nav-list">
+          <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
+            <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
               <li class="nav-header">Standard Albums</li>
             </ul>
-            <ul id="special-albums" class="nav nav-list">
+            <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
               <li class="nav-header">Edit Albums</li>
             </ul>
-            <ul id="user-created-albums" class="nav nav-list">
+            <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
               <li class="nav-header">Your Albums</li>
             </ul>
-              <!-- <div id="automatic-albums" class="album-section"></div> -->
-              <!-- <li class="nav-header">Edit Albums</li>
-              <div id="special-albums" class="album-section"></div>
-              <li class="nav-header">Your Albums</li>
-              <div id="user-created-albums" class="album-section"></div>
-              <input name="name" id="new_plist" type="text"/>
-            </ul> --> 
+            <input name="name" id="new_plist" type="text"/>
           </div>
-
-        <!--   <div class="span3">
-          <div class="well sidebar-nav">
-            <ul class="nav nav-list">
-              <li class="nav-header">Sidebar</li>
-              <li class="active"><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li class="nav-header">Sidebar</li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li class="nav-header">Sidebar</li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-              <li><a href="#">Link</a></li>
-            </ul>
-          </div><!--/.well -->
-        <!-- </div> -->
       
         </div><!--/.well -->
       </div><!--/span-->
-      <div id="content-well" class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>
+      <div id="content-well" class="span9">
         <div class="hero-unit" style="border:2px solid; color:grey">
-          <h3 align="center" style="line-height:100%" id="album-title" ></h3>
+          <h3 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
 
           <div align="center">
            <button class="btn btn-primary" id="btnSelectAll">Select All</button>
@@ -682,6 +653,9 @@ model.addEventListener("deselect_content", function(e) {
 </div>
 
 {% endblock %}
+
+
+
 
 
 
