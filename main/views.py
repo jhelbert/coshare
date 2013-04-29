@@ -92,7 +92,8 @@ def upload(request):
 	album_id = request.POST.get('album')
 	
 	album = None
-	if album_id != -1:
+	if album_id != -1 and album_id != None:
+		print album_id
 		album = Album.objects.get(id=album_id)
 
 	for uploaded_content in request.FILES.getlist('content'):
