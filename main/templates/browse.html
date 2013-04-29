@@ -233,29 +233,15 @@ model.addEventListener("select_album", function(e) {
     .attr("id", "content-" + content.id)
     .attr("id-num", content.id)
     .click(function() {
+      if ($(this).data("dragging")) {
+        return;
+      }
       model.toggle_content(content);
     });
 
     $("#contents-container").append(div);
     pckry.appended(div.get());
 
-    /*
-    model.addEventListener("select_content", function(e2) {
-      if (e2.content.equals(content)) {
-        div.addClass("selected-content");
-        selected_content_ids.push(e2.content.id);
-        selected_content_map[e2.content.id] = e2.content.get_content().src.split("/media/")[1];;
-      }
-    });
-    model.addEventListener("deselect_content", function(e2) {
-      if (e2.content.equals(content)) {
-        div.removeClass("selected-content");
-        var index = selected_content_ids.indexOf(e2.content.id);
-        delete selected_content_map[e2.content.id];
-        selected_content_ids.splice(index,1);
-      }
-    });
-    */
   });
   $("#contents-container").imagesLoaded(function() {
     pckry.layout();
@@ -321,12 +307,14 @@ model.addEventListener("select_content", function(e) {
     revert: true,
     start: function(event, ui) {
       $(ignored_selectors).fadeTo(250, 0.2);
+      $(this).data("dragging", true);
     },
     helper: function( event ) {
       return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
     },
     stop: function(event, ui) {
       $(ignored_selectors).fadeTo(250, 1);
+      $(this).data("dragging", false);
     },
     distance: 20,
     cursorAt: { top: 0, left: -25 },

@@ -3,3 +3,4 @@
 coshare
 main/migrations/*
 media/*
+env/*
