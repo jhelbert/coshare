@@ -102,7 +102,7 @@ The model will propagate the appropriate effects.s
       var option = document.createElement("option");
       option.text = e.album.get_name();
 
-      if(e.album.name.indexOf("Content To editButton")==-1){
+      if(e.album.name.indexOf("Content To Edit")==-1){
         icon.setAttribute("class", "icon-folder-close");
       }
       else{
@@ -124,7 +124,7 @@ The model will propagate the appropriate effects.s
       album_div.append(e.album.get_name()); 
       
 
-      $("#dynamic-albums").append(album_div);
+      $("#user-created-albums").append(album_div);
     }
 
 
@@ -140,7 +140,7 @@ The model will propagate the appropriate effects.s
       album_div.append(icon);
       album_div.append(e.album.get_name()); 
 
-      $("#static-albums").append(album_div);
+      $("#special-albums").append(album_div);
     }
     model.addEventListener("rename_album", function(e2) {
 
@@ -306,7 +306,7 @@ model.addEventListener("select_content", function(e) {
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div.addClass("selected-content");
-  var ignored_selectors = "#static-albums .album-name, .navbar, .selected-album"
+  var ignored_selectors = "#special-albums .album-name, .navbar, .selected-album"
   $("#content-" + e.content.id).draggable({
     revert: true,
     start: function(event, ui) {
@@ -433,7 +433,7 @@ model.addEventListener("deselect_content", function(e) {
     // Get correct album
     var match;
     $(".album-name").each(function(index,element) {
-      if ($(element).html().toString() == albumName) {
+      if ($(element).text().toString() == albumName) {
         match = $(element);
       }
     });
@@ -531,6 +531,23 @@ model.addEventListener("deselect_content", function(e) {
     }
   });
 
+  $("#deletePicture").click(function() {
+    var confirmBox = confirm("Deleting will remove this photo from all albums, as well as from your account. Do you want to continue?");
+    if (confirmBox == true) {
+      console.log("deletePhoto");
+      $("#openModal").modal("hide");
+      // Delete from backend, and update page
+    } else {
+      // do nothing
+      console.log("cancel");
+    }
+  });
+
+  // TODO: Right function to remove photo from database and update page appropriately 
+  var deletePicture = function() {
+
+  }
+
 });
 </script>
 {% endblock %}
@@ -564,7 +581,12 @@ model.addEventListener("deselect_content", function(e) {
         </div>
       </div>
     </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deletePicture"> Delete </button>
+    </div>
   </div>
+
+  
 
   <div id="upload" style="float:right">
    <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
@@ -601,11 +623,12 @@ model.addEventListener("deselect_content", function(e) {
         <ul class="nav nav-list">
           <li class="album-header" margin-left="10px">Albums</li>
           <div id="albums-container" data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
-            <div id="static-albums"></div>
-            <hr>
-            <div id="dynamic-albums">
+            <div id="automatic-albums"></div>
+            <div id="special-albums"></div>
+            <div id="user-created-albums">
               <input name="name" id="new_plist" type="text"/>
             </div>
+
           </div>
           
 
