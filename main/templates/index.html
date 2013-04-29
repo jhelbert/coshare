@@ -24,7 +24,7 @@ Welcome to CoShare!
       <div class="picture-collection">
         {% for image in recently_added_1 %}
         <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120" width="120">
+          <div class="cropped-image" style="background-image: url(/media/{{image.image}}); "></div>
         </div>
         {% endfor %}
 
@@ -33,7 +33,7 @@ Welcome to CoShare!
       <div class="picture-collection">
         {% for image in recently_added_2 %}
         <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120" width="120">
+          <div class="cropped-image" style="background-image: url(/media/{{image.image}}); "></div>
         </div>
         {% endfor %}
       </div>
@@ -45,7 +45,7 @@ Welcome to CoShare!
       <div class="picture-collection">
         {% for image in favs_1 %}
         <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120" width="120">
+          <div class="cropped-image" style="background-image: url(/media/{{image.image}}); "></div>
         </div>
         {% endfor %}
 
@@ -54,7 +54,7 @@ Welcome to CoShare!
       <div class="picture-collection">
         {% for image in favs_2 %}
         <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120" width="120">
+          <div class="cropped-image" style="background-image: url(/media/{{image.image}}); "></div>
         </div>
         {% endfor %}
       </div>
