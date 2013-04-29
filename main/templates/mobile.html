@@ -34,6 +34,7 @@ body {
     <h3>Upload</h3>
     <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
       <input width="150px" name="content" type="file" multiple id="uploadme" onchange="readURL(this);" />
+      <input type="submit" name="submit" value="Submit">
     </div>
   </div>
   <input type="file" style="visibility:hidden;" id="uploadme" />

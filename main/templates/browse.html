@@ -96,63 +96,72 @@ The model will propagate the appropriate effects.s
     }
 
 
-    var album_div = $("<div />");
+    var album_li = $("<li />");
     var icon = document.createElement("i");
+    var link = document.createElement("a");
+    link.setAttribute("href","#");
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
 
-      if(e.album.name.indexOf("Content To Edit")==-1){
-        icon.setAttribute("class", "icon-folder-close");
-      }
-      else{
-        icon.setAttribute("class", "icon-tasks");
-      }
+      
+      icon.setAttribute("class", "icon-folder-close");
+    
 
       option.value = e.album.id;
       var select = document.getElementById("album_list");
       select.appendChild(option);
 
-
-      album_div
-      .addClass("album-name")
+      /**.addClass("album-name")**/
+      album_li
       .attr("id", "album-" + e.album.id)
       .click(function() {
         model.select_album(e.album);
       });
-      album_div.append(icon);
-      album_div.append(e.album.get_name()); 
-      
+      link.innerHTML = icon.outerHTML+e.album.get_name();
+      album_li.append(link);
 
-      $("#user-created-albums").append(album_div);
+      $("#user-created-albums").append(album_li);
     }
 
 
     else{
-      icon.setAttribute("class", "icon-cog");
 
-      album_div
-      .addClass("album-name")
+      if(e.album.name.indexOf("Content To Edit")!=-1){
+        icon.setAttribute("class", "icon-tasks");
+      }
+      else if(e.album.name.indexOf("Favorite")!=-1){
+        icon.setAttribute("class", "icon-star"); 
+      }
+      else{
+        icon.setAttribute("class", "icon-cog");
+      }
+      /**.addClass("album-name")**/
+      album_li
       .attr("id", "album-" + e.album.id)
       .click(function() {
         model.select_album(e.album);
       });
-      album_div.append(icon);
-      album_div.append(e.album.get_name()); 
-
-      $("#special-albums").append(album_div);
+      link.innerHTML = icon.outerHTML+e.album.get_name();
+      album_li.append(link);
+      if(e.album.name.indexOf("Edit")==-1){
+        $("#automatic-albums").append(album_li);
+      }
+      else{
+        $("#special-albums").append(album_li); 
+      }
     }
     model.addEventListener("rename_album", function(e2) {
 
       if (e2.album.equals(e.album)) {
-        album_div.text(e2.album.get_name());
+        album_li.text(e2.album.get_name());
         $("#album-title").text(e2.album.get_name());
       }});
-    var album_div = $("#album-" + e.album.id)
+    var album_li = $("#album-" + e.album.id)
     if (e.album.is_user_generated()) {
-      make_droppable(album_div);
+      make_droppable(album_li);
     } else {
-      album_div.droppable();
+      album_li.droppable();
     }
 });
 
@@ -181,6 +190,7 @@ model.addEventListener("select_album", function(e) {
   } else {
     $("#album-" + e.album.id).addClass("selected-album");
   }
+  $("#album-" + e.album.id).addClass("active");
 
   
   // disable droppability
@@ -277,7 +287,7 @@ model.addEventListener("select_album", function(e) {
 /******** DESELECT ALBUM LISTENER *********/
 model.addEventListener("deselect_album", function(e) {
   var album_div = $("#album-" + e.album.id)
-  console.dir(e);
+  
   if (e.album.is_user_generated()) {
     make_droppable(album_div);
   } else {
@@ -285,7 +295,7 @@ model.addEventListener("deselect_album", function(e) {
 
   }
   album_div.removeClass("selected-album")
-  .removeClass("selected-auto-album");
+  .removeClass("selected-auto-album").removeClass("active");
 });
 
 /********** REMOVE ALBUM LISTENER *********/
@@ -619,19 +629,49 @@ model.addEventListener("deselect_content", function(e) {
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
-      <div class="well sidebar-nav" style="margin-top:110px;border:2px solid; color:grey">
-        <ul class="nav nav-list">
-          <li class="album-header" margin-left="10px">Albums</li>
+      <div class="well sidebar-nav" style="margin-top:52px;border:2px solid; color:grey">
           <div id="albums-container" data-intro='Here are all your albums - they help group related content. <br>Try selecting one.<br><b>Note:</b> The ones with the gears are generated automatically.' data-step='1'>
-            <div id="automatic-albums"></div>
-            <div id="special-albums"></div>
-            <div id="user-created-albums">
+            <ul id="automatic-albums" class="nav nav-list">
+              <li class="nav-header">Standard Albums</li>
+            </ul>
+            <ul id="special-albums" class="nav nav-list">
+              <li class="nav-header">Edit Albums</li>
+            </ul>
+            <ul id="user-created-albums" class="nav nav-list">
+              <li class="nav-header">Your Albums</li>
+            </ul>
+              <!-- <div id="automatic-albums" class="album-section"></div> -->
+              <!-- <li class="nav-header">Edit Albums</li>
+              <div id="special-albums" class="album-section"></div>
+              <li class="nav-header">Your Albums</li>
+              <div id="user-created-albums" class="album-section"></div>
               <input name="name" id="new_plist" type="text"/>
-            </div>
-
+            </ul> --> 
           </div>
-          
 
+        <!--   <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="nav-header">Sidebar</li>
+              <li class="active"><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li class="nav-header">Sidebar</li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li class="nav-header">Sidebar</li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+              <li><a href="#">Link</a></li>
+            </ul>
+          </div><!--/.well -->
+        <!-- </div> -->
+      
         </div><!--/.well -->
       </div><!--/span-->
       <div id="content-well" class="span9" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='2'>

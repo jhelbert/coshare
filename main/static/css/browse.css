@@ -4,13 +4,13 @@
 
 .album-name {
     /*background-color: #CCC;*/
+    color: #0088cc;
 }
 
 #new_plist, .album-name {
     padding: 5px;
     width: 90%;
     padding: 5px;
-    margin: 5px;
 }
 
 #new_plist {
@@ -24,6 +24,10 @@
 .selected-album {
     background-color: #ccc;
     color: white;
+    margin-left: -10px;
+    margin-right: -15px;
+    padding-right: 15px;
+    padding-left: 10px;
 }
 
 .droppable-album {
@@ -55,6 +59,10 @@
 
 #contents-container {
     width: 100%;
+}
+
+#albums-container{
+    margin-left: -5px;
 }
 
 .content img {

@@ -17,9 +17,6 @@ body {
 
 .cropped-image{
 display: block;
-width: 128px;
-height: 128px;
-background-position: center;
-background-size: auto 250px;
-background-repeat: no-repeat;
+margin:-20px -15px -40px -55px;
+
 }
