@@ -19,6 +19,10 @@ CoShare - Content Manager
 <script src="/static/js/content.js"></script>
 <script src="/static/js/model.js"></script>
 
+<!-- Slider -->
+<script src="{{STATIC_URL}}/js/bootstrap-slider.js"></script>
+<link href="{{STATIC_URL}}/css/slider.css" rel="stylesheet">
+
 <link href="{{STATIC_URL}}/css/browse.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
 
@@ -100,6 +104,16 @@ $(function() {
     itemSelector: ".content",
     transitionDuration: "0.75s",
   });
+
+  $("#slider")
+    .slider({
+      value: 1,
+    })
+    .on("slide", function(ev) {
+      console.dir(ev);
+      $("img").css("height", 100*ev.value);
+      pckry.layout();
+    });
 
   /******************************************/
   /**** Register Listeners to the Model *****/
@@ -387,7 +401,7 @@ model.addEventListener("deselect_content", function(e) {
   {% for content in album.content.all %}
   album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
 
-  
+
   {% endfor %}
 
   {% endfor %}
@@ -633,7 +647,6 @@ function undo_remove() {
 {% endblock %}
 
 {% block content %}
-<body>
 
   <div class="container-fluid">
     <div class="row-fluid">
@@ -677,13 +690,19 @@ function undo_remove() {
          </div>
        </div>
        <div class="fluid-row">
-         <div class="span12"><hr></div>
+          <div class="span12" value="">
+            <div id="slider" style="width: 100px" class="slider" />
+          </div>
+          <hr>
+        </div>
        </div>
        <div class="fluid-row">
         <div class="span12" id="contents-container" />
       </div>
     </div>
   </div>
+
+  <!--- MODAL SHIT -->
 
   <div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
   <!-- Modal copy, trying to port to bootstrap -->

@@ -28,7 +28,7 @@ var Content = function(id,src,size) {
         }
         output.src = "/media/" + src;
         output.id = id;
-        output.height = 170;
+        output.height = 100;
 
         // output.height = size*10;
         this.output = output
