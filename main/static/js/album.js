@@ -74,6 +74,23 @@ var Album = function(id,name) {
                     //refresh_last_modified(side);
               });
         }
+
+    }
+
+    this.add_undone_content = function (content) {
+        this.output.push(content);
+        
+              $.ajax({
+                        type: "POST",
+                        url: "/ajax/add_content/",
+                        data: { album_id: this.id, pic_id:content.id }
+                }).done(function( msg ) {
+                    //refresh_last_modified(side);
+              });
+
+                console.log("adding undone");
+                
+
     }
 
     /** removes @content from this album, if present */
@@ -125,7 +142,11 @@ var Album = function(id,name) {
         return !this.is_auto;
     }
 
+<<<<<<< HEAD
     this.set_is_selected = function(val){
         this.is_selected = val;
     }
+=======
+
+>>>>>>> cb8f44294f0d067603ad644453e6b4e6dda2a171
 }

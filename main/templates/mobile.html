@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block head %}
 
+
 <style type="text/css">
+
+
 body {
   padding-top: 60px;
 }
@@ -18,6 +21,20 @@ body {
   }
 }
 </style>
+
+<script type="text/javascript">
+$(function() {
+{% for album in albums %}
+var select = document.getElementById("album_list");
+var option = document.createElement("option");
+option.text = "{{album.name}}";
+option.value = {{album.id}};
+select.appendChild(option);
+console.log(option);
+{% endfor %}
+});
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -56,6 +73,7 @@ body {
       <div align="center" style="margin-top:30px">
         Add To Album:
         <select id="album_list" name="album">
+
           <option value="1">None</option> 
         </select>
       </div>
@@ -66,5 +84,9 @@ body {
     </div>  
   </div> 
 
-</div>
+</div>"
+
+
+
+
 {% endblock %}

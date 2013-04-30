@@ -28,8 +28,8 @@ var Content = function(id,src,size) {
         }
         output.src = "/media/" + src;
         output.id = id;
-        output.height = size * 10;
-        output.draggable = false;
+        output.height = 100;
+
         // output.height = size*10;
         this.output = output
 

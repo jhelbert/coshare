@@ -19,6 +19,10 @@ CoShare - Content Manager
 <script src="/static/js/content.js"></script>
 <script src="/static/js/model.js"></script>
 
+<!-- Slider -->
+<script src="{{STATIC_URL}}/js/bootstrap-slider.js"></script>
+<link href="{{STATIC_URL}}/css/slider.css" rel="stylesheet">
+
 <link href="{{STATIC_URL}}/css/browse.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
 
@@ -30,11 +34,38 @@ CoShare - Content Manager
 var selected_content_ids = [];
 var selected_content_map = {};
 var image_info = [];
-
+var last_removed_content_list = [];
+var last_removed_content_album;
 var album_map = {};
 var favorites_album;
+var current_album;
+var album_list = [];
+var pckry;
+
+
 
 $(function() {
+
+  var update_selection_count = function() {
+    var num_selected = model.get_num_selected_contents();
+    var num_total =  model.selected_album.get_contents().length;
+    $("#selection-count")
+    .text(num_selected + " of " + num_total + " selected");
+    
+    if (num_selected === 0) {
+      $("#btnRemoveSelectedContent, #btnDeselectAll")
+      .addClass("disabled");
+    } else {
+      $("#btnRemoveSelectedContent, #btnDeselectAll")
+      .removeClass("disabled");
+    }
+
+    if (num_selected === num_total) {
+      $("#btnSelectAll").addClass("disabled");
+    } else {
+      $("#btnSelectAll").removeClass("disabled");
+    }
+  }
 
   /***************************************/
   /************* COSMETICS ***************/
@@ -52,29 +83,42 @@ $(function() {
 
   }
   $('#new_plist')
-    .watermark('New Album')
-    .keyup(function (e) {
-      if (e.keyCode == 13) {
-        new_plist(e.target.value);
-      }
+  .watermark('New Album')
+  .keyup(function (e) {
+    if (e.keyCode == 13 && e.target.value != "") {
+
+      new_plist(e.target.value);
+    }
+  })
+  .droppable({
+    activeClass: "active",
+    hoverClass: "active",
+    accept: ".content",
+    drop: function( event, ui ) {
+      alert("insert workflow for creating new album from selection");
+    },
+  });
+
+  var container = document.querySelector("#contents-container")
+  pckry = new Packery(container, {
+    itemSelector: ".content",
+    transitionDuration: "0.75s",
+  });
+
+  $("#slider")
+    .slider({
+      value: 1,
+      min: 1,
+      max: 5,
     })
-    .droppable({
-      activeClass: "droppable-new-album",
-      hoverClass: "hover-drop-new-album",
-      accept: ".content",
-      drop: function( event, ui ) {
-        alert("insert workflow for creating new album from selection");
-      },
+    .on("slide", function(ev) {
+      $("img").css("height", 100*ev.value);
+      pckry.layout();
     });
 
-var container = document.querySelector("#contents-container")
-var pckry = new Packery(container, {
-  itemSelector: ".content",
-});
-
-/******************************************/
-/**** Register Listeners to the Model *****/
-/******************************************/
+  /******************************************/
+  /**** Register Listeners to the Model *****/
+  /******************************************/
 
   /*
 
@@ -99,16 +143,16 @@ The model will propagate the appropriate effects.s
     var album_li = $("<li />");
     var icon = document.createElement("i");
     var link = document.createElement("a");
-    link.setAttribute("href","#");
     link.setAttribute("class", "album-link");
     var nameSpan = document.createElement("span");
+    link.setAttribute("href","/browse/?album_name=" + e.album.name);
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
 
       
       icon.setAttribute("class", "icon-folder-close");
-    
+
 
       option.value = e.album.id;
       var select = document.getElementById("album_list");
@@ -122,9 +166,12 @@ The model will propagate the appropriate effects.s
       });
       nameSpan.innerHTML = e.album.get_name();
       link.innerHTML = icon.outerHTML+ nameSpan.outerHTML;
+
       album_li.append(link);
 
       $("#user-created-albums").append(album_li);
+      album_list.push(e.album);
+      
     }
 
 
@@ -166,26 +213,45 @@ The model will propagate the appropriate effects.s
     } else {
       album_li.droppable();
     }
-});
+  });
 
 var make_droppable = function(album_div) {
   album_div.droppable({
-        activeClass: "droppable-album",
-        hoverClass: "hover-drop-album",
-        accept: ".content",
-        drop: function( event, ui ) {
-        },
-      });
+    activeClass: "droppable-album",
+    hoverClass: "active",
+    accept: ".content",
+    drop: function( event, ui ) {
+      $(this).tooltip({
+        title: "Added " + model.get_num_selected_contents(),
+        placement: "left",
+        trigger: "manual",
+      }).tooltip("show");
+      var that = this;
+      setTimeout(function() {
+        $(that).tooltip("destroy");
+      }, 2000);
+    },
+  });
 }
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
+<<<<<<< HEAD
   if(!e.album.is_selected){
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
   console.log("album");
   console.dir(e);
+=======
+
+  update_selection_count();
+
+  selected_content_ids = [];
+  selected_content_map = {};
+  selected_album = e.album.id;
+  current_album = e.album;
+>>>>>>> cb8f44294f0d067603ad644453e6b4e6dda2a171
   // refresh title
   $("#album-title").text(e.album.get_name());
 
@@ -232,9 +298,6 @@ model.addEventListener("select_album", function(e) {
     $("#btnRemoveSelectedContent").attr("disabled", "disabled");
   }
 
-  // refresh contents
-  //$("#contents-container").isotope('remove', $("#contents-container .content"));
-  //$("#contents-container").packery('remove', $("#contents-container .content"));
   $("#contents-container .content").each(function(i,v) {
     pckry.remove(v);
   });
@@ -259,6 +322,9 @@ model.addEventListener("select_album", function(e) {
 
   });
   $("#contents-container").imagesLoaded(function() {
+    $("#contents-container img").each(function(i, v) {
+      $(v).css("min-width", $(v).css('width'));
+    });
     pckry.layout();
   });
   $("#content").text("content from " + e.album.get_name());
@@ -273,17 +339,20 @@ model.addEventListener("select_album", function(e) {
     $(".albumList").empty();
     var image = $(this).children("img").attr("src");
 
-    console.log(image);
     if (!image) {
       image = $(this).children("video").attr("src");
-      console.log(image);
     }
 
     var id_val = $(this).attr("id-num");
     populateModal(image,id_val);
 
+<<<<<<< HEAD
     });
 }});
+=======
+  });
+});
+>>>>>>> cb8f44294f0d067603ad644453e6b4e6dda2a171
 
 /******** DESELECT ALBUM LISTENER *********/
 model.addEventListener("deselect_album", function(e) {
@@ -313,20 +382,27 @@ model.addEventListener("remove_album", function(e) {
 
 /********* REMOVE CONTENT LISTENER ********/
 model.addEventListener("remove_content", function(e) {
+
+  last_removed_content_album  = current_album;
   $("#content-" + e.content.id).each(function(i, v) {
+    last_removed_content_list.push(e.content);
     pckry.remove(v);
+    
   });
+  $("#undo_div")[0].style.display="block";
   pckry.layout();
 });
 
+
+
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
+  update_selection_count();
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div.addClass("selected-content");
-  var ignored_selectors = "#special-albums .album-name, .navbar, .selected-album"
+  var ignored_selectors = "#special-albums .album-name, .navbar, .selected-album";
   $("#content-" + e.content.id).draggable({
-    revert: true,
     start: function(event, ui) {
       $(ignored_selectors).fadeTo(250, 0.2);
       $(this).data("dragging", true);
@@ -344,11 +420,12 @@ model.addEventListener("select_content", function(e) {
   })});
 
 model.addEventListener("deselect_content", function(e) {
+  update_selection_count();
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div
-    .draggable('destroy')
-    .removeClass("selected-content");
+  .draggable('destroy')
+  .removeClass("selected-content");
 });
 
   // get albums from django
@@ -357,12 +434,34 @@ model.addEventListener("deselect_content", function(e) {
   var album = new Album({{album.id}},"{{album.name}}");
   model.add_album(album);
   album_map[{{album.id}}] = album;
+  album_list.push(album);
   {% for content in album.content.all %}
   album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
-  {% endfor %}
+
+
   {% endfor %}
 
-  model.select_album(model.albums[0]);
+  {% endfor %}
+
+
+  var valid_album = false;
+  var all_album;
+  for (var i = 0; i < album_list.length; i++)  {
+    if (album_list[i].name == "All Content") {
+      all_album = album_list[i];
+    }
+
+    if ("{{selected_album.name}}" == album_list[i].name) {
+      model.select_album(album_list[i]);
+      valid_album = true;
+    }
+
+  }
+
+  if (!valid_album) {
+    model.select_album(all_album);
+  }
+
 
   // CRUD operations on albums
 
@@ -452,9 +551,11 @@ model.addEventListener("deselect_content", function(e) {
           $(".albumList").append(uiElement);
         }
       });
-  }
 
-  var albumClick = function(albumName) {
+}
+
+
+var albumClick = function(albumName) {
     // Close Modal
     $(".alert").alert('close');
     $("#openModal").modal("hide");
@@ -466,7 +567,6 @@ model.addEventListener("deselect_content", function(e) {
         match = $(element);
       }
     });
-    console.log("match", match);
 
     // Get album object
     var id = match.attr("id");
@@ -474,10 +574,8 @@ model.addEventListener("deselect_content", function(e) {
     var album;
     for (var i=0; i < model.albums.length; i++) {
       var curID = model.albums[i]["id"];
-      console.log(curID,id);
       if (curID.toString() == id.toString()) {
         album = model.albums[i];
-        console.log("album",album);
         break;
       }
     }
@@ -547,15 +645,13 @@ model.addEventListener("deselect_content", function(e) {
   $(".favorited").click(function() {
     $(".favorited").toggleClass("btn-success");
     if ($(".favorited").attr('class') == "btn favorited btn-success") {
-        last_clicked_content.output.height *= 1.5;
-        last_clicked_content.output.width *= 1.5;
-       favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
+      last_clicked_content.output.height *= 1.5;
+      last_clicked_content.output.width *= 1.5;
+      favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
     }
     else {
-      console.log("removing");
-      console.dir(last_clicked_content);
       last_clicked_content.output.height /= 1.5;
-        last_clicked_content.output.width /= 1.5;
+      last_clicked_content.output.width /= 1.5;
       favorites_album.remove_content(last_clicked_content);
     }
   });
@@ -563,12 +659,10 @@ model.addEventListener("deselect_content", function(e) {
   $("#deletePicture").click(function() {
     var confirmBox = confirm("Deleting will remove this photo from all albums, as well as from your account. Do you want to continue?");
     if (confirmBox == true) {
-      console.log("deletePhoto");
       $("#openModal").modal("hide");
       // Delete from backend, and update page
     } else {
       // do nothing
-      console.log("cancel");
     }
   });
 
@@ -577,12 +671,81 @@ model.addEventListener("deselect_content", function(e) {
 
   }
 
+
 });
+
+
+function undo_remove() {
+  var album = last_removed_content_album;
+  for (var i = 0; i < last_removed_content_list.length; i++ ) {
+    album.add_undone_content(last_removed_content_list[i]);
+
+  }
+  location.reload(true);
+}
+
+
 </script>
 {% endblock %}
 
 {% block content %}
-<body>
+
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span3">
+        <div class="well sidebar-nav">
+          <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
+            <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
+              <li class="nav-header">Standard Albums</li>
+            </ul>
+            <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+              <li class="nav-header">Edit Albums</li>
+            </ul>
+            <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
+              <li class="nav-header">Your Albums</li>
+            </ul>
+            <input name="name" id="new_plist" type="text"/>
+          </div>
+
+        </div><!--/.well -->
+      </div><!--/span-->
+      <div id="content-well" class="span9">
+        <div>
+          <div align="right" id="undo_div" style="display:none">
+            Content Removed: <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
+          </div>
+        </div>
+        <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
+
+          <div class="fluid-row">
+            <div class="span5">
+             <button class="btn btn-primary" id="btnSelectAll">Select All</button>
+             <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
+           </div>
+           <div class="span2">
+            <h4 class="text-center" id="selection-count" />
+          </div>
+          <div class="span5">
+            <p class="pull-right">
+             <button class="btn btn-danger" id="btnRemoveSelectedContent">Remove Selected Content</button>
+           </p>
+         </div>
+       </div>
+       <div class="fluid-row">
+          <div class="span12" value="">
+            <div id="slider" style="width: 100px" class="slider" />
+          </div>
+          <hr>
+        </div>
+       </div>
+       <div class="fluid-row">
+        <div class="span12" id="contents-container" />
+      </div>
+    </div>
+  </div>
+
+  <!--- MODAL SHIT -->
+
   <div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
   <!-- Modal copy, trying to port to bootstrap -->
   <div id="openModal" class="modal hide fade" role="dialog">
@@ -641,48 +804,8 @@ model.addEventListener("deselect_content", function(e) {
       <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);">Close</a>  
     </div>  
   </div>  
-
 </div>  
 </form>
-<div id="blah2"/>
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span3">
-      <div class="well sidebar-nav" style="margin-top:52px;border:2px solid; color:grey">
-          <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
-            <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
-              <li class="nav-header">Standard Albums</li>
-            </ul>
-            <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
-              <li class="nav-header">Edit Albums</li>
-            </ul>
-            <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
-              <li class="nav-header">Your Albums</li>
-            </ul>
-            <input name="name" id="new_plist" type="text"/>
-          </div>
-      
-        </div><!--/.well -->
-      </div><!--/span-->
-      <div id="content-well" class="span9">
-        <div class="hero-unit" style="border:2px solid; color:grey">
-          <h3 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
-
-          <div align="center">
-           <button class="btn btn-primary" id="btnSelectAll">Select All</button>
-           <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
-           <button class="btn btn-primary" id="btnRemoveSelectedContent">Remove Selected Content</button>
-         </div>
-         <div>
-          <br>
-          <hr>
-          <div id="contents-container" />
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 {% endblock %}
 
 

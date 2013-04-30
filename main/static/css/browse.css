@@ -39,12 +39,11 @@
 }
 
 .droppable-album {
-    border: 3pt dashed green;
+    color: #0F0;
 }
 
-.hover-drop-album {
-    background-color: #5BB75b;
-    background-color: yellow;
+body .hover-drop-album, body .hover-drop-album:hover {
+    background-color: yellow !important;
 }
 
 .droppable-new-album {
@@ -53,12 +52,11 @@
 }
 
 .content {
-    margin: 10px;
-    padding: 5px;
     text-align: center;
     border: 5px solid transparent;
-    border-radius: 10px;
+    /* border-radius: 10px; */
     cursor: pointer;
+    margin: 10px;
 }
 
 .green-border {
@@ -74,9 +72,8 @@
 }
 
 .content img {
-    border-radius: 5px;
+    /* border-radius: 5px; */
     border: 0px;
-    margin: 10px;
 }
 
 .content video {

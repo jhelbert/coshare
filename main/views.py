@@ -8,12 +8,48 @@ from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
 from random import randint
 import json
+from django.contrib.auth import authenticate,login, logout
 import datetime
 import random
+from django.contrib.auth.models import User
+
+def login_page(request):
+	return render_to_response('login.html', 
+		{
+		},
+		context_instance=RequestContext(request))
+
+def get_user_profile(request):
+	userprof = None
+	if not request.user.is_anonymous():
+		userprof = User.objects.get(username=request.user.username)
+	return userprof
+
+@csrf_exempt
+def login_user(request):
+	email = request.POST.get('email')
+	password = request.POST.get('password')
+	user = User.objects.get(email=email)
+	if user.check_password(password):
+		user.backend = 'django.contrib.auth.backends.ModelBackend'
+		login(request,user)
+		return HttpResponseRedirect('/')
+	else:
+		return HttpResponseRedirect('/login/')
+
+@csrf_exempt
+def logout_user(request):
+	logout(request)
+
+	return HttpResponseRedirect('/login/')
 
 def main(request):
+	userprof = get_user_profile(request)
 	query_all_album()
 	get_recently_added()
+	name = ""
+	if userprof:
+		name = userprof.first_name + " " + userprof.last_name
 
 	try:
 		recent_plist = Album.objects.get(name="Recently Added")
@@ -32,12 +68,16 @@ def main(request):
 		fav_1 = None
 		fav_2 = None
 
+
+
 	return render_to_response('index.html', 
 		{
 			"recently_added_1":recently_added_1,
 			"recently_added_2":recently_added_2,
 			"favs_1":fav_1,
-			"favs_2": fav_2
+			"favs_2": fav_2,
+			"userprof":userprof,
+			"name":name
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -56,9 +96,15 @@ def get_recently_added():
 		pass
 
 def mobile(request):
+	user_albums = []
+	all_albums = Album.objects.all()
+	for album in all_albums:
+		if album.name not in ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "Favorites", "All Content", "Tasks", "Content To Edit", "Spouse Content To Edit"]:
+			user_albums.append(album)
+	print user_albums
 	return render_to_response('mobile.html', 
 		{
-
+			"albums":user_albums
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -73,9 +119,18 @@ def browse(request):
 	get_recently_added()
 	albums = Album.objects.all()
 	query_all_album()
+	album_name = request.GET.get('album_name')
+	selected_album = None
+	try:
+		selected_album = Album.objects.get(name=album_name)
+		print selected_album
+	except:
+		pass
 	return render_to_response('browse.html', 
 		{
-		 "albums":albums
+		 "albums":albums,
+		 "selected_album": selected_album
+
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -191,7 +246,7 @@ def open_modal(request):
 					count = 0
 					index_set = []
 					while count < max_num:
-						index = randint(0,len(c)-1);
+						index = randint(0,len(c)-1)
 						if index in index_set:
 							continue
 						index_set.append(index)
