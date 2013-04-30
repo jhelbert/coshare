@@ -191,7 +191,7 @@ def open_modal(request):
 					count = 0
 					index_set = []
 					while count < max_num:
-						index = randint(0,len(c)-1);
+						index = randint(0,len(c)-1)
 						if index in index_set:
 							continue
 						index_set.append(index)
