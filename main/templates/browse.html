@@ -43,7 +43,24 @@ var pckry;
 $(function() {
 
   var update_selection_count = function() {
-    $("#selection-count").text(model.get_num_selected_contents() + " of " + model.selected_album.get_contents().length);
+    var num_selected = model.get_num_selected_contents();
+    var num_total =  model.selected_album.get_contents().length;
+    $("#selection-count")
+      .text(num_selected + " of " + num_total + " selected");
+    
+    if (num_selected === 0) {
+      $("#btnRemoveSelectedContent, #btnDeselectAll")
+        .addClass("disabled");
+    } else {
+      $("#btnRemoveSelectedContent, #btnDeselectAll")
+        .removeClass("disabled");
+    }
+
+    if (num_selected === num_total) {
+      $("#btnSelectAll").addClass("disabled");
+    } else {
+      $("#btnSelectAll").removeClass("disabled");
+    }
   }
 
   /***************************************/
@@ -735,7 +752,7 @@ function undo_remove() {
            <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
          </div>
          <div class="span2">
-          <h4 class="text-center" id="selection-count"><span> selected</span></h4>
+          <h4 class="text-center" id="selection-count" />
         </div>
          <div class="span5">
             <p class="pull-right">
@@ -751,7 +768,6 @@ function undo_remove() {
     </div>
   </div>
 </div>
-<a href="/media/static/content/IMG_0703_2_2.MOV">AAA</a>
 
 {% endblock %}
 
