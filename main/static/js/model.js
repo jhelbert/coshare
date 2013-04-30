@@ -122,7 +122,13 @@ var Model = function() {
     }
 
     this.get_num_selected_contents = function() {
-        return this.selected_contents.length;
+        var output = 0;
+        for (i in this.selected_contents) {
+            if (this.selected_contents[i]) {
+                output += 1
+            }
+        }
+        return output;
     }
 
     // Event Management

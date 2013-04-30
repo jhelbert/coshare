@@ -38,7 +38,13 @@ var current_album;
 var album_list = [];
 var pckry;
 
+
+
 $(function() {
+
+  var update_selection_count = function() {
+    $("#selection-count").text(model.get_num_selected_contents());
+  }
 
   /***************************************/
   /************* COSMETICS ***************/
@@ -56,30 +62,31 @@ $(function() {
 
   }
   $('#new_plist')
-    .watermark('New Album')
-    .keyup(function (e) {
-      if (e.keyCode == 13 && e.target.value != "") {
-        
-        new_plist(e.target.value);
-      }
-    })
-    .droppable({
-      activeClass: "droppable-new-album",
-      hoverClass: "hover-drop-new-album",
-      accept: ".content",
-      drop: function( event, ui ) {
-        alert("insert workflow for creating new album from selection");
-      },
-    });
+  .watermark('New Album')
+  .keyup(function (e) {
+    if (e.keyCode == 13 && e.target.value != "") {
 
-var container = document.querySelector("#contents-container")
-pckry = new Packery(container, {
-  itemSelector: ".content",
-});
+      new_plist(e.target.value);
+    }
+  })
+  .droppable({
+    activeClass: "droppable-new-album",
+    hoverClass: "hover-drop-new-album",
+    accept: ".content",
+    drop: function( event, ui ) {
+      alert("insert workflow for creating new album from selection");
+    },
+  });
 
-/******************************************/
-/**** Register Listeners to the Model *****/
-/******************************************/
+  var container = document.querySelector("#contents-container")
+  pckry = new Packery(container, {
+    itemSelector: ".content",
+    transitionDuration: "0.75s",
+  });
+
+  /******************************************/
+  /**** Register Listeners to the Model *****/
+  /******************************************/
 
   /*
 
@@ -111,7 +118,7 @@ The model will propagate the appropriate effects.s
 
       
       icon.setAttribute("class", "icon-folder-close");
-    
+
 
       option.value = e.album.id;
       var select = document.getElementById("album_list");
@@ -168,20 +175,22 @@ The model will propagate the appropriate effects.s
     } else {
       album_li.droppable();
     }
-});
+  });
 
 var make_droppable = function(album_div) {
   album_div.droppable({
-        activeClass: "droppable-album",
-        hoverClass: "hover-drop-album",
-        accept: ".content",
-        drop: function( event, ui ) {
-        },
-      });
+    activeClass: "droppable-album",
+    hoverClass: "hover-drop-album",
+    accept: ".content",
+    drop: function( event, ui ) {
+    },
+  });
 }
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
+
+  update_selection_count();
 
   selected_content_ids = [];
   selected_content_map = {};
@@ -274,7 +283,7 @@ model.addEventListener("select_album", function(e) {
     var id_val = $(this).attr("id-num");
     populateModal(image,id_val);
 
-    });
+  });
 });
 
 /******** DESELECT ALBUM LISTENER *********/
@@ -298,7 +307,7 @@ model.addEventListener("remove_album", function(e) {
 
 /********* REMOVE CONTENT LISTENER ********/
 model.addEventListener("remove_content", function(e) {
-  
+
   last_removed_content_album  = current_album;
   $("#content-" + e.content.id).each(function(i, v) {
     last_removed_content_list.push(e.content);
@@ -317,10 +326,11 @@ model.addEventListener("remove_content", function(e) {
 
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
+  update_selection_count();
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div.addClass("selected-content");
-  var ignored_selectors = "#special-albums .album-name, .navbar, .selected-album"
+  var ignored_selectors = "#special-albums .album-name, .navbar, .selected-album";
   $("#content-" + e.content.id).draggable({
     revert: true,
     start: function(event, ui) {
@@ -337,14 +347,15 @@ model.addEventListener("select_content", function(e) {
     distance: 20,
     cursorAt: { top: 0, left: -25 },
     cursor: "default",
-  })});
+})});
 
 model.addEventListener("deselect_content", function(e) {
+  update_selection_count();
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div
-    .draggable('destroy')
-    .removeClass("selected-content");
+  .draggable('destroy')
+  .removeClass("selected-content");
 });
 
   // get albums from django
@@ -364,22 +375,22 @@ model.addEventListener("deselect_content", function(e) {
   console.log("starting");
   var valid_album = false;
   var all_album;
-for (var i = 0; i < album_list.length; i++)  {
-  if (album_list[i].name == "All Content") {
-    all_album = album_list[i];
+  for (var i = 0; i < album_list.length; i++)  {
+    if (album_list[i].name == "All Content") {
+      all_album = album_list[i];
+    }
+
+    if ("{{selected_album.name}}" == album_list[i].name) {
+      console.log(album_list[i]);
+      model.select_album(album_list[i]);
+      valid_album = true;
+    }
+
   }
 
-  if ("{{selected_album.name}}" == album_list[i].name) {
-    console.log(album_list[i]);
-    model.select_album(album_list[i]);
-    valid_album = true;
+  if (!valid_album) {
+    model.select_album(all_album);
   }
-
-}
-
-if (!valid_album) {
-  model.select_album(all_album);
-}
 
 
   // CRUD operations on albums
@@ -465,9 +476,9 @@ if (!valid_album) {
           $(".albumList").append(uiElement);
         }
       });
-  }
+}
 
-  var albumClick = function(albumName) {
+var albumClick = function(albumName) {
     // Close Modal
     $(".alert").alert('close');
     $("#openModal").modal("hide");
@@ -562,15 +573,15 @@ if (!valid_album) {
   $(".favorited").click(function() {
     $(".favorited").toggleClass("btn-success");
     if ($(".favorited").attr('class') == "btn favorited btn-success") {
-        last_clicked_content.output.height *= 1.5;
-        last_clicked_content.output.width *= 1.5;
-       favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
+      last_clicked_content.output.height *= 1.5;
+      last_clicked_content.output.width *= 1.5;
+      favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
     }
     else {
       console.log("removing");
       console.dir(last_clicked_content);
       last_clicked_content.output.height /= 1.5;
-        last_clicked_content.output.width /= 1.5;
+      last_clicked_content.output.width /= 1.5;
       favorites_album.remove_content(last_clicked_content);
     }
   });
@@ -682,41 +693,49 @@ function undo_remove() {
 
     <div class="span3">
       <div class="well sidebar-nav" style="margin-top:52px;border:2px solid; color:grey">
-          <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
-            <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
-              <li class="nav-header">Standard Albums</li>
-            </ul>
-            <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
-              <li class="nav-header">Edit Albums</li>
-            </ul>
-            <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
-              <li class="nav-header">Your Albums</li>
-            </ul>
-            <input name="name" id="new_plist" type="text"/>
-          </div>
-      
-        </div><!--/.well -->
-      </div><!--/span-->
-      <div id="content-well" class="span9">
-        <div style="height:20px">
-          <div align="right" id="undo_div" style="display:none">
-            Content Removed: <button class = "btn btn-danger" onclick="undo_remove()"> Undo </button>
-          </div>
+        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
+          <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
+            <li class="nav-header">Standard Albums</li>
+          </ul>
+          <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+            <li class="nav-header">Edit Albums</li>
+          </ul>
+          <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
+            <li class="nav-header">Your Albums</li>
+          </ul>
+          <input name="name" id="new_plist" type="text"/>
         </div>
-          <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
-          
-          <div align="center">
-           <button class="btn btn-primary" id="btnSelectAll">Select All</button>
-           <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
-           <button class="btn btn-primary" id="btnRemoveSelectedContent">Remove Selected Content</button>
-           
-         </div>
-         <div>
-          <br>
-          <hr>
-          <div id="contents-container" />
+
+      </div><!--/.well -->
+    </div><!--/span-->
+    <div id="content-well" class="span9">
+      <div style="height:20px">
+        <div align="right" id="undo_div" style="display:none">
+          Content Removed: <button class = "btn btn-danger" onclick="undo_remove()"> Undo </button>
         </div>
       </div>
+      <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
+
+        <div class="fluid-row">
+          <div class="span5">
+           <button class="btn btn-primary" id="btnSelectAll">Select All</button>
+           <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
+         </div>
+         <div class="span2">
+          <h4 class="text-center" id="selection-count">test</h5>
+        </div>
+         <div class="span5">
+            <p class="pull-right">
+           <button class="btn btn-danger" id="btnRemoveSelectedContent">Remove Selected Content</button>
+         </p>
+         </div>
+       </div>
+       <div>
+        <br>
+        <hr>
+        <div id="contents-container" />
+      </div>
+    </div>
   </div>
 </div>
 
