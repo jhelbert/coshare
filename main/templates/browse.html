@@ -36,6 +36,7 @@ var album_map = {};
 var favorites_album;
 var current_album;
 var album_list = [];
+var pckry;
 
 $(function() {
 
@@ -72,7 +73,7 @@ $(function() {
     });
 
 var container = document.querySelector("#contents-container")
-var pckry = new Packery(container, {
+pckry = new Packery(container, {
   itemSelector: ".content",
 });
 
@@ -223,9 +224,6 @@ model.addEventListener("select_album", function(e) {
     $("#btnRemoveSelectedContent").attr("disabled", "disabled");
   }
 
-  // refresh contents
-  //$("#contents-container").isotope('remove', $("#contents-container .content"));
-  //$("#contents-container").packery('remove', $("#contents-container .content"));
   $("#contents-container .content").each(function(i,v) {
     pckry.remove(v);
   });
@@ -250,6 +248,9 @@ model.addEventListener("select_album", function(e) {
 
   });
   $("#contents-container").imagesLoaded(function() {
+    $("#contents-container img").each(function(i, v) {
+      $(v).css("min-width", $(v).css('width'));
+    });
     pckry.layout();
   });
   $("#content").text("content from " + e.album.get_name());
@@ -697,16 +698,12 @@ function undo_remove() {
         </div><!--/.well -->
       </div><!--/span-->
       <div id="content-well" class="span9">
-
-
-
-        <div class="hero-unit" style="border:2px solid; color:grey">
-          <div style="height:20px">
+        <div style="height:20px">
           <div align="right" id="undo_div" style="display:none">
             Content Removed: <button class = "btn btn-danger" onclick="undo_remove()"> Undo </button>
           </div>
         </div>
-          <h3 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
+          <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
           
           <div align="center">
            <button class="btn btn-primary" id="btnSelectAll">Select All</button>
@@ -720,7 +717,6 @@ function undo_remove() {
           <div id="contents-container" />
         </div>
       </div>
-    </div>
   </div>
 </div>
 
