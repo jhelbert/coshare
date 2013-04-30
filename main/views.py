@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
+from random import randint
 import json
 import datetime
 import random
@@ -182,8 +183,20 @@ def open_modal(request):
 				c = plist.content.all()
 				max_num = min(3,len(c))
 				photos[plist.name] = []
-				for i in range(0,max_num):
-					photos[plist.name].append(c[i].image.url)
+				# Get randon three photos from list
+				if len(c) > 3: 
+					count = 0
+					index_set = []
+					while count < max_num:
+						index = randint(0,len(c)-1);
+						if index in index_set:
+							continue
+						index_set.append(index)
+						photos[plist.name].append(c[index].image.url)
+						count += 1
+				else:
+					for i in range(0,max_num):
+						photos[plist.name].append(c[i].image.url)
 				break
 
 	res["albums"] = albumList

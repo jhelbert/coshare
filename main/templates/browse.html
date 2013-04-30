@@ -414,9 +414,13 @@ model.addEventListener("deselect_content", function(e) {
         var description = msg["des"];
         var pls = msg["albums"];
         var photo_table = msg["photos"];
+        
+        /*
         if (description == "") {
-          description = "No Description";
+          description = "\n";
         }
+        */
+        
         $(".imageDescription").text(description);
 
         for (var i = 0; i < pls.length; i++) {
