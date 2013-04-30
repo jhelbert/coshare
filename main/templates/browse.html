@@ -300,10 +300,8 @@ model.addEventListener("select_album", function(e) {
     $(".albumList").empty();
     var image = $(this).children("img").attr("src");
 
-    console.log(image);
     if (!image) {
       image = $(this).children("video").attr("src");
-      console.log(image);
     }
 
     var id_val = $(this).attr("id-num");
@@ -341,10 +339,6 @@ model.addEventListener("remove_content", function(e) {
     
   });
   $("#undo_div")[0].style.display="block";
-  console.log("last_removed_content_album");
-  console.log(last_removed_content_album);
-  console.log("last_removed_content_list");
-  console.log(last_removed_content_list);
   pckry.layout();
 });
 
@@ -385,7 +379,6 @@ model.addEventListener("deselect_content", function(e) {
 
   // get albums from django
   // MUST APPEAR AFTER LISTENERS ARE CREATED
-  console.log("adding_albums");
   {% for album in albums %}
   var album = new Album({{album.id}},"{{album.name}}");
   model.add_album(album);
@@ -400,7 +393,6 @@ model.addEventListener("deselect_content", function(e) {
   {% endfor %}
 
 
-  console.log("starting");
   var valid_album = false;
   var all_album;
   for (var i = 0; i < album_list.length; i++)  {
@@ -409,7 +401,6 @@ model.addEventListener("deselect_content", function(e) {
     }
 
     if ("{{selected_album.name}}" == album_list[i].name) {
-      console.log(album_list[i]);
       model.select_album(album_list[i]);
       valid_album = true;
     }
@@ -520,7 +511,6 @@ var albumClick = function(albumName) {
         match = $(element);
       }
     });
-    console.log("match", match);
 
     // Get album object
     var id = match.attr("id");
@@ -528,10 +518,8 @@ var albumClick = function(albumName) {
     var album;
     for (var i=0; i < model.albums.length; i++) {
       var curID = model.albums[i]["id"];
-      console.log(curID,id);
       if (curID.toString() == id.toString()) {
         album = model.albums[i];
-        console.log("album",album);
         break;
       }
     }
@@ -608,8 +596,6 @@ var albumClick = function(albumName) {
       favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
     }
     else {
-      console.log("removing");
-      console.dir(last_clicked_content);
       last_clicked_content.output.height /= 1.5;
       last_clicked_content.output.width /= 1.5;
       favorites_album.remove_content(last_clicked_content);
@@ -619,12 +605,10 @@ var albumClick = function(albumName) {
   $("#deletePicture").click(function() {
     var confirmBox = confirm("Deleting will remove this photo from all albums, as well as from your account. Do you want to continue?");
     if (confirmBox == true) {
-      console.log("deletePhoto");
       $("#openModal").modal("hide");
       // Delete from backend, and update page
     } else {
       // do nothing
-      console.log("cancel");
     }
   });
 
@@ -638,12 +622,8 @@ var albumClick = function(albumName) {
 
 
 function undo_remove() {
-  console.log("undo remove");
-  console.log(last_removed_content_list);
   var album = last_removed_content_album;
   for (var i = 0; i < last_removed_content_list.length; i++ ) {
-    console.log("adding");
-    console.log(last_removed_content_list[i]);
     album.add_undone_content(last_removed_content_list[i]);
 
   }
