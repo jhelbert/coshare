@@ -46,14 +46,14 @@ $(function() {
     var num_selected = model.get_num_selected_contents();
     var num_total =  model.selected_album.get_contents().length;
     $("#selection-count")
-      .text(num_selected + " of " + num_total + " selected");
+    .text(num_selected + " of " + num_total + " selected");
     
     if (num_selected === 0) {
       $("#btnRemoveSelectedContent, #btnDeselectAll")
-        .addClass("disabled");
+      .addClass("disabled");
     } else {
       $("#btnRemoveSelectedContent, #btnDeselectAll")
-        .removeClass("disabled");
+      .removeClass("disabled");
     }
 
     if (num_selected === num_total) {
@@ -366,7 +366,7 @@ model.addEventListener("select_content", function(e) {
     distance: 20,
     cursorAt: { top: 0, left: -25 },
     cursor: "default",
-})});
+  })});
 
 model.addEventListener("deselect_content", function(e) {
   update_selection_count();
@@ -387,7 +387,7 @@ model.addEventListener("deselect_content", function(e) {
   {% for content in album.content.all %}
   album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
 
- 
+  
   {% endfor %}
 
   {% endfor %}
@@ -635,60 +635,57 @@ function undo_remove() {
 {% block content %}
 <body>
 
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span3">
+        <div class="well sidebar-nav">
+          <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
+            <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
+              <li class="nav-header">Standard Albums</li>
+            </ul>
+            <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+              <li class="nav-header">Edit Albums</li>
+            </ul>
+            <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
+              <li class="nav-header">Your Albums</li>
+            </ul>
+            <input name="name" id="new_plist" type="text"/>
+          </div>
 
-<div id="blah2"/>
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span3">
-      <div class="well sidebar-nav">
-        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
-          <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
-            <li class="nav-header">Standard Albums</li>
-          </ul>
-          <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
-            <li class="nav-header">Edit Albums</li>
-          </ul>
-          <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
-            <li class="nav-header">Your Albums</li>
-          </ul>
-          <input name="name" id="new_plist" type="text"/>
+        </div><!--/.well -->
+      </div><!--/span-->
+      <div id="content-well" class="span9">
+        <div>
+          <div align="right" id="undo_div" style="display:none">
+            Content Removed: <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
+          </div>
         </div>
+        <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
 
-      </div><!--/.well -->
-    </div><!--/span-->
-    <div id="content-well" class="span9">
-      <div>
-        <div align="right" id="undo_div" style="display:none">
-          Content Removed: <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
-        </div>
-      </div>
-      <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
-
-        <div class="fluid-row">
+          <div class="fluid-row">
+            <div class="span5">
+             <button class="btn btn-primary" id="btnSelectAll">Select All</button>
+             <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
+           </div>
+           <div class="span2">
+            <h4 class="text-center" id="selection-count" />
+          </div>
           <div class="span5">
-           <button class="btn btn-primary" id="btnSelectAll">Select All</button>
-           <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
-         </div>
-         <div class="span2">
-          <h4 class="text-center" id="selection-count" />
-        </div>
-         <div class="span5">
             <p class="pull-right">
-           <button class="btn btn-danger" id="btnRemoveSelectedContent">Remove Selected Content</button>
-         </p>
+             <button class="btn btn-danger" id="btnRemoveSelectedContent">Remove Selected Content</button>
+           </p>
          </div>
        </div>
        <div class="fluid-row">
-       <div class="span12"><hr></div>
-     </div>
+         <div class="span12"><hr></div>
+       </div>
        <div class="fluid-row">
         <div class="span12" id="contents-container" />
       </div>
     </div>
   </div>
-</div>
 
-<div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
+  <div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
   <!-- Modal copy, trying to port to bootstrap -->
   <div id="openModal" class="modal hide fade" role="dialog">
     <div class="modal-header">
