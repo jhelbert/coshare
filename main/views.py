@@ -95,7 +95,10 @@ def upload(request):
 	album = None
 	if album_id != -1 and album_id != None:
 		print album_id
-		album = Album.objects.get(id=album_id)
+		try:
+			album = Album.objects.get(id=album_id)
+		except:
+			album = None
 
 	for uploaded_content in request.FILES.getlist('content'):
 		print uploaded_content
