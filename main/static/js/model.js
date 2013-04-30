@@ -88,7 +88,6 @@ var Model = function() {
         this.selected_contents = []
         for (var i in contents) {
             var content = contents[i]
-            this.selected_contents[content.id] = content;
             // WARNING: requires event listeners to be idempotent
             this.fireEvent("deselect_content", {content: content});
             console.log("DESELECTING " + i);
