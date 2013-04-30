@@ -73,6 +73,23 @@ var Album = function(id,name) {
                     //refresh_last_modified(side);
               });
         }
+
+    }
+
+    this.add_undone_content = function (content) {
+        this.output.push(content);
+        
+              $.ajax({
+                        type: "POST",
+                        url: "/ajax/add_content/",
+                        data: { album_id: this.id, pic_id:content.id }
+                }).done(function( msg ) {
+                    //refresh_last_modified(side);
+              });
+
+                console.log("adding undone");
+                
+
     }
 
     /** removes @content from this album, if present */
@@ -123,4 +140,6 @@ var Album = function(id,name) {
     this.can_edit_content = function() {
         return !this.is_auto;
     }
+
+
 }

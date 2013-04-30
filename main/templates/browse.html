@@ -30,9 +30,11 @@ CoShare - Content Manager
 var selected_content_ids = [];
 var selected_content_map = {};
 var image_info = [];
-
+var last_removed_content_list = [];
+var last_removed_content_album;
 var album_map = {};
 var favorites_album;
+var current_album;
 
 $(function() {
 
@@ -180,6 +182,7 @@ model.addEventListener("select_album", function(e) {
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
+  current_album = e.album;
   // refresh title
   $("#album-title").text(e.album.get_name());
 
@@ -291,11 +294,22 @@ model.addEventListener("remove_album", function(e) {
 
 /********* REMOVE CONTENT LISTENER ********/
 model.addEventListener("remove_content", function(e) {
+  
+  last_removed_content_album  = current_album;
   $("#content-" + e.content.id).each(function(i, v) {
+    last_removed_content_list.push(e.content);
     pckry.remove(v);
+    
   });
+  $("#undo_div")[0].style.display="block";
+  console.log("last_removed_content_album");
+  console.log(last_removed_content_album);
+  console.log("last_removed_content_list");
+  console.log(last_removed_content_list);
   pckry.layout();
 });
+
+
 
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
@@ -341,6 +355,7 @@ model.addEventListener("deselect_content", function(e) {
   {% endfor %}
 
   model.select_album(model.albums[0]);
+
 
   // CRUD operations on albums
 
@@ -461,6 +476,8 @@ model.addEventListener("deselect_content", function(e) {
 
   }
 
+  
+
 
   var editDescription = function() {
     var text = $(".imageDescription").text();
@@ -551,6 +568,19 @@ model.addEventListener("deselect_content", function(e) {
   }
 
 });
+
+function undo_remove() {
+  console.log("undo remove");
+  console.log(last_removed_content_list);
+  var album = last_removed_content_album;
+  for (var i = 0; i < last_removed_content_list.length; i++ ) {
+    console.log("adding");
+    console.log(last_removed_content_list[i]);
+    album.add_undone_content(last_removed_content_list[i]);
+
+  }
+  location.reload(true);
+}
 </script>
 {% endblock %}
 
@@ -620,6 +650,7 @@ model.addEventListener("deselect_content", function(e) {
 <div id="blah2"/>
 <div class="container-fluid">
   <div class="row-fluid">
+
     <div class="span3">
       <div class="well sidebar-nav" style="margin-top:52px;border:2px solid; color:grey">
           <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
@@ -638,13 +669,22 @@ model.addEventListener("deselect_content", function(e) {
         </div><!--/.well -->
       </div><!--/span-->
       <div id="content-well" class="span9">
-        <div class="hero-unit" style="border:2px solid; color:grey">
-          <h3 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
 
+
+
+        <div class="hero-unit" style="border:2px solid; color:grey">
+          <div style="height:20px">
+          <div align="right" id="undo_div" style="display:none">
+            Content Removed: <button class = "btn btn-danger" onclick="undo_remove()"> Undo </button>
+          </div>
+        </div>
+          <h3 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
+          
           <div align="center">
            <button class="btn btn-primary" id="btnSelectAll">Select All</button>
            <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
            <button class="btn btn-primary" id="btnRemoveSelectedContent">Remove Selected Content</button>
+           
          </div>
          <div>
           <br>
