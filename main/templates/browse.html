@@ -112,7 +112,6 @@ $(function() {
       max: 5,
     })
     .on("slide", function(ev) {
-      console.dir(ev);
       $("img").css("height", 100*ev.value);
       pckry.layout();
     });
