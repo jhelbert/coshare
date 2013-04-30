@@ -43,7 +43,7 @@ var pckry;
 $(function() {
 
   var update_selection_count = function() {
-    $("#selection-count").text(model.get_num_selected_contents());
+    $("#selection-count").text(model.get_num_selected_contents() + " of " + model.selected_album.get_contents().length);
   }
 
   /***************************************/
@@ -70,8 +70,8 @@ $(function() {
     }
   })
   .droppable({
-    activeClass: "droppable-new-album",
-    hoverClass: "hover-drop-new-album",
+    activeClass: "active",
+    hoverClass: "active",
     accept: ".content",
     drop: function( event, ui ) {
       alert("insert workflow for creating new album from selection");
@@ -180,9 +180,18 @@ The model will propagate the appropriate effects.s
 var make_droppable = function(album_div) {
   album_div.droppable({
     activeClass: "droppable-album",
-    hoverClass: "hover-drop-album",
+    hoverClass: "active",
     accept: ".content",
     drop: function( event, ui ) {
+      $(this).tooltip({
+        title: "Added " + model.get_num_selected_contents(),
+        placement: "left",
+        trigger: "manual",
+      }).tooltip("show");
+      var that = this;
+      setTimeout(function() {
+        $(that).tooltip("destroy");
+      }, 2000);
     },
   });
 }
@@ -332,7 +341,6 @@ model.addEventListener("select_content", function(e) {
   content_div.addClass("selected-content");
   var ignored_selectors = "#special-albums .album-name, .navbar, .selected-album";
   $("#content-" + e.content.id).draggable({
-    revert: true,
     start: function(event, ui) {
       $(ignored_selectors).fadeTo(250, 0.2);
       $(this).data("dragging", true);
@@ -716,7 +724,7 @@ function undo_remove() {
     <div id="content-well" class="span9">
       <div style="height:20px">
         <div align="right" id="undo_div" style="display:none">
-          Content Removed: <button class = "btn btn-danger" onclick="undo_remove()"> Undo </button>
+          Content Removed: <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
         </div>
       </div>
       <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
@@ -727,7 +735,7 @@ function undo_remove() {
            <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
          </div>
          <div class="span2">
-          <h4 class="text-center" id="selection-count">test</h5>
+          <h4 class="text-center" id="selection-count"><span> selected</span></h4>
         </div>
          <div class="span5">
             <p class="pull-right">

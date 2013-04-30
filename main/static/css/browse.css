@@ -33,12 +33,11 @@
 }
 
 .droppable-album {
-    border: 3pt dashed green;
+    color: #0F0;
 }
 
-.hover-drop-album {
-    background-color: #5BB75b;
-    background-color: yellow;
+body .hover-drop-album, body .hover-drop-album:hover {
+    background-color: yellow !important;
 }
 
 .droppable-new-album {
