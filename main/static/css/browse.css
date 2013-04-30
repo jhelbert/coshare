@@ -7,6 +7,12 @@
     color: #0088cc;
 }
 
+.pencil-button{
+    padding:2px 2px;
+    height: 20px;
+    width: 20px;
+}
+
 #new_plist, .album-name {
     padding: 5px;
     width: 90%;
