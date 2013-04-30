@@ -35,6 +35,7 @@ var last_removed_content_album;
 var album_map = {};
 var favorites_album;
 var current_album;
+var album_list = [];
 
 $(function() {
 
@@ -56,7 +57,8 @@ $(function() {
   $('#new_plist')
     .watermark('New Album')
     .keyup(function (e) {
-      if (e.keyCode == 13) {
+      if (e.keyCode == 13 && e.target.value != "") {
+        
         new_plist(e.target.value);
       }
     })
@@ -101,7 +103,7 @@ The model will propagate the appropriate effects.s
     var album_li = $("<li />");
     var icon = document.createElement("i");
     var link = document.createElement("a");
-    link.setAttribute("href","#");
+    link.setAttribute("href","/browse/?album_name=" + e.album.name);
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
@@ -117,13 +119,13 @@ The model will propagate the appropriate effects.s
       /**.addClass("album-name")**/
       album_li
       .attr("id", "album-" + e.album.id)
-      .click(function() {
-        model.select_album(e.album);
-      });
+
       link.innerHTML = icon.outerHTML+e.album.get_name();
       album_li.append(link);
 
       $("#user-created-albums").append(album_li);
+      album_list.push(e.album);
+      
     }
 
 
@@ -179,6 +181,7 @@ var make_droppable = function(album_div) {
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
+
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
@@ -345,16 +348,37 @@ model.addEventListener("deselect_content", function(e) {
 
   // get albums from django
   // MUST APPEAR AFTER LISTENERS ARE CREATED
+  console.log("adding_albums");
   {% for album in albums %}
   var album = new Album({{album.id}},"{{album.name}}");
   model.add_album(album);
   album_map[{{album.id}}] = album;
+  album_list.push(album);
   {% for content in album.content.all %}
   album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
   {% endfor %}
   {% endfor %}
 
-  model.select_album(model.albums[0]);
+
+  console.log("starting");
+  var valid_album = false;
+  var all_album;
+for (var i = 0; i < album_list.length; i++)  {
+  if (album_list[i].name == "All Content") {
+    all_album = album_list[i];
+  }
+
+  if ("{{selected_album.name}}" == album_list[i].name) {
+    console.log(album_list[i]);
+    model.select_album(album_list[i]);
+    valid_album = true;
+  }
+
+}
+
+if (!valid_album) {
+  model.select_album(all_album);
+}
 
 
   // CRUD operations on albums
@@ -567,7 +591,9 @@ model.addEventListener("deselect_content", function(e) {
 
   }
 
+
 });
+
 
 function undo_remove() {
   console.log("undo remove");
@@ -581,6 +607,8 @@ function undo_remove() {
   }
   location.reload(true);
 }
+
+
 </script>
 {% endblock %}
 

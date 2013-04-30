@@ -73,9 +73,18 @@ def browse(request):
 	get_recently_added()
 	albums = Album.objects.all()
 	query_all_album()
+	album_name = request.GET.get('album_name')
+	selected_album = None
+	try:
+		selected_album = Album.objects.get(name=album_name)
+		print selected_album
+	except:
+		pass
 	return render_to_response('browse.html', 
 		{
-		 "albums":albums
+		 "albums":albums,
+		 "selected_album": selected_album
+
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
