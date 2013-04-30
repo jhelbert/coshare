@@ -108,6 +108,8 @@ $(function() {
   $("#slider")
     .slider({
       value: 1,
+      min: 1,
+      max: 5,
     })
     .on("slide", function(ev) {
       console.dir(ev);
