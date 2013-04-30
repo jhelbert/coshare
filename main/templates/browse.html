@@ -100,6 +100,7 @@ The model will propagate the appropriate effects.s
     var icon = document.createElement("i");
     var link = document.createElement("a");
     link.setAttribute("href","#");
+    link.setAttribute("class", "album-link")
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
@@ -180,6 +181,7 @@ model.addEventListener("select_album", function(e) {
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
+  console.dir(e);
   // refresh title
   $("#album-title").text(e.album.get_name());
 
@@ -188,7 +190,17 @@ model.addEventListener("select_album", function(e) {
   if (e.album.is_auto) {
     $("#album-" + e.album.id).addClass("selected-auto-album");
   } else {
+
+    var edit = document.createElement("i");
+    edit.setAttribute("class", "icon-pencil pull-right");
+    edit.setAttribute("id", "pencil");
+    var button = document.createElement("button");
+    button.setAttribute("class","pull-right");
+    button.setAttribute("class","icon-pencil");
+    //button.append(edit);
+
     $("#album-" + e.album.id).addClass("selected-album");
+    $("#album-" + e.album.id).find("a").append(edit);
   }
   $("#album-" + e.album.id).addClass("active");
 
@@ -280,8 +292,11 @@ model.addEventListener("deselect_album", function(e) {
     album_div.droppable();
 
   }
+  var pencil = document.getElementById("pencil");
   album_div.removeClass("selected-album")
   .removeClass("selected-auto-album").removeClass("active");
+  console.dir(album_div);
+  // album_div.remove(album_div.find(pencil));
 });
 
 /********** REMOVE ALBUM LISTENER *********/
