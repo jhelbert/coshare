@@ -368,7 +368,10 @@ model.addEventListener("deselect_content", function(e) {
   album_list.push(album);
   {% for content in album.content.all %}
   album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
+
+ 
   {% endfor %}
+
   {% endfor %}
 
 
@@ -476,7 +479,9 @@ model.addEventListener("deselect_content", function(e) {
           $(".albumList").append(uiElement);
         }
       });
+
 }
+
 
 var albumClick = function(albumName) {
     // Close Modal
@@ -738,6 +743,7 @@ function undo_remove() {
     </div>
   </div>
 </div>
+<a href="/media/static/content/IMG_0703_2_2.MOV">AAA</a>
 
 {% endblock %}
 

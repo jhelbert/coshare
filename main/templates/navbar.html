@@ -9,7 +9,9 @@
       <a class="brand" href="/" >CoShare</a>
       <div class="nav-collapse collapse">
         <p class="navbar-text pull-right">
-          Logged in as Jim Smith</a>
+          {% if userprof %}
+          Hi {{name}}<button onclick="window.location.href='/logout/';" style="margin-left:20px">Logout</button></a>
+          {% endif %}
         </p>
         <ul class="nav">
           <li><a href="/"><i class="icon-home icon-white"></i> Home</a></li>

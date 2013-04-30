@@ -8,12 +8,48 @@ from django.core.files.base import ContentFile
 from django.http import HttpResponseRedirect
 from random import randint
 import json
+from django.contrib.auth import authenticate,login, logout
 import datetime
 import random
+from django.contrib.auth.models import User
+
+def login_page(request):
+	return render_to_response('login.html', 
+		{
+		},
+		context_instance=RequestContext(request))
+
+def get_user_profile(request):
+	userprof = None
+	if not request.user.is_anonymous():
+		userprof = User.objects.get(username=request.user.username)
+	return userprof
+
+@csrf_exempt
+def login_user(request):
+	email = request.POST.get('email')
+	password = request.POST.get('password')
+	user = User.objects.get(email=email)
+	if user.check_password(password):
+		user.backend = 'django.contrib.auth.backends.ModelBackend'
+		login(request,user)
+		return HttpResponseRedirect('/')
+	else:
+		return HttpResponseRedirect('/login/')
+
+@csrf_exempt
+def logout_user(request):
+	logout(request)
+
+	return HttpResponseRedirect('/login/')
 
 def main(request):
+	userprof = get_user_profile(request)
 	query_all_album()
 	get_recently_added()
+	name = ""
+	if userprof:
+		name = userprof.first_name + " " + userprof.last_name
 
 	try:
 		recent_plist = Album.objects.get(name="Recently Added")
@@ -32,12 +68,16 @@ def main(request):
 		fav_1 = None
 		fav_2 = None
 
+
+
 	return render_to_response('index.html', 
 		{
 			"recently_added_1":recently_added_1,
 			"recently_added_2":recently_added_2,
 			"favs_1":fav_1,
-			"favs_2": fav_2
+			"favs_2": fav_2,
+			"userprof":userprof,
+			"name":name
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
