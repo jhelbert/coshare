@@ -56,9 +56,15 @@ def get_recently_added():
 		pass
 
 def mobile(request):
+	user_albums = []
+	all_albums = Album.objects.all()
+	for album in all_albums:
+		if album.name not in ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "Favorites", "All Content", "Tasks", "Content To Edit", "Spouse Content To Edit"]:
+			user_albums.append(album)
+	print user_albums
 	return render_to_response('mobile.html', 
 		{
-
+			"albums":user_albums
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
