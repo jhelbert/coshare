@@ -195,7 +195,13 @@ The model will propagate the appropriate effects.s
       });
       link.innerHTML = icon.outerHTML+ e.album.get_name();
       if (e.album.name.indexOf("Queue") != -1) {
-        link.innerHTML += '&nbsp;  <span class="badge badge-important">6</span>';
+        var size = e.album.get_contents().length;
+        var label = "";
+        if (size > 0) {
+          label = "badge-important";
+        }
+        link.innerHTML += '&nbsp;  <span class="badge ' + label + '">' + size +  '</span>';
+        
       }
       album_li.append(link);
       if(e.album.name.indexOf("Queue") == -1 && e.album.name != "Favorites"){
@@ -430,7 +436,7 @@ model.addEventListener("deselect_content", function(e) {
   // MUST APPEAR AFTER LISTENERS ARE CREATED
   {% for album in albums %}
   var album = new Album({{album.id}},"{{album.name}}");
-  model.add_album(album);
+  
   album_map[{{album.id}}] = album;
   album_list.push(album);
   {% for content in album.content.all %}
@@ -438,6 +444,7 @@ model.addEventListener("deselect_content", function(e) {
 
 
   {% endfor %}
+  model.add_album(album);
 
   {% endfor %}
 

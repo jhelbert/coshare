@@ -73,9 +73,11 @@ body .hover-drop-album, body .hover-drop-album:hover {
     width: 100%;
 }
 
+/*** WHY
 #albums-container{
     margin-left: -5px;
 }
+*/
 
 .content img {
     /* border-radius: 5px; */
