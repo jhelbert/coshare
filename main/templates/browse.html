@@ -106,15 +106,15 @@ $(function() {
   });
 
   $("#slider")
-    .slider({
-      value: 1,
-      min: 1,
-      max: 5,
-    })
-    .on("slide", function(ev) {
-      $("img").css("height", 100*ev.value);
-      pckry.layout();
-    });
+  .slider({
+    value: 1,
+    min: 1,
+    max: 5,
+  })
+  .on("slide", function(ev) {
+    $("img").css("height", 100*ev.value);
+    pckry.layout();
+  });
 
   /******************************************/
   /**** Register Listeners to the Model *****/
@@ -144,6 +144,7 @@ The model will propagate the appropriate effects.s
     var icon = document.createElement("i");
     var link = document.createElement("a");
     link.setAttribute("class", "album-link");
+    link.setAttribute("class", "album-name");
     var nameSpan = document.createElement("span");
     link.setAttribute("href","/browse/?id=" + e.album.id);
     if (e.album.is_user_generated()) {
@@ -263,19 +264,19 @@ model.addEventListener("select_album", function(e) {
     $("#album-" + e.album.id).addClass("selected-auto-album");
   } else {
     if (e.album.is_user_generated() && ! e.album.is_selected){
-    var edit = document.createElement("i");
-    edit.setAttribute("class", "icon-pencil pull-right");
-    edit.setAttribute("id", "pencil");
+      var edit = document.createElement("i");
+      edit.setAttribute("class", "icon-pencil pull-right");
+      edit.setAttribute("id", "pencil");
 
-    $("#album-" + e.album.id).addClass("selected-album");
-    $("#album-" + e.album.id).find("a").append(edit);
+      $("#album-" + e.album.id).addClass("selected-album");
+      $("#album-" + e.album.id).find("a").append(edit);
     //e.album.set_is_selected(true);
     $("#album-" + e.album.id + "> a > span").attr("id","selected-span");
-    }
   }
-  $("#album-" + e.album.id).addClass("active");
+}
+$("#album-" + e.album.id).addClass("active");
 
-  
+
   // disable droppability
   $("#album-" + e.album.id).droppable("destroy");
 
@@ -348,7 +349,7 @@ model.addEventListener("select_album", function(e) {
     var id_val = $(this).attr("id-num");
     populateModal(image,id_val);
 
-    });
+  });
 });
 
 /******** DESELECT ALBUM LISTENER *********/
@@ -398,7 +399,7 @@ model.addEventListener("select_content", function(e) {
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div.addClass("selected-content");
-  var ignored_selectors = "#special-albums .album-name, .navbar, .selected-album";
+  var ignored_selectors = "#automatic-albums, .navbar, .selected-album";
   $("#content-" + e.content.id).draggable({
     start: function(event, ui) {
       $(ignored_selectors).fadeTo(250, 0.2);
@@ -704,16 +705,16 @@ function undo_remove() {
 
   }
 
- 
+
   location.reload(true);
 }
 
- function remove_from_album() {
-    model.remove_selected_contents_from_selected_album(false);
-  }
-  function remove_from_site() {
-    model.remove_selected_contents_from_selected_album(true);
-  }
+function remove_from_album() {
+  model.remove_selected_contents_from_selected_album(false);
+}
+function remove_from_site() {
+  model.remove_selected_contents_from_selected_album(true);
+}
 
 
 </script>
@@ -721,139 +722,158 @@ function undo_remove() {
 
 {% block content %}
 
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span3">
-        <div class="well sidebar-nav">
-          <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
-            <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
-              <li class="nav-header">Standard Albums</li>
-            </ul>
-            <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
-              <li class="nav-header">Edit Albums</li>
-            </ul>
-            <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
-              <li class="nav-header">Your Albums</li>
-            </ul>
-            <input name="name" id="new_plist" type="text"/>
-          </div>
-          <p class="text-center"><span class="label label-info">Drag Content To Me!</span></p>
-        </div><!--/.well -->
-      </div><!--/span-->
-      <div id="content-well" class="span9">
-        <div>
-          <div align="right" id="undo_div" style="display:none">
-            Content Removed: <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span3">
+      <div class="well sidebar-nav">
+        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
+          <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
+            <li class="nav-header">Standard Albums</li>
+          </ul>
+          <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+            <li class="nav-header">Edit Albums</li>
+          </ul>
+          <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
+            <li class="nav-header">Your Albums</li>
+          </ul>
+          <input name="name" id="new_plist" type="text"/>
+        </div>
+        <p class="text-center"><span class="label label-info">Drag Content To Me!</span></p>
+      </div><!--/.well -->
+    </div><!--/span-->
+    <div id="content-well" class="span9">
+      <div>
+        <div align="right" id="undo_div" style="display:none">
+          Content Removed: <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
+        </div>
+      </div>
+      <div class="container-fluid">
+        <!-- TITLE -->
+        <div id="row-fluid">
+          <div class="span12">
+            <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop These pieces of content between Albums.' data-step='5'></h2>
           </div>
         </div>
-        <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop these pieces of content between Albums.' data-step='5'></h3>
+        <!-- Selection -->
+        <div class="row-fluid">
+          <!-- left buttons -->
+          <div class="span5">
 
-          <div class="fluid-row">
-            <div class="span5">
-              
-             <button class="btn btn-primary" id="btnSelectAll">Select All</button>
-             <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
-           </div>
-           <div class="span2">
+           <button class="btn btn-primary" id="btnSelectAll">Select All</button>
+           <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
+          </div>
+          <!-- middle selection count -->
+          <div class="span2">
             <h4 class="text-center" id="selection-count" />
           </div>
+          <!-- right buttons -->
           <div class="span5">
             <p class="pull-right">
-            <div class="btn-group">
-  <a class="btn dropdown-toggle btn-danger" data-toggle="dropdown" href="#">
-    Removed Selected Content
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu">
-   <li><a href="#" onclick="remove_from_album()">From Album</a></li>
-   <li><a href="#" onclick="remove_from_site()">From Website</a></li>
-  </ul>
-</div>
-           </p>
-         </div>
-       </div>
-       <div class="fluid-row">
-          <div class="span12" value="">
-            <div id="slider" style="width: 100px" class="slider" />
+              <div class="btn-group">
+                <a class="btn dropdown-toggle btn-danger" data-toggle="dropdown" href="#">
+                  Removed Selected Content
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                 <li><a href="#" onclick="remove_from_album()">From Album</a></li>
+                 <li><a href="#" onclick="remove_from_site()">From Website</a></li>
+                </ul>
+              </div>
+            </p>
           </div>
-          <hr>
+        </div> <!-- end of Selection row -->
+
+        <!-- slider row -->
+        <div class="row-fluid">
+          <table>
+            <tr>
+              <td><i class="icon-zoom-out"></i></td>
+              <td><div id="slider" class="slider" /></td>
+              <td><i class="icon-zoom-in"></i></td>
+            </tr>
+          </table>
         </div>
-       </div>
-       <div class="fluid-row">
-        <div class="span12" id="contents-container" />
+        <!-- end slider row -->
+
+        <!-- actual content! -->
+        <div class="row-fluid">
+          <div class="span12" id="contents-container" />
+        </div>
+
+      </div> <!-- end right side of screen container -->
+    </div> <!-- end content well -->
+  </div>
+</div>
+
+<!--- MODAL SHIT -->
+
+<div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
+<div id="openModal" class="modal hide fade" role="dialog">
+  <div class="modal-header">
+    <button id="closeModal" type="button" class="close">x</button>
+    <h4> Picture </h4>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="span6 offset1" id="leftCol">
+        <img class="imageHolder" id="modalImage" src=""></img>
+        <div class="favoriteIcon">&#9734</div>
+          <!--
+          <button class="btn favorited"> Favorited </button>
+        -->
+      </div>
+      <div class="span5" id="rightCol">
+        <h4> Album Membership </h4>
+        <ul class="albumList">
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span11 offset1" id="descriptionBox">
+        <h4> Description </h4>
+        <p class="imageDescription">
+
+        </p>
+
+        <textarea class="descriptionInput hidden"> </textarea>
+        <button class="btn btn-success buttonRight" id="editButton"> Edit </button>
+        <br> <br>
       </div>
     </div>
   </div>
-
-  <!--- MODAL SHIT -->
-
-  <div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
-  <div id="openModal" class="modal hide fade" role="dialog">
-    <div class="modal-header">
-      <button id="closeModal" type="button" class="close">x</button>
-      <h4> Picture </h4>
-    </div>
-    <div class="modal-body">
-      <div class="row">
-        <div class="span6 offset1" id="leftCol">
-          <img class="imageHolder" id="modalImage" src=""></img>
-          <div class="favoriteIcon">&#9734</div>
-          <!--
-          <button class="btn favorited"> Favorited </button>
-          -->
-        </div>
-        <div class="span5" id="rightCol">
-          <h4> Album Membership </h4>
-          <ul class="albumList">
-          </ul>
-        </div>
-      </div>
-      <div class="row">
-        <div class="span11 offset1" id="descriptionBox">
-          <h4> Description </h4>
-          <p class="imageDescription">
-
-          </p>
-
-          <textarea class="descriptionInput hidden"> </textarea>
-          <button class="btn btn-success buttonRight" id="editButton"> Edit </button>
-          <br> <br>
-        </div>
-      </div>
-    </div>
     <!--
     <div class="modal-footer">
       <button class="btn btn-danger" id="deletePicture"> Delete </button>
     </div>
-    -->
-  </div>
+  -->
+</div>
 
-  
 
-  <div id="upload" style="float:right">
-   <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
-    <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
 
-  </div>
+<div id="upload" style="float:right">
+ <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+  <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
 
-  <div id="example" class="modal hide fade in" style="display: none; ">  
-    <div class="modal-header">  
-      <h3 align="center">Upload Preview</h3>  
-    </div>  
-    <div class="modal-body">  
-      <div id="blah" align="center"></div>              
-      <div align="center" style="margin-top:30px">
-        Add To Album:
-        <select id="album_list" name="album">
-          <option value="1">None</option> 
-        </select>
-      </div>
-    </div>  
-    <div class="modal-footer">  
-      <input class="btn btn-primary" type="submit" style="width:80px"/>
-      <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</a>  
-    </div>  
+</div>
+
+<div id="example" class="modal hide fade in" style="display: none; ">  
+  <div class="modal-header">  
+    <h3 align="center">Upload Preview</h3>  
   </div>  
+  <div class="modal-body">  
+    <div id="blah" align="center"></div>              
+    <div align="center" style="margin-top:30px">
+      Add To Album:
+      <select id="album_list" name="album">
+        <option value="1">None</option> 
+      </select>
+    </div>
+  </div>  
+  <div class="modal-footer">  
+    <input class="btn btn-primary" type="submit" style="width:80px"/>
+    <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</a>  
+  </div>  
+</div>  
 </div>  
 </form>
 {% endblock %}
