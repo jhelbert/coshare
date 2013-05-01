@@ -143,6 +143,8 @@ The model will propagate the appropriate effects.s
     var album_li = $("<li />");
     var icon = document.createElement("i");
     var link = document.createElement("a");
+    link.setAttribute("class", "album-link");
+    var nameSpan = document.createElement("span");
     link.setAttribute("href","/browse/?id=" + e.album.id);
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
@@ -159,8 +161,12 @@ The model will propagate the appropriate effects.s
       /**.addClass("album-name")**/
       album_li
       .attr("id", "album-" + e.album.id)
+      .click(function() {
+        model.select_album(e.album);
+      });
+      nameSpan.innerHTML = e.album.get_name();
+      link.innerHTML = icon.outerHTML+ nameSpan.outerHTML;
 
-      link.innerHTML = icon.outerHTML+e.album.get_name();
       album_li.append(link);
 
       $("#user-created-albums").append(album_li);
@@ -238,13 +244,13 @@ var make_droppable = function(album, album_div) {
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
-
   update_selection_count();
 
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
   current_album = e.album;
+
   // refresh title
   $("#album-title").text(e.album.get_name());
 
@@ -253,7 +259,16 @@ model.addEventListener("select_album", function(e) {
   if (e.album.is_auto) {
     $("#album-" + e.album.id).addClass("selected-auto-album");
   } else {
+    if (e.album.is_user_generated() && ! e.album.is_selected){
+    var edit = document.createElement("i");
+    edit.setAttribute("class", "icon-pencil pull-right");
+    edit.setAttribute("id", "pencil");
+
     $("#album-" + e.album.id).addClass("selected-album");
+    $("#album-" + e.album.id).find("a").append(edit);
+    e.album.set_is_selected(true);
+    $("#album-" + e.album.id + "> a > span").attr("id","selected-span");
+    }
   }
   $("#album-" + e.album.id).addClass("active");
 
@@ -330,7 +345,7 @@ model.addEventListener("select_album", function(e) {
     var id_val = $(this).attr("id-num");
     populateModal(image,id_val);
 
-  });
+    });
 });
 
 /******** DESELECT ALBUM LISTENER *********/
@@ -343,8 +358,15 @@ model.addEventListener("deselect_album", function(e) {
     album_div.droppable();
 
   }
+  var pencil = document.getElementById("pencil");
   album_div.removeClass("selected-album")
   .removeClass("selected-auto-album").removeClass("active");
+  console.log("album_div");
+  console.dir(album_div);
+  // album_div.removeChild(album_div.lastChild);
+  $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
+  e.album.set_is_selected(false);
+  // album_div.remove(album_div.find(pencil));
 });
 
 /********** REMOVE ALBUM LISTENER *********/
@@ -437,6 +459,11 @@ model.addEventListener("deselect_content", function(e) {
 
   // CRUD operations on albums
 
+  //Event listener for edit pencil - editing albums
+  var pencilEdit = document.getElementById("pencil");
+  pencilEdit.addEventListener("click",function(e){
+    $("#selected-span").attr('contentEditable', true);
+    });
   // crea
   $("#btnNewAlbum").click(function() {
       // add stubbed out

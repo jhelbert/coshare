@@ -6,6 +6,7 @@
  */
 var Album = function(id,name) {
     this.id  = id;
+    this.is_selected = false;
     this.name = name;
     this.is_auto = false;
     this.output = []
@@ -130,7 +131,7 @@ var Album = function(id,name) {
     }
 
     this.can_rename = function() {
-        return !this.is_auto;
+        return this.is_user_generated;
     }
 
     this.can_remove = function() {
@@ -140,6 +141,4 @@ var Album = function(id,name) {
     this.can_edit_content = function() {
         return !this.is_auto;
     }
-
-
 }
