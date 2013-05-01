@@ -192,7 +192,10 @@ The model will propagate the appropriate effects.s
       .click(function() {
         model.select_album(e.album);
       });
-      link.innerHTML = icon.outerHTML+e.album.get_name();
+      link.innerHTML = icon.outerHTML+ e.album.get_name();
+      if (e.album.name.indexOf("Queue") != -1) {
+        link.innerHTML += '&nbsp;  <span class="badge badge-important">6</span>';
+      }
       album_li.append(link);
       if(e.album.name.indexOf("Queue") == -1 && e.album.name != "Favorites"){
         $("#automatic-albums").append(album_li);
