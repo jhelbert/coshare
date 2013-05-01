@@ -585,11 +585,11 @@ var albumClick = function(albumName) {
       if (msg != "error") {
         var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
 
-        $("#leftCol").append(alertBox);
+        $("#descriptionBox").append(alertBox);
       } else {
         var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
 
-        $("#leftCol").append(alertBox);
+        $("#descriptionBox").append(alertBox);
       }
       $("#editButton").html('Edit');
     });
@@ -769,13 +769,6 @@ function undo_remove() {
           <!--
           <button class="btn favorited"> Favorited </button>
           -->
-          <h5> Description </h5>
-          <p class="imageDescription">
-
-          </p>
-
-          <textarea class="descriptionInput hidden"> </textarea>
-          <button class="btn btn-success buttonRight" id="editButton"> Edit </button>
         </div>
         <div class="span5" id="rightCol">
           <h4> Album Membership </h4>
@@ -783,10 +776,24 @@ function undo_remove() {
           </ul>
         </div>
       </div>
+      <div class="row">
+        <div class="span11 offset1" id="descriptionBox">
+          <h4> Description </h4>
+          <p class="imageDescription">
+
+          </p>
+
+          <textarea class="descriptionInput hidden"> </textarea>
+          <button class="btn btn-success buttonRight" id="editButton"> Edit </button>
+          <br> <br>
+        </div>
+      </div>
     </div>
+    <!--
     <div class="modal-footer">
       <button class="btn btn-danger" id="deletePicture"> Delete </button>
     </div>
+    -->
   </div>
 
   
