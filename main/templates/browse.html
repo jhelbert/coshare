@@ -623,6 +623,21 @@ var albumClick = function(albumName) {
     }
   });
 
+  // Full screen handler
+  $(".imageHolder").dblclick(function() {
+    // Take image to full screen
+    // determin type of browser
+    try {
+      $(this).get(0).mozRequestFullScreen();
+    } catch(err) {
+      try {
+        $(this).get(0).webkitRequestFullScreen();
+      } catch(err) {
+        console.log("no full screen support for browser");
+      }
+    }
+  });
+
   $("#deletePicture").click(function() {
     var confirmBox = confirm("Deleting will remove this photo from all albums, as well as from your account. Do you want to continue?");
     if (confirmBox == true) {
@@ -722,7 +737,7 @@ function undo_remove() {
     <div class="modal-body">
       <div class="row">
         <div class="span6 offset1" id="leftCol">
-          <img class="imageHolder" src=""></img>
+          <img class="imageHolder" id="modalImage" src=""></img>
           <button class="btn favorited"> Favorited </button>
           <h5> Description </h5>
           <p class="imageDescription">
