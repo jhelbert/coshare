@@ -209,7 +209,7 @@ The model will propagate the appropriate effects.s
         $("#album-title").text(e2.album.get_name());
       }});
     var album_li = $("#album-" + e.album.id)
-    if (e.album.is_user_generated() || e.album.name.indexOf("Queue") != -1) {
+    if (e.album.is_user_generated() || e.album.name.indexOf("Queue") != -1 || e.album.name == "Favorites") {
       make_droppable(e.album, album_li);
     } else {
 
