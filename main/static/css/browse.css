@@ -70,12 +70,6 @@ body .hover-drop-album, body .hover-drop-album:hover {
     border: 0px;
 }
 
-.content video {
-    margin: 10px;
-    border: 0px;
-    border-radius: 5px;
-}
-
 .selected-content {
     border-color: #006DCC;
     cursor: move;

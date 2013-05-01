@@ -76,7 +76,7 @@ var Album = function(id,name) {
 
     }
 
-    this.add_undone_content = function (content) {
+    this.post_content = function (content) {
         this.output.push(content);
         
               $.ajax({

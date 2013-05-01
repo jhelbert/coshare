@@ -95,7 +95,7 @@ $(function() {
     hoverClass: "active",
     accept: ".content",
     drop: function( event, ui ) {
-      alert("insert workflow for creating new album from selection");
+      // TODO!!!
     },
   });
 
@@ -203,18 +203,24 @@ The model will propagate the appropriate effects.s
       }});
     var album_li = $("#album-" + e.album.id)
     if (e.album.is_user_generated()) {
-      make_droppable(album_li);
+      make_droppable(e.album, album_li);
     } else {
       album_li.droppable();
     }
   });
 
-var make_droppable = function(album_div) {
+var make_droppable = function(album, album_div) {
   album_div.droppable({
     activeClass: "droppable-album",
     hoverClass: "active",
     accept: ".content",
     drop: function( event, ui ) {
+      var selected_contents = model.get_selected_contents();
+      for (var i in selected_contents) {
+        var content = selected_contents[i];
+        console.log(selected_contents[i]);
+        album.post_content(content);
+      }
       $(this).tooltip({
         title: "Added " + model.get_num_selected_contents(),
         placement: "left",
@@ -330,7 +336,7 @@ model.addEventListener("deselect_album", function(e) {
   var album_div = $("#album-" + e.album.id)
   
   if (e.album.is_user_generated()) {
-    make_droppable(album_div);
+    make_droppable(e.album, album_div);
   } else {
     album_div.droppable();
 
@@ -637,7 +643,7 @@ var albumClick = function(albumName) {
 function undo_remove() {
   var album = last_removed_content_album;
   for (var i = 0; i < last_removed_content_list.length; i++ ) {
-    album.add_undone_content(last_removed_content_list[i]);
+    album.post_content(last_removed_content_list[i]);
 
   }
   location.reload(true);

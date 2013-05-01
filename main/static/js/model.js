@@ -27,6 +27,14 @@ var Model = function() {
         
     }
 
+    this.get_selected_contents = function() {
+        var output = [];
+        for (var i in this.selected_contents) {
+            output[i] = this.selected_contents[i];
+        }
+        return output
+    }
+
     this.remove_selected_album = function() {
 
         // should not be able to remove auto album
