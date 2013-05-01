@@ -211,6 +211,14 @@ def remove_content(request):
 	return HttpResponse('OK')
 
 @csrf_exempt
+def delete_content(request):
+	pic_id = request.POST.get('id')
+	content = Content.objects.get(id=int(pic_id))
+	content.delete()
+	return HttpResponse('OK')
+
+
+@csrf_exempt
 def add(request):
 	content =  request.GET.getlist('eles')
 	content = tuple(content)

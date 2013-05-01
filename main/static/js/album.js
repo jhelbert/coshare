@@ -24,7 +24,7 @@ var Album = function(id,name) {
 
     this.is_user_generated = function () {
         for (i in staticNames){
-            if (this.name === staticNames[i]){
+            if (this.name.indexOf(staticNames[i]) != -1){
                 return false;
             }
         }
@@ -77,7 +77,7 @@ var Album = function(id,name) {
 
     }
 
-    this.add_undone_content = function (content) {
+    this.post_content = function (content) {
         this.output.push(content);
         
               $.ajax({

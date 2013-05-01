@@ -41,7 +41,7 @@ var favorites_album;
 var current_album;
 var album_list = [];
 var pckry;
-
+var model = new Model();
 
 
 $(function() {
@@ -95,7 +95,7 @@ $(function() {
     hoverClass: "active",
     accept: ".content",
     drop: function( event, ui ) {
-      alert("insert workflow for creating new album from selection");
+      // TODO!!!
     },
   });
 
@@ -130,7 +130,7 @@ The model will propagate the appropriate effects.s
 */
 
   // instantiate model
-  var model = new Model();
+  
 
   /************ ADD ALBUM LISTENER **********/
   model.addEventListener("add_album", function(e) {
@@ -194,8 +194,9 @@ The model will propagate the appropriate effects.s
       });
       link.innerHTML = icon.outerHTML+e.album.get_name();
       album_li.append(link);
-      if(e.album.name.indexOf("Edit")==-1){
+      if(e.album.name.indexOf("Edit") == -1){
         $("#automatic-albums").append(album_li);
+
       }
       else{
         $("#special-albums").append(album_li); 
@@ -208,19 +209,26 @@ The model will propagate the appropriate effects.s
         $("#album-title").text(e2.album.get_name());
       }});
     var album_li = $("#album-" + e.album.id)
-    if (e.album.is_user_generated()) {
-      make_droppable(album_li);
+    if (e.album.is_user_generated() || e.album.name.indexOf("Edit") != -1) {
+      make_droppable(e.album, album_li);
     } else {
+
       album_li.droppable();
     }
   });
 
-var make_droppable = function(album_div) {
+var make_droppable = function(album, album_div) {
   album_div.droppable({
     activeClass: "droppable-album",
     hoverClass: "active",
     accept: ".content",
     drop: function( event, ui ) {
+      var selected_contents = model.get_selected_contents();
+      for (var i in selected_contents) {
+        var content = selected_contents[i];
+        console.log(selected_contents[i]);
+        album.post_content(content);
+      }
       $(this).tooltip({
         title: "Added " + model.get_num_selected_contents(),
         placement: "left",
@@ -345,7 +353,7 @@ model.addEventListener("deselect_album", function(e) {
   var album_div = $("#album-" + e.album.id)
   
   if (e.album.is_user_generated()) {
-    make_droppable(album_div);
+    make_droppable(e.album, album_div);
   } else {
     album_div.droppable();
 
@@ -548,7 +556,9 @@ var albumClick = function(albumName) {
 
     // Get correct album
     var match;
-    $(".album-name").each(function(index,element) {
+    console.log($("#albums-container").find("li"));
+    $("#albums-container").find("li").each(function(index,element) {
+      console.log(index,element);
       if ($(element).text().toString() == albumName) {
         match = $(element);
       }
@@ -602,11 +612,11 @@ var albumClick = function(albumName) {
       if (msg != "error") {
         var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
 
-        $("#leftCol").append(alertBox);
+        $("#descriptionBox").append(alertBox);
       } else {
         var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
 
-        $("#leftCol").append(alertBox);
+        $("#descriptionBox").append(alertBox);
       }
       $("#editButton").html('Edit');
     });
@@ -642,6 +652,22 @@ var albumClick = function(albumName) {
     }
   });
 
+  // Full screen handler
+  $(".imageHolder").dblclick(function() {
+    // Take image to full screen
+    // determin type of browser
+    try {
+      $(this).get(0).mozRequestFullScreen();
+    } catch(err) {
+      try {
+        $(this).get(0).webkitRequestFullScreen();
+      } catch(err) {
+        console.log("no full screen support for browser");
+      }
+    }
+  });
+  
+
   $("#deletePicture").click(function() {
     var confirmBox = confirm("Deleting will remove this photo from all albums, as well as from your account. Do you want to continue?");
     if (confirmBox == true) {
@@ -652,11 +678,16 @@ var albumClick = function(albumName) {
     }
   });
 
-  // TODO: Right function to remove photo from database and update page appropriately 
-  var deletePicture = function() {
 
-  }
-
+  // Favorited icon click handler
+  $(".favoriteIcon").click(function() {
+    $(this).toggleClass("isFavorited");
+    if ($(this).hasClass("isFavorited")) {
+      $(this).html('&#9733');
+    } else {
+      $(this).html('&#9734');
+    }
+  });
 
 });
 
@@ -664,11 +695,20 @@ var albumClick = function(albumName) {
 function undo_remove() {
   var album = last_removed_content_album;
   for (var i = 0; i < last_removed_content_list.length; i++ ) {
-    album.add_undone_content(last_removed_content_list[i]);
+    album.post_content(last_removed_content_list[i]);
 
   }
+
+ 
   location.reload(true);
 }
+
+ function remove_from_album() {
+    model.remove_selected_contents_from_selected_album(false);
+  }
+  function remove_from_site() {
+    model.remove_selected_contents_from_selected_album(true);
+  }
 
 
 </script>
@@ -705,6 +745,7 @@ function undo_remove() {
 
           <div class="fluid-row">
             <div class="span5">
+              
              <button class="btn btn-primary" id="btnSelectAll">Select All</button>
              <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
            </div>
@@ -713,7 +754,16 @@ function undo_remove() {
           </div>
           <div class="span5">
             <p class="pull-right">
-             <button class="btn btn-danger" id="btnRemoveSelectedContent">Remove Selected Content</button>
+            <div class="btn-group">
+  <a class="btn dropdown-toggle btn-danger" data-toggle="dropdown" href="#">
+    Removed Selected Content
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu">
+   <li><a href="#" onclick="remove_from_album()">From Album</a></li>
+   <li><a href="#" onclick="remove_from_site()">From Website</a></li>
+  </ul>
+</div>
            </p>
          </div>
        </div>
@@ -733,7 +783,6 @@ function undo_remove() {
   <!--- MODAL SHIT -->
 
   <div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
-  <!-- Modal copy, trying to port to bootstrap -->
   <div id="openModal" class="modal hide fade" role="dialog">
     <div class="modal-header">
       <button id="closeModal" type="button" class="close">x</button>
@@ -741,27 +790,37 @@ function undo_remove() {
     </div>
     <div class="modal-body">
       <div class="row">
-        <div class="span3" id="leftCol">
-          <img class="imageHolder" src=""></img>
+        <div class="span6 offset1" id="leftCol">
+          <img class="imageHolder" id="modalImage" src=""></img>
+          <div class="favoriteIcon">&#9734</div>
+          <!--
           <button class="btn favorited"> Favorited </button>
-          <h5> Description </h5>
+          -->
+        </div>
+        <div class="span5" id="rightCol">
+          <h4> Album Membership </h4>
+          <ul class="albumList">
+          </ul>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span11 offset1" id="descriptionBox">
+          <h4> Description </h4>
           <p class="imageDescription">
 
           </p>
 
           <textarea class="descriptionInput hidden"> </textarea>
           <button class="btn btn-success buttonRight" id="editButton"> Edit </button>
-        </div>
-        <div class="span2" id="rightCol">
-          <h4> Album Membership </h4>
-          <ul class="albumList">
-          </ul>
+          <br> <br>
         </div>
       </div>
     </div>
+    <!--
     <div class="modal-footer">
       <button class="btn btn-danger" id="deletePicture"> Delete </button>
     </div>
+    -->
   </div>
 
   

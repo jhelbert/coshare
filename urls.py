@@ -32,4 +32,5 @@ urlpatterns = patterns('',
     url(r'^ajax/add_album/','main.views.add_album'),
     url(r'^ajax/add_content/','main.views.add_content'),
     url(r'^ajax/remove_content/','main.views.remove_content'),
+    url(r'^ajax/delete_content/','main.views.delete_content'),
 )+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

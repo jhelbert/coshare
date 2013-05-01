@@ -27,6 +27,14 @@ var Model = function() {
         
     }
 
+    this.get_selected_contents = function() {
+        var output = [];
+        for (var i in this.selected_contents) {
+            output[i] = this.selected_contents[i];
+        }
+        return output
+    }
+
     this.remove_selected_album = function() {
 
         // should not be able to remove auto album
@@ -90,7 +98,6 @@ var Model = function() {
             var content = contents[i]
             // WARNING: requires event listeners to be idempotent
             this.fireEvent("deselect_content", {content: content});
-            console.log("DESELECTING " + i);
         }
         this.selected_contents = []
     }
@@ -114,11 +121,20 @@ var Model = function() {
 
 
     // i'm really sorry about this name
-    this.remove_selected_contents_from_selected_album = function() {
+    this.remove_selected_contents_from_selected_album = function(del) {
         for (var i in this.selected_contents) {
             var content = this.selected_contents[i];
             this.selected_album.remove_content(content);
             this.fireEvent("remove_content", {album: this.selected_album, content: content});
+            if (del) {
+                $.ajax({
+                        type: "POST",
+                        url: "/ajax/delete_content/",
+                        data: {"id":content.id}
+                }).done(function( msg ) {
+                    //refresh_last_modified(side);
+              });
+            }
         }
     }
 

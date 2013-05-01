@@ -76,12 +76,6 @@ body .hover-drop-album, body .hover-drop-album:hover {
     border: 0px;
 }
 
-.content video {
-    margin: 10px;
-    border: 0px;
-    border-radius: 5px;
-}
-
 .selected-content {
     border-color: #006DCC;
     cursor: move;
@@ -214,8 +208,8 @@ td {
     }
 
     .buttonRight {
-        width: 45%;
-        margin-left: 55%;
+        width: 25%;
+        float: right;
     }
 
     .hidden {
@@ -223,8 +217,10 @@ td {
     }
 
     .modal-body {
-        max-height: 700px;
+        max-height: 600px;
+        overflow: auto;
     }
+
     .favorited{
         width: 45%;
         margin-left: 55%;
@@ -256,3 +252,17 @@ td {
         margin-left: 0px;
 
     }
+
+    .favoriteIcon {
+        color: white;
+        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        font-size: 2em;
+        float: right;
+        margin-top: -27px;
+        z-index: 10;
+        position: relative;
+    }
+
+    .isFavorited {
+        color: goldenrod;
+    } 
