@@ -146,7 +146,7 @@ The model will propagate the appropriate effects.s
     link.setAttribute("class", "album-link");
     var nameSpan = document.createElement("span");
     link.setAttribute("href","/browse/?id=" + e.album.id);
-    if (e.album.is_user_generated()) {
+    if (e.album.is_user_generated() || e.album.name=="Favorites"  || e.album.name.indexOf("Queue")!=-1) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
 

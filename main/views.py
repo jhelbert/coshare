@@ -75,6 +75,8 @@ def main(request):
 	
 	get_recently_added()
 	userprof = get_user_profile(request)
+	if userprof is None:
+		return HttpResponseRedirect('/login/')
 	couple = get_couple(userprof)
 	query_all_album(couple)
 	name = ""
@@ -159,11 +161,12 @@ def new_plist(request):
 
 def browse(request):
 	get_recently_added()
-	try:
-		userprof = get_user_profile(request)
-	except: return HttpResponseRedirect('/login/')
+
+	userprof = get_user_profile(request)
+
 	if userprof == None:
-		return HttpResponse("create UserProfile")
+	 	return HttpResponseRedirect('/login/')
+
 	couple = get_couple(userprof)
 	print "got couple"
 	albums = couple.albums.all()
