@@ -1,4 +1,4 @@
-from main.models import Content,Album
+from main.models import Content,Album, UserProfile, Couple
 from django.shortcuts import render_to_response
 from django import forms
 from django.template import RequestContext
@@ -19,20 +19,47 @@ def login_page(request):
 		},
 		context_instance=RequestContext(request))
 
-def get_user_profile(request):
+def get_user(request):
 	userprof = None
 	if not request.user.is_anonymous():
 		userprof = User.objects.get(username=request.user.username)
 	return userprof
+
+def get_user_profile(request):
+	userprof = None
+	print request.user
+	try:
+		userprof = UserProfile.objects.get(user=request.user)
+	except:
+		pass
+		
+	return userprof
+
+def get_couple(userprof):
+
+	return Couple.objects.get(members=userprof)
 
 @csrf_exempt
 def login_user(request):
 	email = request.POST.get('email')
 	password = request.POST.get('password')
 	user = User.objects.get(email=email)
+
 	if user.check_password(password):
 		user.backend = 'django.contrib.auth.backends.ModelBackend'
 		login(request,user)
+		userprof = get_user_profile(request)
+		if userprof is None:
+			print "no userprof"
+			if user.first_name:
+				queue = Album(name=user.first_name + "'s queue")
+			else:
+				queue = Album(name=user.username + "'s queue")
+			queue.save()
+			userprof = UserProfile(user=user,queue=queue)
+			userprof.save()
+
+
 		return HttpResponseRedirect('/')
 	else:
 		return HttpResponseRedirect('/login/')
@@ -44,15 +71,18 @@ def logout_user(request):
 	return HttpResponseRedirect('/login/')
 
 def main(request):
-	userprof = get_user_profile(request)
+	user = get_user(request)
 	query_all_album()
 	get_recently_added()
+	userprof = get_user_profile(request)
+	couple = get_couple(userprof)
 	name = ""
-	if userprof:
-		name = userprof.first_name + " " + userprof.last_name
+	if user:
+		name = user.first_name + " " + user.last_name
 
 	try:
-		recent_plist = Album.objects.get(name="Recently Added")
+		possible_albums = couple.albums.all()
+		recent_plist = possible_albums.get(name="Recently Added")
 		recently_added = recent_plist.content.all()
 		recently_added_1 = recently_added[:4]
 		recently_added_2 = recently_added[4:8]
@@ -60,7 +90,8 @@ def main(request):
 		recently_added_1 = None
 		recently_added_2 = None
 	try:
-		fav_plist = Album.objects.get(name="Recently Favorited")
+		possible_albums = couple.albums.all()
+		recent_plist = possible_albums.get(name="Recently Favorited")
 		favs = fav_plist.content.all()
 		fav_1 = favs[:4]
 		fav_2 = favs[4:8]
@@ -76,7 +107,7 @@ def main(request):
 			"recently_added_2":recently_added_2,
 			"favs_1":fav_1,
 			"favs_2": fav_2,
-			"userprof":userprof,
+			"userprof":user,
 			"name":name
 		},
 		context_instance=RequestContext(request))# Create your views here.
@@ -110,14 +141,31 @@ def mobile(request):
 
 @csrf_exempt
 def new_plist(request):
+	print "new_plist"
+	userprof = get_user_profile(request)
+	print userprof
+	couple = get_couple(userprof)
+	print "got couple"
 	name = request.POST.get('name')
 	plist = Album(name=name)
 	plist.save()
+	if couple:
+		couple.albums.add(plist)
+		couple.save()
+	else:
+		return HttpResponse("create a couple")
 	return HttpResponseRedirect('/')
 
 def browse(request):
 	get_recently_added()
-	albums = Album.objects.all()
+	try:
+		userprof = get_user_profile(request)
+	except: return HttpResponseRedirect('/login/')
+	if userprof == None:
+		return HttpResponse("create UserProfile")
+	couple = get_couple(userprof)
+	print "got couple"
+	albums = couple.albums.all()
 	query_all_album()
 	album_id = request.GET.get('id')
 	selected_album = None
@@ -173,10 +221,16 @@ def upload(request):
 
 @csrf_exempt
 def add_album(request):
+	userprof = get_user_profile(request)
+	couple = get_couple(userprof)
 	name = request.POST.get('name')
-	print name
-	new_album = Album(name=name)
-	new_album.save()
+	plist = Album(name=name)
+	plist.save()
+	if couple:
+		couple.albums.add(plist)
+		couple.save()
+	else:
+		return HttpResponse("create a couple")
 	return HttpResponse('OK')
 
 @csrf_exempt

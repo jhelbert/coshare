@@ -36,7 +36,7 @@ var Album = function(id,name) {
 
     /** returns name of album */
     this.get_name = function() {
-        return this.name;
+        return this.name.replace("&#39;","'");
 
         // TODO: interface with server
         // caching?
