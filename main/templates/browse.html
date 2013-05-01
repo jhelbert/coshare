@@ -266,7 +266,7 @@ model.addEventListener("select_album", function(e) {
 
     $("#album-" + e.album.id).addClass("selected-album");
     $("#album-" + e.album.id).find("a").append(edit);
-    e.album.set_is_selected(true);
+    //e.album.set_is_selected(true);
     $("#album-" + e.album.id + "> a > span").attr("id","selected-span");
     }
   }

@@ -252,6 +252,7 @@ def add_content(request):
 	print 'got content'
 	album.content.add(content)
 	album.save()
+	print album.content.all()
 
 	return HttpResponse('OK')
 
