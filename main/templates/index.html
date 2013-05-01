@@ -7,6 +7,16 @@ Welcome to CoShare!
 {% block head %}
 <link href="{{STATIC_URL}}/css/index.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
+
+<style>
+img {
+  height:60px;
+  width:60px;
+  margin: 15px;
+}
+
+
+</style>
 {% endblock %}
 
 {% block content %}
@@ -19,28 +29,31 @@ Welcome to CoShare!
       </ul>
     </div>
     <h1 data-intro="Welcome to CoShare, your family's content manager! <br><br>Use the menu bar at the top of the page to add content and navigate to the content browsing page." data-step='1'>Smith Family</h1>
-    <div class="pictureSection">Recently Added<a href="" style="margin-left:300px; text-decoration:none;" data-intro="These links convenitely bring you to the browsing page displaying all of the sections content." data-step='3'>See All</a></div>
+    <div class="well" style="width:500px;margin-top:30px">
+    <div class="pictureSection"><b>Recently Added</b><a href="" style="margin-left:300px; text-decoration:none" data-intro="These links convenitely bring you to the browsing page displaying all of the sections content." data-step='3'>See All</a></div>
     <div>
       <div class="picture-collection" >
         {% for image in recently_added_1 %}
-        <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120">
+        <div class="floated_img" style="float:left">
+          <img src="/media/{{image.image}}" alt="Some image">
         </div>
         {% endfor %}
 
       </div>
 
-      <div class="picture-collection">
+      <div class="picture-collection" style="clear:both;width:500px;height:100px" >
         {% for image in recently_added_2 %}
-        <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120">
+        <div class="floated_img" style="float:left">
+          <img src="/media/{{image.image}}" alt="Some image">
         </div>
         {% endfor %}
       </div>
     </div>
+  </div>
+  <div style="background-color:lightgray;width:500px">
+    <div class="well pull-left" style="float:left;clear:both;margin-top:30px;width:500px;">
 
-    <div class="pull-left" style="float:left">
-      <div class="pictureSection">Recently Favorited<a href="" style="margin-left:250px; text-decoration:none;">See All</a></div>
+      <div class="pictureSection"><b>Recently Favorited</b><a href="" style="margin-left:250px; text-decoration:none">See All</a></div>
 
       <div class="picture-collection">
         {% for image in favs_1 %}
@@ -60,6 +73,7 @@ Welcome to CoShare!
       </div>
     </div>
   </div>
+</div>
 </div>
 
 <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
