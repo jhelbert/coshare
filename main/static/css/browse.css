@@ -211,8 +211,10 @@ td {
     }
 
     .modal-body {
-        max-height: 700px;
+        max-height: 600px;
+        overflow: auto;
     }
+    
     .favorited{
         width: 45%;
         margin-left: 55%;
