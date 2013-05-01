@@ -98,7 +98,6 @@ var Model = function() {
             var content = contents[i]
             // WARNING: requires event listeners to be idempotent
             this.fireEvent("deselect_content", {content: content});
-            console.log("DESELECTING " + i);
         }
         this.selected_contents = []
     }
