@@ -72,10 +72,11 @@ def logout_user(request):
 
 def main(request):
 	user = get_user(request)
-	query_all_album()
+	
 	get_recently_added()
 	userprof = get_user_profile(request)
 	couple = get_couple(userprof)
+	query_all_album(couple)
 	name = ""
 	if user:
 		name = user.first_name + " " + user.last_name
@@ -166,7 +167,7 @@ def browse(request):
 	couple = get_couple(userprof)
 	print "got couple"
 	albums = couple.albums.all()
-	query_all_album()
+	query_all_album(couple)
 	album_id = request.GET.get('id')
 	selected_album = None
 	try:
@@ -182,9 +183,11 @@ def browse(request):
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
-def query_all_album():
+def query_all_album(couple):
 	try:
-		all_album = Album.objects.get(auto_all=True)
+		possible_albums = couple.albums.all()
+		all_album = possible_albums.get(auto_all=True)
+		print "got all_album"
 		all_content = Content.objects.all()
 		for content in all_content:
 			all_album.content.add(content)

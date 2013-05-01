@@ -194,7 +194,7 @@ The model will propagate the appropriate effects.s
       });
       link.innerHTML = icon.outerHTML+e.album.get_name();
       album_li.append(link);
-      if(e.album.name.indexOf("Queue") == -1){
+      if(e.album.name.indexOf("Queue") == -1 && e.album.name != "Favorites"){
         $("#automatic-albums").append(album_li);
 
       }
@@ -460,11 +460,13 @@ model.addEventListener("deselect_content", function(e) {
   // CRUD operations on albums
 
   //Event listener for edit pencil - editing albums
+  /**
   var pencilEdit = document.getElementById("pencil");
   pencilEdit.addEventListener("click",function(e){
     $("#selected-span").attr('contentEditable', true);
     });
   // crea
+  **/
   $("#btnNewAlbum").click(function() {
       // add stubbed out
       model.add_album(new Album(new Date().getTime() % 100));
