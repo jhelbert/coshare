@@ -82,6 +82,7 @@ $(function() {
     });
 
   }
+
   $('#new_plist')
   .watermark('New Album')
   .keyup(function (e) {
@@ -103,6 +104,10 @@ $(function() {
   pckry = new Packery(container, {
     itemSelector: ".content",
     transitionDuration: "0.75s",
+  });
+  $(window).resize(function() {
+
+    pckry.layout();
   });
 
   $("#slider")
@@ -218,7 +223,6 @@ var make_droppable = function(album, album_div) {
       var selected_contents = model.get_selected_contents();
       for (var i in selected_contents) {
         var content = selected_contents[i];
-        console.log(selected_contents[i]);
         album.post_content(content);
       }
       $(this).tooltip({
@@ -286,18 +290,16 @@ model.addEventListener("select_album", function(e) {
   pckry.layout();
   var contents = e.album.get_contents();
   $(contents).each(function(i, content) {
-    var inner = content.get_content();
-    var div = $("<div />")
-    .append(inner)
-    .addClass("content")
-    .attr("id", "content-" + content.id)
-    .attr("id-num", content.id)
-    .click(function() {
-      if ($(this).data("dragging")) {
-        return;
-      }
-      model.toggle_content(content);
-    });
+    var div = $(content.get_content())
+      .addClass("content")
+      .attr("id", "content-" + content.id)
+      .attr("id-num", content.id)
+      .click(function() {
+        if ($(this).data("dragging")) {
+          return;
+        }
+        model.toggle_content(content);
+      });
 
     $("#contents-container").append(div);
     pckry.appended(div.get());
@@ -305,7 +307,7 @@ model.addEventListener("select_album", function(e) {
   });
   $("#contents-container").imagesLoaded(function() {
     $("#contents-container img").each(function(i, v) {
-      $(v).css("min-width", $(v).css('width'));
+      $(v).css("min-width", $(v).css('width') + " !important");
     });
     pckry.layout();
   });
