@@ -654,6 +654,15 @@ var albumClick = function(albumName) {
 
   }
 
+  // Favorited icon click handler
+  $(".favoriteIcon").click(function() {
+    $(this).toggleClass("isFavorited");
+    if ($(this).hasClass("isFavorited")) {
+      $(this).html('&#9733');
+    } else {
+      $(this).html('&#9734');
+    }
+  });
 
 });
 
@@ -739,7 +748,10 @@ function undo_remove() {
       <div class="row">
         <div class="span6 offset1" id="leftCol">
           <img class="imageHolder" id="modalImage" src=""></img>
+          <div class="favoriteIcon">&#9734</div>
+          <!--
           <button class="btn favorited"> Favorited </button>
+          -->
           <h5> Description </h5>
           <p class="imageDescription">
 

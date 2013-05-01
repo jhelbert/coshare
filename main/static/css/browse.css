@@ -246,3 +246,16 @@ td {
         margin-left: 0px;
 
     }
+
+    .favoriteIcon {
+        color: black;
+        font-size: 2em;
+        float: right;
+        margin-top: -25px;
+        z-index: 10;
+        position: relative;
+    }
+
+    .isFavorited {
+        color: goldenrod;
+    } 
