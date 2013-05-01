@@ -41,7 +41,7 @@ var favorites_album;
 var current_album;
 var album_list = [];
 var pckry;
-
+var model = new Model();
 
 
 $(function() {
@@ -130,7 +130,7 @@ The model will propagate the appropriate effects.s
 */
 
   // instantiate model
-  var model = new Model();
+  
 
   /************ ADD ALBUM LISTENER **********/
   model.addEventListener("add_album", function(e) {
@@ -188,8 +188,9 @@ The model will propagate the appropriate effects.s
       });
       link.innerHTML = icon.outerHTML+e.album.get_name();
       album_li.append(link);
-      if(e.album.name.indexOf("Edit")==-1){
+      if(e.album.name.indexOf("Edit") == -1){
         $("#automatic-albums").append(album_li);
+
       }
       else{
         $("#special-albums").append(album_li); 
@@ -202,9 +203,10 @@ The model will propagate the appropriate effects.s
         $("#album-title").text(e2.album.get_name());
       }});
     var album_li = $("#album-" + e.album.id)
-    if (e.album.is_user_generated()) {
+    if (e.album.is_user_generated() || e.album.name.indexOf("Edit") != -1) {
       make_droppable(e.album, album_li);
     } else {
+
       album_li.droppable();
     }
   });
@@ -631,10 +633,6 @@ var albumClick = function(albumName) {
     }
   });
 
-  // TODO: Right function to remove photo from database and update page appropriately 
-  var deletePicture = function() {
-
-  }
 
 
 });
@@ -646,8 +644,17 @@ function undo_remove() {
     album.post_content(last_removed_content_list[i]);
 
   }
+
+ 
   location.reload(true);
 }
+
+ function remove_from_album() {
+    model.remove_selected_contents_from_selected_album(false);
+  }
+  function remove_from_site() {
+    model.remove_selected_contents_from_selected_album(true);
+  }
 
 
 </script>
@@ -684,6 +691,7 @@ function undo_remove() {
 
           <div class="fluid-row">
             <div class="span5">
+              
              <button class="btn btn-primary" id="btnSelectAll">Select All</button>
              <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
            </div>
@@ -692,7 +700,16 @@ function undo_remove() {
           </div>
           <div class="span5">
             <p class="pull-right">
-             <button class="btn btn-danger" id="btnRemoveSelectedContent">Remove Selected Content</button>
+            <div class="btn-group">
+  <a class="btn dropdown-toggle btn-danger" data-toggle="dropdown" href="#">
+    Removed Selected Content
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu">
+   <li><a href="#" onclick="remove_from_album()">From Album</a></li>
+   <li><a href="#" onclick="remove_from_site()">From Website</a></li>
+  </ul>
+</div>
            </p>
          </div>
        </div>

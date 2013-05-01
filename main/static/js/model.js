@@ -122,11 +122,20 @@ var Model = function() {
 
 
     // i'm really sorry about this name
-    this.remove_selected_contents_from_selected_album = function() {
+    this.remove_selected_contents_from_selected_album = function(del) {
         for (var i in this.selected_contents) {
             var content = this.selected_contents[i];
             this.selected_album.remove_content(content);
             this.fireEvent("remove_content", {album: this.selected_album, content: content});
+            if (del) {
+                $.ajax({
+                        type: "POST",
+                        url: "/ajax/delete_content/",
+                        data: {"id":content.id}
+                }).done(function( msg ) {
+                    //refresh_last_modified(side);
+              });
+            }
         }
     }
 

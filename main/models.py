@@ -15,6 +15,7 @@ class Album(models.Model):
 	name = models.CharField(max_length=100)
 	content = models.ManyToManyField(Content,null=True,blank=True)
 	auto_all = models.BooleanField()
+	owner = models.ForeignKey(User,null=True,blank=True)
 	def __unicode__(self):
 		return self.name
 
