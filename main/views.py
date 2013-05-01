@@ -119,10 +119,10 @@ def browse(request):
 	get_recently_added()
 	albums = Album.objects.all()
 	query_all_album()
-	album_name = request.GET.get('album_name')
+	album_id = request.GET.get('id')
 	selected_album = None
 	try:
-		selected_album = Album.objects.get(name=album_name)
+		selected_album = Album.objects.get(id=album_id)
 		print selected_album
 	except:
 		pass

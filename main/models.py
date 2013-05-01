@@ -20,3 +20,12 @@ class Album(models.Model):
 		return self.name
 
 
+
+
+
+class UserProfile(models.Model):
+	user = models.ForeignKey(User, unique=True)
+	queue = models.ForeignKey(Album)
+
+class Couple(models.Model):
+	members = models.ManyToManyField(User)

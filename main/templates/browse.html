@@ -145,7 +145,7 @@ The model will propagate the appropriate effects.s
     var link = document.createElement("a");
     link.setAttribute("class", "album-link");
     var nameSpan = document.createElement("span");
-    link.setAttribute("href","/browse/?album_name=" + e.album.name);
+    link.setAttribute("href","/browse/?id=" + e.album.id);
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
@@ -177,7 +177,7 @@ The model will propagate the appropriate effects.s
 
     else{
 
-      if(e.album.name.indexOf("Content To Edit")!=-1){
+      if(e.album.name.indexOf("Queue")!=-1){
         icon.setAttribute("class", "icon-tasks");
       }
       else if(e.album.name.indexOf("Favorite")!=-1){
@@ -194,7 +194,7 @@ The model will propagate the appropriate effects.s
       });
       link.innerHTML = icon.outerHTML+e.album.get_name();
       album_li.append(link);
-      if(e.album.name.indexOf("Edit") == -1){
+      if(e.album.name.indexOf("Queue") == -1){
         $("#automatic-albums").append(album_li);
 
       }
@@ -209,7 +209,7 @@ The model will propagate the appropriate effects.s
         $("#album-title").text(e2.album.get_name());
       }});
     var album_li = $("#album-" + e.album.id)
-    if (e.album.is_user_generated() || e.album.name.indexOf("Edit") != -1) {
+    if (e.album.is_user_generated() || e.album.name.indexOf("Queue") != -1) {
       make_droppable(e.album, album_li);
     } else {
 
@@ -846,7 +846,7 @@ function undo_remove() {
     </div>  
     <div class="modal-footer">  
       <input class="btn btn-primary" type="submit" style="width:80px"/>
-      <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);">Close</a>  
+      <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</a>  
     </div>  
   </div>  
 </div>  
