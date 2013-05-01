@@ -23,7 +23,7 @@ var Album = function(id,name) {
 
     this.is_user_generated = function () {
         for (i in staticNames){
-            if (this.name === staticNames[i]){
+            if (this.name.indexOf(staticNames[i]) != -1){
                 return false;
             }
         }
