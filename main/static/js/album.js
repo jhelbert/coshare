@@ -141,12 +141,4 @@ var Album = function(id,name) {
     this.can_edit_content = function() {
         return !this.is_auto;
     }
-
-<<<<<<< HEAD
-    this.set_is_selected = function(val){
-        this.is_selected = val;
-    }
-=======
-
->>>>>>> cb8f44294f0d067603ad644453e6b4e6dda2a171
 }

@@ -236,22 +236,13 @@ var make_droppable = function(album_div) {
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
-<<<<<<< HEAD
-  if(!e.album.is_selected){
-  selected_content_ids = [];
-  selected_content_map = {};
-  selected_album = e.album.id;
-  console.log("album");
-  console.dir(e);
-=======
-
   update_selection_count();
 
   selected_content_ids = [];
   selected_content_map = {};
   selected_album = e.album.id;
   current_album = e.album;
->>>>>>> cb8f44294f0d067603ad644453e6b4e6dda2a171
+
   // refresh title
   $("#album-title").text(e.album.get_name());
 
@@ -346,13 +337,8 @@ model.addEventListener("select_album", function(e) {
     var id_val = $(this).attr("id-num");
     populateModal(image,id_val);
 
-<<<<<<< HEAD
     });
-}});
-=======
-  });
 });
->>>>>>> cb8f44294f0d067603ad644453e6b4e6dda2a171
 
 /******** DESELECT ALBUM LISTENER *********/
 model.addEventListener("deselect_album", function(e) {
