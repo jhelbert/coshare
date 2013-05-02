@@ -25,8 +25,16 @@
     margin-top: 10px;
 }
 
-.album-name:hover {
+.new-album-dd-active {
     cursor: pointer;
+}
+
+.new-album-dd-hover {
+    background-color: #08c !important;
+}
+
+.new-album-dd-hover::-webkit-input-placeholder {
+    color: white;
 }
 
 .selected-album {

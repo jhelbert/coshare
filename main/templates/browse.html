@@ -91,8 +91,8 @@ $(function() {
     }
   })
   .droppable({
-    activeClass: "active",
-    hoverClass: "active",
+    activeClass: "new-album-dd-active",
+    hoverClass: "new-album-dd-hover",
     accept: ".content",
     drop: function( event, ui ) {
       // capture dropping onto new album text box
@@ -452,7 +452,9 @@ model.addEventListener("select_content", function(e) {
     },
     stop: function(event, ui) {
       $(ignored_selectors).fadeTo(250, 1);
-      $(this).data("dragging", false);
+      var that = this;
+      setTimeout(function() {
+        $(that).data("dragging", false); }, 300);
     },
     distance: 20,
     cursorAt: { top: 0, left: -25 },
