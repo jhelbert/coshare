@@ -33,10 +33,24 @@
         var reader = new FileReader();
 
         reader.onload = function (e) {
+          var div = document.createElement('div');
+          div.style.float = "left";
           var output = new Image();
           output.src = e.target.result;
-          output.height = "150";
-          $('#blah').append(output);
+          output.height = "150px";
+
+          var x = new Image();
+          x.src = "/static/Red-X.svg"
+          x.height=15;
+          x.style.position = "absolute";
+          x.style.right = output.style.left + output.style.width;
+          
+          x.style.top = output.style.top;
+          console.log(output.style.top);
+          x.width = 15;
+          div.appendChild(output);
+          div.appendChild(x);
+          $('#blah').append(div);
         }
         reader.readAsDataURL(f);
       }   
