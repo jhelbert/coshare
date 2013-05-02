@@ -470,19 +470,53 @@ model.addEventListener("deselect_content", function(e) {
 
   //Event listener for edit pencil - editing albums
   $(".active > .album-name >#pencil").click(function(){
-    console.log("pencil");
+    $("#selected-span").attr("contenteditable",true);
+    $("#selected-span").addClass("editable");
+    $("#selected-span").focus(); 
+    document.execCommand('selectAll', false, null)
   });
-
-  $(".active > .album-name >#pencil").click(function(){
-      $("#selected-span").attr("contenteditable",true);
-    });
 
   $('.active').click(function() {
     $(".active > .album-name >#pencil").click(function(){
       $("#selected-span").attr("contenteditable",true);
+      $("#selected-span").addClass("editable");
+      $("#selected-span").focus();
+      document.execCommand('selectAll', false, null)
     });
     return false;
     });
+
+   $("#selected-span").blur(function(){
+      $(this).attr("contenteditable",false);
+      $(this).removeClass("editable");
+    }
+  );
+
+  $('#selected-span').keydown(function(event) {
+    if (event.which == 13) {
+      $(this).blur();
+      $(this).attr("contenteditable",false);
+      $(this).removeClass("editable");
+    }
+   
+  });
+
+   $("#selected-span").onfocus = function() {
+    window.setTimeout(function() {
+        var sel, range;
+        if (window.getSelection && document.createRange) {
+            range = document.createRange();
+            range.selectNodeContents(div);
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (document.body.createTextRange) {
+            range = document.body.createTextRange();
+            range.moveToElementText(div);
+            range.select();
+        }
+    }, 1);
+};
 
   // create
   $("#btnNewAlbum").click(function() {
