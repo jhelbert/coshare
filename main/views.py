@@ -225,7 +225,7 @@ def query_all_album(couple):
 @csrf_exempt
 def upload(request):
 	album_id = request.POST.get('album')
-	
+	delete = request.POST.get('deleted').split('|')
 	album = None
 	if album_id != -1 and album_id != None:
 		print album_id
@@ -233,21 +233,25 @@ def upload(request):
 			album = Album.objects.get(id=album_id)
 		except:
 			album = None
-
+	index = 0
 	for uploaded_content in request.FILES.getlist('content'):
-		print uploaded_content
-		new_content = Content()
-		file_content = ContentFile(uploaded_content.read()) 
-		new_content.image.save(uploaded_content.name, file_content)
-		ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
-		if ext not in ["jpg",'jpeg','png','gif']:
-			new_content.is_video = True
-		new_content.metric = int(random.random() * 6) + 8
-		new_content.save()
-		new_content.save()
-		if album:
-			album.content.add(new_content)
-			album.save()
+		if str(index) not in delete:
+			print uploaded_content
+			new_content = Content()
+			file_content = ContentFile(uploaded_content.read()) 
+			new_content.image.save(uploaded_content.name, file_content)
+			ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
+			if ext not in ["jpg",'jpeg','png','gif']:
+				new_content.is_video = True
+			new_content.metric = int(random.random() * 6) + 8
+			new_content.save()
+			new_content.save()
+			if album:
+				album.content.add(new_content)
+				album.save()
+		else:
+			print "not uploading index:%i" % index
+		index += 1
 	return HttpResponseRedirect('/browse/')
 
 @csrf_exempt
@@ -266,7 +270,6 @@ def add_album(request):
 
 @csrf_exempt
 def rename_album(request):
-	print 'renaming'
 	new_name = request.POST.get("name")
 	album_id = request.POST.get("album_id")
 	album = Album.objects.get(id=album_id)
