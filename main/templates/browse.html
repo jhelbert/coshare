@@ -469,19 +469,22 @@ model.addEventListener("deselect_content", function(e) {
   // CRUD operations on albums
 
   //Event listener for edit pencil - editing albums
-  $(".active > .album-name >#pencil").click(function(){
+  $(".active > .album-name >#pencil").click(function(e){
     $("#selected-span").attr("contenteditable",true);
     $("#selected-span").addClass("editable");
     $("#selected-span").focus(); 
     document.execCommand('selectAll', false, null)
+
+    console.dir(e);
   });
 
   $('.active').click(function() {
-    $(".active > .album-name >#pencil").click(function(){
+    $(".active > .album-name >#pencil").click(function(e){
       $("#selected-span").attr("contenteditable",true);
       $("#selected-span").addClass("editable");
       $("#selected-span").focus();
       document.execCommand('selectAll', false, null)
+      console.dir(e);
     });
     return false;
     });
@@ -501,22 +504,32 @@ model.addEventListener("deselect_content", function(e) {
    
   });
 
-   $("#selected-span").onfocus = function() {
-    window.setTimeout(function() {
-        var sel, range;
-        if (window.getSelection && document.createRange) {
-            range = document.createRange();
-            range.selectNodeContents(div);
-            sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-        } else if (document.body.createTextRange) {
-            range = document.body.createTextRange();
-            range.moveToElementText(div);
-            range.select();
-        }
-    }, 1);
-};
+  function rename_album(name,id) {
+    $.ajax({
+      type: "POST",
+      url: "/ajax/rename_album/",
+      data: { name:name, id:id }
+    }).done(function( msg ) {
+    });
+
+  }
+
+//    $("#selected-span").onfocus = function() {
+//     window.setTimeout(function() {
+//         var sel, range;
+//         if (window.getSelection && document.createRange) {
+//             range = document.createRange();
+//             range.selectNodeContents(div);
+//             sel = window.getSelection();
+//             sel.removeAllRanges();
+//             sel.addRange(range);
+//         } else if (document.body.createTextRange) {
+//             range = document.body.createTextRange();
+//             range.moveToElementText(div);
+//             range.select();
+//         }
+//     }, 1);
+// };
 
   // create
   $("#btnNewAlbum").click(function() {
