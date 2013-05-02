@@ -66,18 +66,12 @@ var Album = function(id,name) {
         var content = new Content(id,src,size);
         this.output.push(content);
         if (is_new) {
-              $.ajax({
-                        type: "POST",
-                        url: "/ajax/add_content/",
-                        data: { album_id: this.id, pic_id:id }
-                }).done(function( msg ) {
-                    //refresh_last_modified(side);
-              });
+          this.post_content(new Content(id, src, size));
         }
 
     }
 
-    this.post_content = function (content) {
+    this.post_content = function (content, callback) {
         this.output.push(content);
         var that = this;
         
@@ -85,13 +79,7 @@ var Album = function(id,name) {
                         type: "POST",
                         url: "/ajax/add_content/",
                         data: { album_id: this.id, pic_id:content.id }
-                }).done(function( msg ) {
-                    $("#album-" + that.id + " .label").text(msg);
-              });
-
-                console.log("adding undone");
-                
-
+                }).done(callback);
     }
 
     /** removes @content from this album, if present */
