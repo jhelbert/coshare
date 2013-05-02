@@ -312,9 +312,7 @@ $("#album-" + e.album.id).addClass("select-extend");
   pckry.layout();
   var contents = e.album.get_contents();
   $(contents).each(function(i, content) {
-    var inner = content.get_content();
-    var div = $("<div />")
-    .append(inner)
+    var inner = $(content.get_content())
     .addClass("content")
     .attr("id", "content-" + content.id)
     .attr("id-num", content.id)
@@ -325,8 +323,8 @@ $("#album-" + e.album.id).addClass("select-extend");
       model.toggle_content(content);
     });
 
-    $("#contents-container").append(div);
-    pckry.appended(div.get());
+    $("#contents-container").append(inner);
+    pckry.appended(inner.get());
 
   });
   $("#contents-container").imagesLoaded(function() {

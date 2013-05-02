@@ -49,6 +49,7 @@ body .hover-drop-album, body .hover-drop-album:hover {
 .content {
     text-align: center;
     border: 5px solid transparent;
+    height: 100px;
     /* border-radius: 10px; */
     cursor: pointer;
     margin: 10px;
