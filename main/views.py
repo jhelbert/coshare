@@ -269,7 +269,7 @@ def remove_content(request):
 	print 'got content'
 	album.content.remove(content)
 	album.save()
-	return HttpResponse('OK')
+	return HttpResponse("%i" % (len(album.content.all()), ))
 
 @csrf_exempt
 def delete_content(request):

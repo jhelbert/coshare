@@ -166,7 +166,7 @@ The model will propagate the appropriate effects.s
         model.select_album(e.album);
       });
       nameSpan.innerHTML = e.album.get_name();
-      link.innerHTML = icon.outerHTML+ nameSpan.outerHTML;
+      link.innerHTML = icon.outerHTML+ nameSpan.outerHTML + " &nbsp;";
 
       album_li.append(link);
 
@@ -194,15 +194,6 @@ The model will propagate the appropriate effects.s
         model.select_album(e.album);
       });
       link.innerHTML = icon.outerHTML+ e.album.get_name();
-      if (e.album.name.indexOf("Queue") != -1) {
-        var size = e.album.get_contents().length;
-        var label = "";
-        if (size > 0) {
-          label = "badge-important";
-        }
-        link.innerHTML += '&nbsp;  <span class="badge ' + label + '">' + size +  '</span>';
-        
-      }
       album_li.append(link);
       if(e.album.name.indexOf("Queue") == -1 && e.album.name != "Favorites"){
         $("#automatic-albums").append(album_li);
@@ -226,17 +217,6 @@ The model will propagate the appropriate effects.s
       album_li.droppable();
     }
   });
-
-var update_queue_size = function(album, new_size) {
-  if (album.name.indexOf("Queue") != -1) {
-    var badge = $("#album-" + album.id + " .badge").text(new_size);
-    if (new_size > 0) {
-      badge.addClass("badge-important");
-    } else {
-      badge.removeClass("badge-important");
-    }
-  }
-}
 
 var make_droppable = function(album, album_div) {
   album_div.droppable({
@@ -267,6 +247,11 @@ var make_droppable = function(album, album_div) {
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
+  for (var i in model.albums) {
+    var album = model.albums[i];
+    update_queue_size(album, album.get_contents().length);  
+  }
+  
   update_selection_count();
 
   selected_content_ids = [];
@@ -513,10 +498,6 @@ model.addEventListener("deselect_content", function(e) {
     model.deselect_all();
   });
 
-  $("#btnRemoveSelectedContent").click(function() {
-    model.remove_selected_contents_from_selected_album();
-  });
-
   $("#editButton").click(function() {
     var state = $("#editButton").html()
     if (state.toString() == "Save Changes") {
@@ -729,11 +710,32 @@ function undo_remove() {
   location.reload(true);
 }
 
+
+var update_queue_size = function(album, new_size) {
+  if (album.name.indexOf("Queue") != -1) {
+    $("#album-" + album.id + " .badge").remove();
+    var badge = $("<span />").addClass("badge").text(new_size);
+    $("#album-" + album.id + " a").append(badge);
+    if (album.equals(model.selected_album)) {
+      if (new_size > 0) {
+        badge.addClass("badge-important");
+      } else {
+        badge.addClass("badge-success");
+      }
+    }
+  }
+}
+
+var callback = function(new_size) {
+  console.log("wasup");
+  update_queue_size(model.selected_album, new_size)
+};
+
 function remove_from_album() {
-  model.remove_selected_contents_from_selected_album(false);
+  model.remove_selected_contents_from_selected_album(false, callback);
 }
 function remove_from_site() {
-  model.remove_selected_contents_from_selected_album(true);
+  model.remove_selected_contents_from_selected_album(true, callback);
 }
 
 

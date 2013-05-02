@@ -83,7 +83,7 @@ var Album = function(id,name) {
     }
 
     /** removes @content from this album, if present */
-    this.remove_content = function(content) {
+    this.remove_content = function(content, callback) {
         var index = this.output.indexOf(content);
         var srcs = [];
         for (var i = 0; i < this.output.length; i++) {
@@ -105,8 +105,7 @@ var Album = function(id,name) {
                         type: "POST",
                         url: "/ajax/remove_content/",
                         data: { album_id: this.id, id:content.id }
-                }).done(function( msg ) {
-              });
+                }).done(callback);
 
 
     }

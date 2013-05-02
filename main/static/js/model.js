@@ -121,19 +121,17 @@ var Model = function() {
 
 
     // i'm really sorry about this name
-    this.remove_selected_contents_from_selected_album = function(del) {
+    this.remove_selected_contents_from_selected_album = function(del, callback) {
         for (var i in this.selected_contents) {
             var content = this.selected_contents[i];
-            this.selected_album.remove_content(content);
+            this.selected_album.remove_content(content, callback);
             this.fireEvent("remove_content", {album: this.selected_album, content: content});
             if (del) {
                 $.ajax({
                         type: "POST",
                         url: "/ajax/delete_content/",
                         data: {"id":content.id}
-                }).done(function( msg ) {
-                    //refresh_last_modified(side);
-              });
+                }).done(callback);
             }
         }
     }
