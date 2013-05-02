@@ -266,7 +266,7 @@ def add_album(request):
 		couple.save()
 	else:
 		return HttpResponse("create a couple")
-	return HttpResponse('OK')
+	return HttpResponse('%i' % (plist.id, ))
 
 @csrf_exempt
 def rename_album(request):
