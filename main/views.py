@@ -73,11 +73,14 @@ def logout_user(request):
 def main(request):
 	user = get_user(request)
 	
-	get_recently_added()
+	
 	userprof = get_user_profile(request)
+
 	if userprof is None:
 		return HttpResponseRedirect('/login/')
 	couple = get_couple(userprof)
+	get_recently_added(couple)
+	get_recently_favorited(couple)
 	query_all_album(couple)
 	name = ""
 	if user:
@@ -94,7 +97,7 @@ def main(request):
 		recently_added_2 = None
 	try:
 		possible_albums = couple.albums.all()
-		recent_plist = possible_albums.get(name="Recently Favorited")
+		fav_plist = possible_albums.get(name="Recently Favorited")
 		favs = fav_plist.content.all()
 		fav_1 = favs[:4]
 		fav_2 = favs[4:8]
@@ -115,9 +118,10 @@ def main(request):
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
-def get_recently_added():
+def get_recently_added(couple):
 	try:
-		recently_added_plist = Album.objects.get(name="Recently Added")
+		possible_albums = couple.albums.all()
+		recently_added_plist = possible_albums.get(name="Recently Added")
 		print "got ra plist"
 		recently_added_plist.content.clear()
 		content = Content.objects.all()
@@ -127,7 +131,25 @@ def get_recently_added():
 					recently_added_plist.content.add(c)
 		print "done with get recently added"
 	except:
-		pass
+		print "recently added failed"
+
+
+def get_recently_favorited(couple):
+
+	possible_albums = couple.albums.all()
+	favorited = possible_albums.get(name="Favorites")
+	recently_added_plist = possible_albums.get(name="Recently Favorited")
+	print "got ra plist"
+	recently_added_plist.content.clear()
+	content = Content.objects.all()
+	for c in content:
+		if c.favorited_time:
+			if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
+				for f in favorited.content.all():
+					if f.id == c.id:
+						recently_added_plist.content.add(c)
+	print "done with get recently added"
+
 
 def mobile(request):
 	user_albums = []
@@ -160,7 +182,7 @@ def new_plist(request):
 	return HttpResponseRedirect('/')
 
 def browse(request):
-	get_recently_added()
+	
 
 	userprof = get_user_profile(request)
 
@@ -168,6 +190,8 @@ def browse(request):
 	 	return HttpResponseRedirect('/login/')
 
 	couple = get_couple(userprof)
+	get_recently_added(couple)
+	get_recently_favorited(couple)
 	print "got couple"
 	albums = couple.albums.all()
 	query_all_album(couple)
@@ -241,6 +265,15 @@ def add_album(request):
 	return HttpResponse('OK')
 
 @csrf_exempt
+def rename_album(request):
+	new_name = request.POST.get("name")
+	album_id = request.POST.get("album_id")
+	album = Album.objects.get(id=album_id)
+	album.name = new_name
+	album.save()
+	return HttpResponse('ok')
+
+@csrf_exempt
 def add_content(request):
 	album_id = request.POST.get('album_id')
 	pic_id = request.POST.get('pic_id')
@@ -254,6 +287,10 @@ def add_content(request):
 	album.content.add(content)
 	album.save()
 	print album.content.all()
+
+	if album.name == "Favorites":
+		content.favorited_time = datetime.datetime.now()
+		content.save()
 
 	return HttpResponse("%i" % (len(album.content.all()), ))
 

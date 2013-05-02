@@ -147,7 +147,7 @@ The model will propagate the appropriate effects.s
     link.setAttribute("class", "album-link");
     link.setAttribute("class", "album-name");
     var nameSpan = document.createElement("span");
-    link.setAttribute("href","/browse/?id=" + e.album.id);
+    link.setAttribute("href","#"); //"/browse/?id=" + e.album.id
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
@@ -251,6 +251,14 @@ var make_droppable = function(album, album_div) {
 
 /*********** SELECT ALBUM LISTENER ********/
 model.addEventListener("select_album", function(e) {
+  $("#remove_button")[0].style.display = "none";
+  var dropdown = $('#remove_dropdown')[0];
+  dropdown.innerHTML = "";
+  if (e.album.name != "All Content" && e.album.name != "Recently Added" && e.album.name && "Recently Favorited") {
+    $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_album()">From Album</a></li>');
+                 
+  }
+$('#remove_dropdown').append('<li><a href="#" onclick="remove_from_site()">From Website</a></li>');
   for (var i in model.albums) {
     var album = model.albums[i];
     update_queue_size(album, album.get_contents().length);  
@@ -399,6 +407,7 @@ model.addEventListener("remove_content", function(e) {
 
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
+  $("#remove_button")[0].style.display = "block";
   update_selection_count();
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
@@ -422,6 +431,10 @@ model.addEventListener("select_content", function(e) {
   })});
 
 model.addEventListener("deselect_content", function(e) {
+  if (model.get_num_selected_contents() == 0 ) {
+  $("#remove_button")[0].style.display = "none";
+
+  }
   update_selection_count();
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
@@ -846,11 +859,11 @@ function remove_from_site() {
           <div class="span5">
             <p class="pull-right">
               <div class="btn-group">
-                <a class="btn dropdown-toggle btn-danger" data-toggle="dropdown" href="#">
-                  Removed Selected Content
+                <a id="remove_button" class="btn dropdown-toggle btn-danger" data-toggle="dropdown" href="#">
+                  Remove Selected Content
                   <span class="caret"></span>
                 </a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" id="remove_dropdown">
                  <li><a href="#" onclick="remove_from_album()">From Album</a></li>
                  <li><a href="#" onclick="remove_from_site()">From Website</a></li>
                 </ul>
