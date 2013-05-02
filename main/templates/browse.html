@@ -482,19 +482,22 @@ model.addEventListener("deselect_content", function(e) {
   // CRUD operations on albums
 
   //Event listener for edit pencil - editing albums
-  $(".active > .album-name >#pencil").click(function(){
+  $(".active > .album-name >#pencil").click(function(e){
     $("#selected-span").attr("contenteditable",true);
     $("#selected-span").addClass("editable");
     $("#selected-span").focus(); 
-    document.execCommand('selectAll', false, null)
+    document.execCommand('selectAll', false, null);
+    console.log("pencil click");
   });
 
   $('.active').click(function() {
-    $(".active > .album-name >#pencil").click(function(){
+    console.log("active click");
+    $(".active > .album-name >#pencil").click(function(e){
       $("#selected-span").attr("contenteditable",true);
       $("#selected-span").addClass("editable");
       $("#selected-span").focus();
-      document.execCommand('selectAll', false, null)
+      document.execCommand('selectAll', false, null);
+      console.log("pencil click");
     });
     return false;
     });
@@ -502,6 +505,7 @@ model.addEventListener("deselect_content", function(e) {
    $("#selected-span").blur(function(){
       $(this).attr("contenteditable",false);
       $(this).removeClass("editable");
+      rename_album($(this)[0].innerHTML);
     }
   );
 
@@ -510,26 +514,38 @@ model.addEventListener("deselect_content", function(e) {
       $(this).blur();
       $(this).attr("contenteditable",false);
       $(this).removeClass("editable");
+      rename_album($(this)[0].innerHTML);
     }
    
   });
 
-   $("#selected-span").onfocus = function() {
-    window.setTimeout(function() {
-        var sel, range;
-        if (window.getSelection && document.createRange) {
-            range = document.createRange();
-            range.selectNodeContents(div);
-            sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-        } else if (document.body.createTextRange) {
-            range = document.body.createTextRange();
-            range.moveToElementText(div);
-            range.select();
-        }
-    }, 1);
-};
+  function rename_album(name) {
+    var id = $(".active")[0].id.split("-")[1];
+    $.ajax({
+      type: "POST",
+      url: "/ajax/rename_album/",
+      data: { name:name, id:id }
+    }).done(function( msg ) {
+    });
+
+  }
+
+//    $("#selected-span").onfocus = function() {
+//     window.setTimeout(function() {
+//         var sel, range;
+//         if (window.getSelection && document.createRange) {
+//             range = document.createRange();
+//             range.selectNodeContents(div);
+//             sel = window.getSelection();
+//             sel.removeAllRanges();
+//             sel.addRange(range);
+//         } else if (document.body.createTextRange) {
+//             range = document.body.createTextRange();
+//             range.moveToElementText(div);
+//             range.select();
+//         }
+//     }, 1);
+// };
 
   // create
   $("#btnNewAlbum").click(function() {
