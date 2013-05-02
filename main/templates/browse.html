@@ -609,6 +609,9 @@ model.addEventListener("deselect_content", function(e) {
 
         for (var i = 0; i < pls.length; i++) {
           var plName = pls[i];
+          if (plName == "All Content") {
+            continue;
+          }
           var titleElement = $("<h5>" + plName + "</h5>");
           var uiElement = $("<ui style='cursor:hand;' class='outerUI'> </ui>");
           uiElement.append(titleElement);
@@ -717,20 +720,6 @@ var albumClick = function(albumName) {
     $("#openModal").modal("hide");
   });
 
-  $(".favorited").click(function() {
-    $(".favorited").toggleClass("btn-success");
-    if ($(".favorited").attr('class') == "btn favorited btn-success") {
-      last_clicked_content.output.height *= 1.5;
-      last_clicked_content.output.width *= 1.5;
-      favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
-    }
-    else {
-      last_clicked_content.output.height /= 1.5;
-      last_clicked_content.output.width /= 1.5;
-      favorites_album.remove_content(last_clicked_content);
-    }
-  });
-
   // Full screen handler
   $(".imageHolder").dblclick(function() {
     // Take image to full screen
@@ -765,6 +754,7 @@ var albumClick = function(albumName) {
       $(this).html('&#9733');
     } else {
       $(this).html('&#9734');
+
     }
   });
 
@@ -774,19 +764,16 @@ var albumClick = function(albumName) {
     },
     function() {
       $(this).removeClass('mouseOver');
+      // After mouse leaves update back end
+      if ($(this).hasClass('isFavorited')) {
+        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
+      } else {
+        favorites_album.remove_content(last_clicked_content);
+      }
     }
   );
 
 });
-
-var favoritePicture = function(picture) {
-
-}
-
-var removeFavorite = function(picture) {
-  
-}
-
 
 function undo_remove() {
   var album = last_removed_content_album;
