@@ -42,6 +42,7 @@ var current_album;
 var album_list = [];
 var pckry;
 var model = new Model();
+var user_queue_id = {{user_queue_id}};
 
 
 $(function() {
@@ -193,7 +194,10 @@ The model will propagate the appropriate effects.s
       .click(function() {
         model.select_album(e.album);
       });
-      link.innerHTML = icon.outerHTML+ e.album.get_name();
+      link.innerHTML = icon.outerHTML+ e.album.get_name() + " ";
+      if (e.album.id === user_queue_id) {
+        link.innerHTML = icon.outerHTML + "Your Queue ";
+      }
       album_li.append(link);
       if(e.album.name.indexOf("Queue") == -1 && e.album.name != "Favorites"){
         $("#automatic-albums").append(album_li);
@@ -721,11 +725,9 @@ var update_queue_size = function(album, new_size) {
     $("#album-" + album.id + " .badge").remove();
     var badge = $("<span />").addClass("badge").text(new_size);
     $("#album-" + album.id + " a").append(badge);
-    if (album.equals(model.selected_album)) {
+    if (album.id === user_queue_id) {
       if (new_size > 0) {
         badge.addClass("badge-important");
-      } else {
-        badge.addClass("badge-success");
       }
     }
   }

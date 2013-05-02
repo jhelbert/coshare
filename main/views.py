@@ -181,7 +181,8 @@ def browse(request):
 	return render_to_response('browse.html', 
 		{
 		 "albums":albums,
-		 "selected_album": selected_album
+		 "selected_album": selected_album,
+		 "user_queue_id": userprof.queue.id,
 
 		},
 		context_instance=RequestContext(request))# Create your views here.
