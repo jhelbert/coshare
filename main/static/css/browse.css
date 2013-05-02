@@ -259,6 +259,7 @@ td {
         margin-top: -27px;
         z-index: 10;
         position: relative;
+        cursor: pointer;
     }
 
     .mouseOver {
