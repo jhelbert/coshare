@@ -254,7 +254,7 @@ def add_content(request):
 	album.save()
 	print album.content.all()
 
-	return HttpResponse('OK')
+	return HttpResponse("%i" % (len(album.content.all()), ))
 
 @csrf_exempt
 def remove_content(request):

@@ -227,6 +227,17 @@ The model will propagate the appropriate effects.s
     }
   });
 
+var update_queue_size = function(album, new_size) {
+  if (album.name.indexOf("Queue") != -1) {
+    var badge = $("#album-" + album.id + " .badge").text(new_size);
+    if (new_size > 0) {
+      badge.addClass("badge-important");
+    } else {
+      badge.removeClass("badge-important");
+    }
+  }
+}
+
 var make_droppable = function(album, album_div) {
   album_div.droppable({
     activeClass: "droppable-album",
@@ -237,7 +248,9 @@ var make_droppable = function(album, album_div) {
       for (var i in selected_contents) {
         var content = selected_contents[i];
         console.log(selected_contents[i]);
-        album.post_content(content);
+        album.post_content(content, function(new_size) {
+          update_queue_size(album, new_size);  
+        });
       }
       $(this).tooltip({
         title: "Added " + model.get_num_selected_contents(),
