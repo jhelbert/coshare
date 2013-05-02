@@ -71,24 +71,23 @@ $(function() {
   /***************************************/
   /************* COSMETICS ***************/
   /***************************************/
-  function new_plist(name) {
-    $("#new_plist")[0].value = "";
-    var album = new Album(100,name);
-    model.add_album(album);
+  function new_plist(name, callback) {
     $.ajax({
       type: "POST",
       url: "/ajax/add_album/",
       data: { name:name }
-    }).done(function( msg ) {
-    });
-
+    }).done(callback);
+    $("#new_plist")[0].value = "";
   }
   $('#new_plist')
   .watermark('New Album')
   .keyup(function (e) {
     if (e.keyCode == 13 && e.target.value != "") {
-
-      new_plist(e.target.value);
+      var name = e.target.value;
+      new_plist(name, function(id) {
+        var album = new Album(parseInt(id),name);
+        model.add_album(album);
+      });
     }
   })
   .droppable({
@@ -96,8 +95,35 @@ $(function() {
     hoverClass: "active",
     accept: ".content",
     drop: function( event, ui ) {
-      // TODO!!!
+      // capture dropping onto new album text box
+      // we want to do the following
+      //  1) create new album
+      //  2) add selected content to this new album
+      //  3) edit new album name and give focus
+    new_plist("New Album", function(new_id) {
+      // new_id is a string that is the id of the newly created album
+
+      // construct fake album with correct ID
+      var album = new Album(parseInt(new_id), "New Album");
+      model.add_album(album);
+
+      // add content to newly created album
+      var selected_contents = model.get_selected_contents();
+      for (var i in selected_contents) {
+        var content = selected_contents[i];
+        console.log(selected_contents[i]);
+        album.post_content(content, function(new_size) {
+          update_queue_size(album, new_size);  
+        });
+      }
+
+
+
+    });
+    console.log("TODO: initiate editing.");
+
     },
+
   });
 
   var container = document.querySelector("#contents-container")
@@ -214,7 +240,7 @@ The model will propagate the appropriate effects.s
         $("#album-title").text(e2.album.get_name());
       }});
     var album_li = $("#album-" + e.album.id)
-    if (e.album.is_user_generated() || e.album.name.indexOf("Queue") != -1 || e.album.name == "Favorites") {
+    if (e.album.is_user_generated() || (e.album.name.indexOf("Queue") != -1) || (e.album.name === "Favorites")) {
       make_droppable(e.album, album_li);
     } else {
 
@@ -237,7 +263,7 @@ var make_droppable = function(album, album_div) {
         });
       }
       $(this).tooltip({
-        title: "Added " + model.get_num_selected_contents(),
+        title: "Added!",
         placement: "left",
         trigger: "manual",
       }).tooltip("show");
@@ -412,14 +438,17 @@ model.addEventListener("select_content", function(e) {
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div.addClass("selected-content");
-  var ignored_selectors = "#automatic-albums, .navbar, .selected-album";
+  var ignored_selectors = "#automatic-albums, .navbar, " + "#album-" + current_album.id;
   $("#content-" + e.content.id).draggable({
     start: function(event, ui) {
       $(ignored_selectors).fadeTo(250, 0.2);
       $(this).data("dragging", true);
     },
     helper: function( event ) {
-      return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
+      return $("<div />")
+        .addClass("badge")
+        .attr("id", "helper")
+        .text("" + model.get_num_selected_contents());
     },
     stop: function(event, ui) {
       $(ignored_selectors).fadeTo(250, 1);
@@ -548,10 +577,6 @@ model.addEventListener("deselect_content", function(e) {
 // };
 
   // create
-  $("#btnNewAlbum").click(function() {
-      // add stubbed out
-      model.add_album(new Album(new Date().getTime() % 100));
-    });
 
   $("#btnRenameAlbum").click(function() {
     model.rename_selected_album();
