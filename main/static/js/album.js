@@ -79,13 +79,14 @@ var Album = function(id,name) {
 
     this.post_content = function (content) {
         this.output.push(content);
+        var that = this;
         
               $.ajax({
                         type: "POST",
                         url: "/ajax/add_content/",
                         data: { album_id: this.id, pic_id:content.id }
                 }).done(function( msg ) {
-                    //refresh_last_modified(side);
+                    $("#album-" + that.id + " .label").text(msg);
               });
 
                 console.log("adding undone");
