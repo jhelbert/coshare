@@ -261,6 +261,11 @@ td {
         position: relative;
     }
 
+    .mouseOver {
+        font-size:3em;
+        margin-top:-35px;
+    }
+
     .isFavorited {
         color: goldenrod;
     } 
