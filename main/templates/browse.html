@@ -147,7 +147,7 @@ The model will propagate the appropriate effects.s
     link.setAttribute("class", "album-link");
     link.setAttribute("class", "album-name");
     var nameSpan = document.createElement("span");
-    link.setAttribute("href","#"); //"/browse/?id=" + e.album.id
+    link.setAttribute("href","/browse/?id=" + e.album.id); //
     if (e.album.is_user_generated()) {
       var option = document.createElement("option");
       option.text = e.album.get_name();
@@ -524,7 +524,7 @@ model.addEventListener("deselect_content", function(e) {
     $.ajax({
       type: "POST",
       url: "/ajax/rename_album/",
-      data: { name:name, id:id }
+      data: { name:name, album_id:id }
     }).done(function( msg ) {
     });
 

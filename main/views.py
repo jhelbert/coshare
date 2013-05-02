@@ -266,6 +266,7 @@ def add_album(request):
 
 @csrf_exempt
 def rename_album(request):
+	print 'renaming'
 	new_name = request.POST.get("name")
 	album_id = request.POST.get("album_id")
 	album = Album.objects.get(id=album_id)
