@@ -385,8 +385,6 @@ model.addEventListener("deselect_album", function(e) {
   var pencil = document.getElementById("pencil");
   album_div.removeClass("selected-album")
   .removeClass("selected-auto-album").removeClass("active");
-  console.log("album_div");
-  console.dir(album_div);
   // album_div.removeChild(album_div.lastChild);
   $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
   // album_div.remove(album_div.find(pencil));
@@ -484,13 +482,22 @@ model.addEventListener("deselect_content", function(e) {
   // CRUD operations on albums
 
   //Event listener for edit pencil - editing albums
-  /**
-  var pencilEdit = document.getElementById("pencil");
-  pencilEdit.addEventListener("click",function(e){
-    $("#selected-span").attr('contentEditable', true);
+  $(".active > .album-name >#pencil").click(function(){
+    console.log("pencil");
+  });
+
+  $(".active > .album-name >#pencil").click(function(){
+      $("#selected-span").attr("contenteditable",true);
     });
-  // crea
-  **/
+
+  $('.active').click(function() {
+    $(".active > .album-name >#pencil").click(function(){
+      $("#selected-span").attr("contenteditable",true);
+    });
+    return false;
+    });
+
+  // create
   $("#btnNewAlbum").click(function() {
       // add stubbed out
       model.add_album(new Album(new Date().getTime() % 100));
@@ -582,7 +589,7 @@ var albumClick = function(albumName) {
 
     // Get correct album
     var match;
-    console.log($("#albums-container").find("li"));
+    //console.log($("#albums-container").find("li"));
     $("#albums-container").find("li").each(function(index,element) {
       console.log(index,element);
       if ($(element).text().toString() == albumName) {
