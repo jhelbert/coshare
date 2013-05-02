@@ -281,6 +281,7 @@ model.addEventListener("select_album", function(e) {
   }
 }
 $("#album-" + e.album.id).addClass("active");
+$("#album-" + e.album.id).addClass("select-extend");
 
 
   // disable droppability
@@ -375,7 +376,6 @@ model.addEventListener("deselect_album", function(e) {
   console.dir(album_div);
   // album_div.removeChild(album_div.lastChild);
   $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
-  e.album.set_is_selected(false);
   // album_div.remove(album_div.find(pencil));
 });
 
@@ -732,7 +732,7 @@ function remove_from_site() {
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span3">
-      <div class="well sidebar-nav">
+      <div class="well album-well sidebar-nav">
         <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
           <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
             <li class="nav-header">Standard Albums</li>
