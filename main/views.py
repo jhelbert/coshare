@@ -80,6 +80,7 @@ def main(request):
 		return HttpResponseRedirect('/login/')
 	couple = get_couple(userprof)
 	get_recently_added(couple)
+	get_recently_favorited(couple)
 	query_all_album(couple)
 	name = ""
 	if user:
@@ -96,7 +97,7 @@ def main(request):
 		recently_added_2 = None
 	try:
 		possible_albums = couple.albums.all()
-		recent_plist = possible_albums.get(name="Recently Favorited")
+		fav_plist = possible_albums.get(name="Recently Favorited")
 		favs = fav_plist.content.all()
 		fav_1 = favs[:4]
 		fav_2 = favs[4:8]
@@ -262,6 +263,15 @@ def add_album(request):
 	else:
 		return HttpResponse("create a couple")
 	return HttpResponse('OK')
+
+@csrf_exempt
+def rename_album(request):
+	new_name = request.POST.get("name")
+	album_id = request.POST.get("album_id")
+	album = Album.objects.get(id=album_id)
+	album.name = new_name
+	album.save()
+	return HttpResponse('ok')
 
 @csrf_exempt
 def add_content(request):
