@@ -25,7 +25,9 @@ img {
     <div data-intro="These are your beautiful children! <br><br> Clicking on them will bring you directly to their album on the browsing page." data-step="2" class="well pull-right">
       <ul class="nav nav-list">
         <li class="nav-header">Children:</li>
-        <li><h3>TODO Children!</h3></li>
+        {% for child in children %}
+        <li>{{child.name}}</li>
+        {% endfor %}
       </ul>
     </div>
     <h1 data-intro="Welcome to CoShare, your family's content manager! <br><br>Use the menu bar at the top of the page to add content and navigate to the content browsing page." data-step='1'>Smith Family</h1>

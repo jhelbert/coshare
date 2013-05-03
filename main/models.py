@@ -21,9 +21,6 @@ class Album(models.Model):
 		return self.name
 
 
-
-
-
 class UserProfile(models.Model):
 	user = models.ForeignKey(User, unique=True)
 	queue = models.ForeignKey(Album)
@@ -31,6 +28,12 @@ class UserProfile(models.Model):
 	def __unicode__(self):
 		return self.user.username
 
+class Child(models.Model):
+	name = models.CharField(max_length=100)
+	album = models.ForeignKey(Album)
+
 class Couple(models.Model):
 	members = models.ManyToManyField(UserProfile)
 	albums = models.ManyToManyField(Album)
+	children = models.ManyToManyField(Child)
+

@@ -282,7 +282,7 @@ td {
     .album-well{
         margin-top: 40px;
         margin-right: 30px;
-        position: fixed;
+        /*position: fixed;*/
         width: 250px;
     }
 

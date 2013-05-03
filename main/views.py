@@ -1,4 +1,4 @@
-from main.models import Content,Album, UserProfile, Couple
+from main.models import Content,Album, UserProfile, Couple, Child
 from django.shortcuts import render_to_response
 from django import forms
 from django.template import RequestContext
@@ -79,6 +79,7 @@ def main(request):
 	if userprof is None:
 		return HttpResponseRedirect('/login/')
 	couple = get_couple(userprof)
+	children = couple.children.all();
 	get_recently_added(couple)
 	get_recently_favorited(couple)
 	query_all_album(couple)
@@ -114,7 +115,8 @@ def main(request):
 			"favs_1":fav_1,
 			"favs_2": fav_2,
 			"userprof":user,
-			"name":name
+			"name":name,
+			"children":children
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -132,7 +134,6 @@ def get_recently_added(couple):
 		print "done with get recently added"
 	except:
 		print "recently added failed"
-
 
 def get_recently_favorited(couple):
 
@@ -190,6 +191,7 @@ def browse(request):
 	 	return HttpResponseRedirect('/login/')
 
 	couple = get_couple(userprof)
+	children = couple.children.all()
 	get_recently_added(couple)
 	get_recently_favorited(couple)
 	print "got couple"
@@ -202,12 +204,15 @@ def browse(request):
 		print selected_album
 	except:
 		pass
+	print children
+	print albums
+
 	return render_to_response('browse.html', 
 		{
 		 "albums":albums,
 		 "selected_album": selected_album,
 		 "user_queue_id": userprof.queue.id,
-
+		 "children":children
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
