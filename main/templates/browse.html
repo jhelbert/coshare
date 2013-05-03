@@ -43,6 +43,7 @@ var album_list = [];
 var pckry;
 var model = new Model();
 var user_queue_id = {{user_queue_id}};
+var already_favorited = false;
 
 
 $(function() {
@@ -614,10 +615,12 @@ model.addEventListener("deselect_content", function(e) {
     image_info['src'] = image.substring(7);
     image_info['id'] = id_val;
     image_info['height'] = $(this).children("img").attr("height") / 10;
+    already_favorited = false;
     // Add favorited icon to reflect picture
     if (favorites_album.content_in(id_val)) {
       $(".favoriteIcon").addClass("isFavorited");
       $(".favoriteIcon").html('&#9733');
+      already_favorited = true;
     }
     // Add albums info to list
     $.ajax({
@@ -791,9 +794,10 @@ var albumClick = function(albumName) {
       $(this).removeClass('mouseOver');
       // After mouse leaves update back end
       if ($(this).hasClass('isFavorited')) {
-        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
+        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
       } else {
         favorites_album.remove_content(last_clicked_content);
+        already_favorited = false;
       }
     }
   );
