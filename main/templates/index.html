@@ -61,7 +61,7 @@ img {
   <div style="background-color:lightgray;width:500px">
     <div class="well pull-left" style="float:left;clear:both;margin-top:30px;width:500px;">
 
-      <div class="pictureSection"><b>Recently Favorited</b><a href="" style="margin-left:250px; text-decoration:none">See All</a></div>
+      <div class="pictureSection"><b>Recently Favorited</b><a href="/recently_favorited/" style="margin-left:250px; text-decoration:none">See All</a></div>
 
       <div class="picture-collection">
         {% for image in favs_1 %}
@@ -84,7 +84,31 @@ img {
 </div>
 </div>
 
-<input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
+<div id="upload" style="float:right">
+ <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+  <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
 
 </div>
+
+<div id="example" class="modal hide fade in" style="display: none; ">  
+  <div class="modal-header">  
+    <h3 align="center">Upload Preview</h3>  
+  </div>  
+  <div class="modal-body">  
+    <div id="blah" align="center" style="position:relative;float:left"></div>              
+    <div align="center" style="margin-top:30px;clear:both;">
+      Add To Album:
+      <select id="album_list" name="album">
+        <option value="1">None</option> 
+      </select>
+      <input name="deleted" id="deleted_uploads" style="display:none"/>
+    </div>
+  </div>  
+  <div class="modal-footer">  
+    <input class="btn btn-primary" type="submit" style="width:80px"/>
+    <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</a>  
+  </div>  
+</div>  
+</div>  
+</form>
 {% endblock %}

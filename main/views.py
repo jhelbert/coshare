@@ -39,6 +39,20 @@ def get_couple(userprof):
 
 	return Couple.objects.get(members=userprof)
 
+
+def go_to_recently_added(request):
+	userprof = get_user_profile(request)
+	couple = get_couple(userprof)
+	possible_albums = couple.albums.all()
+	recently_added_plist = possible_albums.get(name="Recently Added")
+	return HttpResponseRedirect('/browse/?id=' + str(recently_added_plist.id))
+
+def go_to_recently_favorited(request):
+	userprof = get_user_profile(request)
+	couple = get_couple(userprof)
+	possible_albums = couple.albums.all()
+	recently_added_plist = possible_albums.get(name="Recently Favorited")
+	return HttpResponseRedirect('/browse/?id=' + str(recently_added_plist.id))
 @csrf_exempt
 def login_user(request):
 	email = request.POST.get('email')
