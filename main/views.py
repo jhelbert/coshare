@@ -150,20 +150,22 @@ def get_recently_added(couple):
 		print "recently added failed"
 
 def get_recently_favorited(couple):
-
-	possible_albums = couple.albums.all()
-	favorited = possible_albums.get(name="Favorites")
-	recently_added_plist = possible_albums.get(name="Recently Favorited")
-	print "got ra plist"
-	recently_added_plist.content.clear()
-	content = Content.objects.all()
-	for c in content:
-		if c.favorited_time:
-			if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
-				for f in favorited.content.all():
-					if f.id == c.id:
-						recently_added_plist.content.add(c)
-	print "done with get recently added"
+	try:
+		possible_albums = couple.albums.all()
+		favorited = possible_albums.get(name="Favorites")
+		recently_added_plist = possible_albums.get(name="Recently Favorited")
+		print "got ra plist"
+		recently_added_plist.content.clear()
+		content = Content.objects.all()
+		for c in content:
+			if c.favorited_time:
+				if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
+					for f in favorited.content.all():
+						if f.id == c.id:
+							recently_added_plist.content.add(c)
+		print "done with get recently added"
+	except:
+		pass
 
 
 def mobile(request):
