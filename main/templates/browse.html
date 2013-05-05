@@ -1015,14 +1015,15 @@ function remove_from_site() {
   <div class="modal-body">  
     <div id="blah" align="center" style="position:relative;float:left"></div>              
     <div align="center" style="margin-top:30px;clear:both;">
-      Add To Album:
-      <select id="album_list" name="album">
-        <option value="1">None</option> 
-      </select>
+      
       <input name="deleted" id="deleted_uploads" style="display:none"/>
     </div>
   </div>  
   <div class="modal-footer">  
+    Add To Album:
+      <select id="album_list" name="album">
+        <option value="1">None</option> 
+      </select>
     <input class="btn btn-primary" type="submit" style="width:80px"/>
     <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</a>  
   </div>  
