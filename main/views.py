@@ -245,7 +245,10 @@ def query_all_album(couple):
 def upload(request):
 
 	album_id = request.POST.get('album')
-	delete = request.POST.get('deleted').split('|')
+	try:
+		delete = request.POST.get('deleted').split('|')
+	except:
+		delete = []
 	album = None
 	if album_id != -1 and album_id != None:
 		print album_id
