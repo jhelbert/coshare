@@ -295,3 +295,13 @@ td {
         background-color: white;
         color: #0088cc;
     }
+
+    .create{
+    padding: 2px 6px 2px 6px;
+    }
+
+    .album-well{
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+

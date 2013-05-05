@@ -81,17 +81,18 @@ $(function() {
     }).done(callback);
     $("#new_plist")[0].value = "";
   }
+
   $('#new_plist')
   .watermark('New Album')
   .keyup(function (e) {
+    console.dir(e);
     if (e.keyCode == 13 && e.target.value != "") {
       var name = e.target.value;
       new_plist(name, function(id) {
         var album = new Album(parseInt(id),name);
         model.add_album(album);
       });
-    }
-  })
+    }})
   .droppable({
     activeClass: "new-album-dd-active",
     hoverClass: "new-album-dd-hover",
@@ -329,6 +330,7 @@ $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_site()">From 
       $("#album-" + e.album.id).find("a").append(edit);
     //e.album.set_is_selected(true);
     $("#album-" + e.album.id + "> a > span").attr("id","selected-span");
+    $("#album-" + e.album.id + "> a > span").attr("spellcheck","false");
   }
 }
 $("#album-" + e.album.id).addClass("active");
@@ -678,7 +680,6 @@ model.addEventListener("deselect_content", function(e) {
 
 }
 
-
 var albumClick = function(albumName) {
     // Close Modal
     $(".alert").alert('close');
@@ -861,6 +862,14 @@ function remove_from_site() {
   model.remove_selected_contents_from_selected_album(true, callback);
 }
 
+function new_album() {
+    var e = jQuery.Event("keyup");
+    e.keyCode = 13;
+    e.target.value = $("#new_plist")[0].value;
+    console.log("trigger");
+    $("#new_plist").trigger(e);
+  }
+
 
 </script>
 {% endblock %}
@@ -877,20 +886,26 @@ function remove_from_site() {
           </ul>
         </div>
       </div>
-      <div class="well album-well sidebar-nav">
+        <div class="well album-well sidebar-nav">
         <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
           <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
             <li class="nav-header">Standard Albums</li>
           </ul>
-          <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+        </div>
+      </div>
+
+        <div class="well album-well sidebar-nav">
+          <div id="albums-container">
+            <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
             <li class="nav-header">Edit Albums</li>
-          </ul>
-          <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
+            </ul>
+            <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
             <li class="nav-header">Your Albums</li>
           </ul>
           <input name="name" id="new_plist" type="text"/>
         </div>
-        <p class="text-center"><span class="label label-info">Drag Content To Me!</span></p>
+        <div class="text-center"><button class="btn create" onclick="">Create</button>
+          </div>
       </div><!--/.well -->
     </div><!--/span-->
     <div id="content-well" class="span9">
@@ -1024,7 +1039,8 @@ function remove_from_site() {
   </div>  
   <div class="modal-footer">  
     <input class="btn btn-primary" type="submit" style="width:80px"/>
-    <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</a>  
+    <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Cancel</a>  
+    <input class="btn btn-primary" type="submit" style="width:80px"/>
   </div>  
 </div>  
 </div>  
