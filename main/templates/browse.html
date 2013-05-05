@@ -1,0 +1,950 @@
+{% extends "base.html" %}
+
+{% block title %}
+CoShare - Content Manager
+{% endblock %}
+
+{% block head %}
+
+<link href="/static/css/smoothness/jquery-ui-1.10.2.custom.css" rel="stylesheet">
+
+<script src="/static/js/jquery.watermark.min.js"></script>
+
+<!-- packery -->
+<script src="{{STATIC_URL}}/js/packery.min.js"></script>
+<script src="{{STATIC_URL}}/js/jquery.imagesloaded.js"></script>
+
+<!-- Models -->
+<script src="/static/js/album.js"></script>
+<script src="/static/js/content.js"></script>
+<script src="/static/js/model.js"></script>
+
+<!-- Slider -->
+<script src="{{STATIC_URL}}/js/bootstrap-slider.js"></script>
+<link href="{{STATIC_URL}}/css/slider.css" rel="stylesheet">
+
+<link href="{{STATIC_URL}}/css/browse.css" rel="stylesheet">
+<link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
+
+
+
+
+<script type="text/javascript">
+
+var selected_content_ids = [];
+var selected_content_map = {};
+var image_info = [];
+var last_removed_content_list = [];
+var last_removed_content_album;
+var album_map = {};
+var favorites_album;
+var current_album;
+var album_list = [];
+var pckry;
+var model = new Model();
+var user_queue_id = {{user_queue_id}};
+
+
+$(function() {
+
+  var update_selection_count = function() {
+    var num_selected = model.get_num_selected_contents();
+    var num_total =  model.selected_album.get_contents().length;
+    $("#selection-count")
+    .text(num_selected + " of " + num_total + " selected");
+    
+    if (num_selected === 0) {
+      $("#btnRemoveSelectedContent, #btnDeselectAll")
+      .addClass("disabled");
+    } else {
+      $("#btnRemoveSelectedContent, #btnDeselectAll")
+      .removeClass("disabled");
+    }
+
+    if (num_selected === num_total) {
+      $("#btnSelectAll").addClass("disabled");
+    } else {
+      $("#btnSelectAll").removeClass("disabled");
+    }
+  }
+
+  /***************************************/
+  /************* COSMETICS ***************/
+  /***************************************/
+  function new_plist(name) {
+    $("#new_plist")[0].value = "";
+    var album = new Album(100,name);
+    model.add_album(album);
+    $.ajax({
+      type: "POST",
+      url: "/ajax/add_album/",
+      data: { name:name }
+    }).done(function( msg ) {
+    });
+
+  }
+  $('#new_plist')
+  .watermark('New Album')
+  .keyup(function (e) {
+    if (e.keyCode == 13 && e.target.value != "") {
+
+      new_plist(e.target.value);
+    }
+  })
+  .droppable({
+    activeClass: "active",
+    hoverClass: "active",
+    accept: ".content",
+    drop: function( event, ui ) {
+      // TODO!!!
+    },
+  });
+
+  var container = document.querySelector("#contents-container")
+  pckry = new Packery(container, {
+    itemSelector: ".content",
+    transitionDuration: "0.75s",
+  });
+
+  $("#slider")
+  .slider({
+    value: 1,
+    min: 1,
+    max: 5,
+  })
+  .on("slide", function(ev) {
+    $("img").css("height", 100*ev.value);
+    pckry.layout();
+  });
+
+  /******************************************/
+  /**** Register Listeners to the Model *****/
+  /******************************************/
+
+  /*
+
+Use the pardigm of an event driving everything.
+Capture the raw input event and IMMEDIATELY translate
+it into a high level event in the model.
+The model will propagate the appropriate effects.s
+
+*/
+
+  // instantiate model
+  
+
+  /************ ADD ALBUM LISTENER **********/
+  model.addEventListener("add_album", function(e) {
+
+    if (e.album.get_name() == "Favorites") {
+      favorites_album = e.album;
+    }
+
+
+    var album_li = $("<li />");
+    var icon = document.createElement("i");
+    var link = document.createElement("a");
+    link.setAttribute("class", "album-link");
+    link.setAttribute("class", "album-name");
+    var nameSpan = document.createElement("span");
+    link.setAttribute("href","/browse/?id=" + e.album.id);
+    if (e.album.is_user_generated()) {
+      var option = document.createElement("option");
+      option.text = e.album.get_name();
+
+      
+      icon.setAttribute("class", "icon-folder-close");
+
+
+      option.value = e.album.id;
+      var select = document.getElementById("album_list");
+      select.appendChild(option);
+
+      /**.addClass("album-name")**/
+      album_li
+      .attr("id", "album-" + e.album.id)
+      .click(function() {
+        model.select_album(e.album);
+      });
+      nameSpan.innerHTML = e.album.get_name();
+      link.innerHTML = icon.outerHTML+ nameSpan.outerHTML + " &nbsp;";
+
+      album_li.append(link);
+
+      $("#user-created-albums").append(album_li);
+      album_list.push(e.album);
+      
+    }
+
+
+    else{
+
+      if(e.album.name.indexOf("Queue")!=-1){
+        icon.setAttribute("class", "icon-tasks");
+      }
+      else if(e.album.name.indexOf("Favorite")!=-1){
+        icon.setAttribute("class", "icon-star"); 
+      }
+      else{
+        icon.setAttribute("class", "icon-cog");
+      }
+      /**.addClass("album-name")**/
+      album_li
+      .attr("id", "album-" + e.album.id)
+      .click(function() {
+        model.select_album(e.album);
+      });
+      link.innerHTML = icon.outerHTML+ e.album.get_name() + " ";
+      if (e.album.id === user_queue_id) {
+        link.innerHTML = icon.outerHTML + "Your Queue ";
+      }
+      album_li.append(link);
+      if(e.album.name.indexOf("Queue") == -1 && e.album.name != "Favorites"){
+        $("#automatic-albums").append(album_li);
+
+      }
+      else{
+        $("#special-albums").append(album_li); 
+      }
+    }
+    model.addEventListener("rename_album", function(e2) {
+
+      if (e2.album.equals(e.album)) {
+        album_li.text(e2.album.get_name());
+        $("#album-title").text(e2.album.get_name());
+      }});
+    var album_li = $("#album-" + e.album.id)
+    if (e.album.is_user_generated() || e.album.name.indexOf("Queue") != -1 || e.album.name == "Favorites") {
+      make_droppable(e.album, album_li);
+    } else {
+
+      album_li.droppable();
+    }
+  });
+
+var make_droppable = function(album, album_div) {
+  album_div.droppable({
+    activeClass: "droppable-album",
+    hoverClass: "active",
+    accept: ".content",
+    drop: function( event, ui ) {
+      var selected_contents = model.get_selected_contents();
+      for (var i in selected_contents) {
+        var content = selected_contents[i];
+        console.log(selected_contents[i]);
+        album.post_content(content, function(new_size) {
+          update_queue_size(album, new_size);  
+        });
+      }
+      $(this).tooltip({
+        title: "Added " + model.get_num_selected_contents(),
+        placement: "left",
+        trigger: "manual",
+      }).tooltip("show");
+      var that = this;
+      setTimeout(function() {
+        $(that).tooltip("destroy");
+      }, 2000);
+    },
+  });
+}
+
+/*********** SELECT ALBUM LISTENER ********/
+model.addEventListener("select_album", function(e) {
+  for (var i in model.albums) {
+    var album = model.albums[i];
+    update_queue_size(album, album.get_contents().length);  
+  }
+  
+  update_selection_count();
+
+  selected_content_ids = [];
+  selected_content_map = {};
+  selected_album = e.album.id;
+  current_album = e.album;
+
+  // refresh title
+  $("#album-title").text(e.album.get_name());
+
+  // update display
+  // TODO: fix rep exposure
+  if (e.album.is_auto) {
+    $("#album-" + e.album.id).addClass("selected-auto-album");
+  } else {
+    if (e.album.is_user_generated() && ! e.album.is_selected){
+      var edit = document.createElement("i");
+      edit.setAttribute("class", "icon-pencil pull-right");
+      edit.setAttribute("id", "pencil");
+
+      $("#album-" + e.album.id).addClass("selected-album");
+      $("#album-" + e.album.id).find("a").append(edit);
+    //e.album.set_is_selected(true);
+    $("#album-" + e.album.id + "> a > span").attr("id","selected-span");
+  }
+}
+$("#album-" + e.album.id).addClass("active");
+$("#album-" + e.album.id).addClass("select-extend");
+
+
+  // disable droppability
+  $("#album-" + e.album.id).droppable("destroy");
+
+
+  // show/hide relevant pictures
+  // TODO: these buttons don't exist anymore.
+  if (e.album.can_rename()) {
+    $("#btnRenameAlbum").removeAttr("disabled");
+  } else {
+    $("#btnRenameAlbum").attr("disabled", "disabled");
+  }
+
+  if (e.album.can_remove()) {
+    $("#btnRemoveAlbum").removeAttr("disabled");
+  } else {
+    $("#btnRemoveAlbum").attr("disabled", "disabled");
+  }
+
+  if (e.album.can_edit_content()) {
+    $("#btnRemoveSelectedContent").removeAttr("disabled");
+  } else {
+    $("#btnRemoveSelectedContent").attr("disabled", "disabled");
+  }
+
+  $("#contents-container .content").each(function(i,v) {
+    pckry.remove(v);
+  });
+  pckry.layout();
+  var contents = e.album.get_contents();
+  $(contents).each(function(i, content) {
+    var inner = $(content.get_content())
+    .addClass("content")
+    .attr("id", "content-" + content.id)
+    .attr("id-num", content.id)
+    .click(function() {
+      if ($(this).data("dragging")) {
+        return;
+      }
+      model.toggle_content(content);
+    });
+
+    $("#contents-container").append(inner);
+    pckry.appended(inner.get());
+
+  });
+  $("#contents-container").imagesLoaded(function() {
+    $("#contents-container img").each(function(i, v) {
+      $(v).css("min-width", $(v).css('width'));
+    });
+    pckry.layout();
+  });
+  $("#content").text("content from " + e.album.get_name());
+
+  $(".content").dblclick(function() {
+    if (last_clicked_content.height == 200) {
+      $(".favorited").addClass("btn-success")
+    }
+    $(".alert").alert('close');
+    
+    $("#openModal").modal("show");
+    $(".albumList").empty();
+    var image = $(this).children("img").attr("src");
+
+    if (!image) {
+      image = $(this).children("video").attr("src");
+    }
+
+    var id_val = $(this).attr("id-num");
+    populateModal(image,id_val);
+
+  });
+});
+
+/******** DESELECT ALBUM LISTENER *********/
+model.addEventListener("deselect_album", function(e) {
+  var album_div = $("#album-" + e.album.id)
+  
+  if (e.album.is_user_generated()) {
+    make_droppable(e.album, album_div);
+  } else {
+    album_div.droppable();
+
+  }
+  var pencil = document.getElementById("pencil");
+  album_div.removeClass("selected-album")
+  .removeClass("selected-auto-album").removeClass("active");
+  // album_div.removeChild(album_div.lastChild);
+  $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
+  // album_div.remove(album_div.find(pencil));
+});
+
+/********** REMOVE ALBUM LISTENER *********/
+model.addEventListener("remove_album", function(e) {
+  $("#album-" + e.album.id).fadeOut();
+});
+
+/********* REMOVE CONTENT LISTENER ********/
+model.addEventListener("remove_content", function(e) {
+
+  last_removed_content_album  = current_album;
+  $("#content-" + e.content.id).each(function(i, v) {
+    last_removed_content_list.push(e.content);
+    pckry.remove(v);
+    
+  });
+  $("#undo_div")[0].style.display="block";
+  pckry.layout();
+});
+
+
+
+/****** SELECT CONTENT LISETENER ********/
+model.addEventListener("select_content", function(e) {
+  update_selection_count();
+  last_clicked_content = e.content;
+  var content_div = $("#content-" + e.content.id);
+  content_div.addClass("selected-content");
+  var ignored_selectors = "#automatic-albums, .navbar, .selected-album";
+  $("#content-" + e.content.id).draggable({
+    start: function(event, ui) {
+      $(ignored_selectors).fadeTo(250, 0.2);
+      $(this).data("dragging", true);
+    },
+    helper: function( event ) {
+      return $("<div />").addClass("helper").text("" + model.get_num_selected_contents());
+    },
+    stop: function(event, ui) {
+      $(ignored_selectors).fadeTo(250, 1);
+      $(this).data("dragging", false);
+    },
+    distance: 20,
+    cursorAt: { top: 0, left: -25 },
+    cursor: "default",
+  })});
+
+model.addEventListener("deselect_content", function(e) {
+  update_selection_count();
+  last_clicked_content = e.content;
+  var content_div = $("#content-" + e.content.id);
+  content_div
+  .draggable('destroy')
+  .removeClass("selected-content");
+});
+
+  // get albums from django
+  // MUST APPEAR AFTER LISTENERS ARE CREATED
+  {% for album in albums %}
+  var album = new Album({{album.id}},"{{album.name}}");
+  
+  album_map[{{album.id}}] = album;
+  album_list.push(album);
+  {% for content in album.content.all %}
+  album.add_content({{content.id}},"{{content.image}}",{{content.metric}},false);
+
+
+  {% endfor %}
+  model.add_album(album);
+
+  {% endfor %}
+
+
+  var valid_album = false;
+  var all_album;
+  for (var i = 0; i < album_list.length; i++)  {
+    if (album_list[i].name == "All Content") {
+      all_album = album_list[i];
+    }
+
+    if ("{{selected_album.name}}" == album_list[i].name) {
+      model.select_album(album_list[i]);
+      valid_album = true;
+    }
+
+  }
+
+  if (!valid_album) {
+    model.select_album(all_album);
+  }
+
+
+  // CRUD operations on albums
+
+  //Event listener for edit pencil - editing albums
+  $(".active > .album-name >#pencil").click(function(){
+    $("#selected-span").attr("contenteditable",true);
+    $("#selected-span").addClass("editable");
+    $("#selected-span").focus(); 
+    document.execCommand('selectAll', false, null)
+  });
+
+  $('.active').click(function() {
+    $(".active > .album-name >#pencil").click(function(){
+      $("#selected-span").attr("contenteditable",true);
+      $("#selected-span").addClass("editable");
+      $("#selected-span").focus();
+      document.execCommand('selectAll', false, null)
+    });
+    return false;
+    });
+
+   $("#selected-span").blur(function(){
+      $(this).attr("contenteditable",false);
+      $(this).removeClass("editable");
+    }
+  );
+
+  $('#selected-span').keydown(function(event) {
+    if (event.which == 13) {
+      $(this).blur();
+      $(this).attr("contenteditable",false);
+      $(this).removeClass("editable");
+    }
+   
+  });
+
+   $("#selected-span").onfocus = function() {
+    window.setTimeout(function() {
+        var sel, range;
+        if (window.getSelection && document.createRange) {
+            range = document.createRange();
+            range.selectNodeContents(div);
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (document.body.createTextRange) {
+            range = document.body.createTextRange();
+            range.moveToElementText(div);
+            range.select();
+        }
+    }, 1);
+};
+
+  // create
+  $("#btnNewAlbum").click(function() {
+      // add stubbed out
+      model.add_album(new Album(new Date().getTime() % 100));
+    });
+
+  $("#btnRenameAlbum").click(function() {
+    model.rename_selected_album();
+  });
+
+  $("#btnRemoveAlbum").click(function() {
+    model.remove_selected_album();
+  });
+
+  // Select/Deselect All
+  $("#btnSelectAll").click(function() {
+    model.select_all();
+  });
+
+  $("#btnDeselectAll").click(function() {
+    model.deselect_all();
+  });
+
+  $("#editButton").click(function() {
+    var state = $("#editButton").html()
+    if (state.toString() == "Save Changes") {
+      saveDescription();
+    } else {
+      editDescription();
+    }
+  });
+
+  var populateModal = function(image, id_val) {
+    $(".imageHolder").attr("src",image);
+    $(".imageHolder").attr("id-num",id_val);
+
+    image_info = {};
+    image_info['src'] = image.substring(7);
+    image_info['id'] = id_val;
+    image_info['height'] = $(this).children("img").attr("height") / 10;
+
+    // Add albums info to list
+    $.ajax({
+      type: "POST",
+      url: "/open_modal_view/",
+      data: {id: id_val}
+    }).done(function( msg ) {
+        // upload picture description
+        var description = msg["des"];
+        var pls = msg["albums"];
+        var photo_table = msg["photos"];
+        
+        /*
+        if (description == "") {
+          description = "\n";
+        }
+        */
+        
+        $(".imageDescription").text(description);
+
+        for (var i = 0; i < pls.length; i++) {
+          var plName = pls[i];
+          var titleElement = $("<h5>" + plName + "</h5>");
+          var uiElement = $("<ui style='cursor:hand;' class='outerUI'> </ui>");
+          uiElement.append(titleElement);
+          uiElement.click(function() {
+            var curName = $(this).children("h5").html();
+            albumClick(curName.toString());
+          });
+          var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+          for (var j=0; j < photo_table[plName].length; j++) {
+            ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
+          }
+          uiElement.append(ulPhoto);
+          $(".albumList").append(uiElement);
+        }
+      });
+
+}
+
+
+var albumClick = function(albumName) {
+    // Close Modal
+    $(".alert").alert('close');
+    $("#openModal").modal("hide");
+
+    // Get correct album
+    var match;
+    //console.log($("#albums-container").find("li"));
+    $("#albums-container").find("li").each(function(index,element) {
+      console.log(index,element);
+      if ($(element).text().toString() == albumName) {
+        match = $(element);
+      }
+    });
+
+    // Get album object
+    var id = match.attr("id");
+    id = id.substring(6);
+    var album;
+    for (var i=0; i < model.albums.length; i++) {
+      var curID = model.albums[i]["id"];
+      if (curID.toString() == id.toString()) {
+        album = model.albums[i];
+        break;
+      }
+    }
+
+    // Trigger event to load selected album
+    model.select_album(album);
+    
+
+  }
+
+
+  var editDescription = function() {
+    var text = $(".imageDescription").text();
+    text = text.trim();
+    $(".alert").alert('close');
+    $(".descriptionInput").val(text);
+    $(".descriptionInput").removeClass("hidden");
+    $(".imageDescription").addClass("hidden");
+    $(".descriptionInput").focus();
+    $("#editButton").html('Save Changes');
+  };
+
+
+  var saveDescription = function() {
+    var text = $(".descriptionInput").val();
+    text = text.trim();
+    $(".imageDescription").text(text);
+    $(".descriptionInput").addClass("hidden");
+    $(".imageDescription").removeClass("hidden");
+    var id_val = $(".imageHolder").attr("id-num").toString();
+    // send new text value to the server
+    $.ajax({
+      type: "POST",
+      url: "/save_description/",
+      data: { id: id_val, description: text}
+    }).done(function( msg ) {
+      $(".alert").alert('close');
+      if (msg != "error") {
+        var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
+
+        $("#descriptionBox").append(alertBox);
+      } else {
+        var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
+
+        $("#descriptionBox").append(alertBox);
+      }
+      $("#editButton").html('Edit');
+    });
+  };
+
+  $(".descriptionInput").bind('keypress',function(e) {
+    var code = (e.keyCode ? e.keyCode : e.which);
+    if (code ==13) {
+      var text = $(".descriptionInput").val();
+      text = text.trim();
+      $(".imageDescription").text(text);
+      $(".descriptionInput").addClass("hidden");
+      $(".imageDescription").removeClass("hidden");
+    }
+  });
+
+  $("#closeModal").click(function() {
+    $(".alert").alert('close');
+    $("#openModal").modal("hide");
+  });
+
+  $(".favorited").click(function() {
+    $(".favorited").toggleClass("btn-success");
+    if ($(".favorited").attr('class') == "btn favorited btn-success") {
+      last_clicked_content.output.height *= 1.5;
+      last_clicked_content.output.width *= 1.5;
+      favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],true);
+    }
+    else {
+      last_clicked_content.output.height /= 1.5;
+      last_clicked_content.output.width /= 1.5;
+      favorites_album.remove_content(last_clicked_content);
+    }
+  });
+
+  // Full screen handler
+  $(".imageHolder").dblclick(function() {
+    // Take image to full screen
+    // determin type of browser
+    try {
+      $(this).get(0).mozRequestFullScreen();
+    } catch(err) {
+      try {
+        $(this).get(0).webkitRequestFullScreen();
+      } catch(err) {
+        console.log("no full screen support for browser");
+      }
+    }
+  });
+  
+
+  $("#deletePicture").click(function() {
+    var confirmBox = confirm("Deleting will remove this photo from all albums, as well as from your account. Do you want to continue?");
+    if (confirmBox == true) {
+      $("#openModal").modal("hide");
+      // Delete from backend, and update page
+    } else {
+      // do nothing
+    }
+  });
+
+
+  // Favorited icon click handler
+  $(".favoriteIcon").click(function() {
+    $(this).toggleClass("isFavorited");
+    if ($(this).hasClass("isFavorited")) {
+      $(this).html('&#9733');
+    } else {
+      $(this).html('&#9734');
+    }
+  });
+
+});
+
+
+function undo_remove() {
+  var album = last_removed_content_album;
+  for (var i = 0; i < last_removed_content_list.length; i++ ) {
+    album.post_content(last_removed_content_list[i]);
+
+  }
+
+
+  location.reload(true);
+}
+
+
+var update_queue_size = function(album, new_size) {
+  if (album.name.indexOf("Queue") != -1) {
+    $("#album-" + album.id + " .badge").remove();
+    var badge = $("<span />").addClass("badge").text(new_size);
+    $("#album-" + album.id + " a").append(badge);
+    if (album.id === user_queue_id) {
+      if (new_size > 0) {
+        badge.addClass("badge-important");
+      }
+    }
+  }
+}
+
+var callback = function(new_size) {
+  console.log("wasup");
+  update_queue_size(model.selected_album, new_size)
+};
+
+function remove_from_album() {
+  model.remove_selected_contents_from_selected_album(false, callback);
+}
+function remove_from_site() {
+  model.remove_selected_contents_from_selected_album(true, callback);
+}
+
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span3">
+      <div class="well album-well sidebar-nav">
+        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
+          <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
+            <li class="nav-header">Standard Albums</li>
+          </ul>
+          <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+            <li class="nav-header">Edit Albums</li>
+          </ul>
+          <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
+            <li class="nav-header">Your Albums</li>
+          </ul>
+          <input name="name" id="new_plist" type="text"/>
+        </div>
+        <p class="text-center"><span class="label label-info">Drag Content To Me!</span></p>
+      </div><!--/.well -->
+    </div><!--/span-->
+    <div id="content-well" class="span9">
+      <div>
+        <div align="right" id="undo_div" style="display:none">
+          Content Removed: <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
+        </div>
+      </div>
+      <div class="container-fluid">
+        <!-- TITLE -->
+        <div id="row-fluid">
+          <div class="span12">
+            <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop These pieces of content between Albums.' data-step='5'></h2>
+          </div>
+        </div>
+        <!-- Selection -->
+        <div class="row-fluid">
+          <!-- left buttons -->
+          <div class="span5">
+
+           <button class="btn btn-primary" id="btnSelectAll">Select All</button>
+           <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
+          </div>
+          <!-- middle selection count -->
+          <div class="span2">
+            <h4 class="text-center" id="selection-count" />
+          </div>
+          <!-- right buttons -->
+          <div class="span5">
+            <p class="pull-right">
+              <div class="btn-group">
+                <a class="btn dropdown-toggle btn-danger" data-toggle="dropdown" href="#">
+                  Removed Selected Content
+                  <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                 <li><a href="#" onclick="remove_from_album()">From Album</a></li>
+                 <li><a href="#" onclick="remove_from_site()">From Website</a></li>
+                </ul>
+              </div>
+            </p>
+          </div>
+        </div> <!-- end of Selection row -->
+
+        <!-- slider row -->
+        <div class="row-fluid">
+          <table>
+            <tr>
+              <td><i class="icon-zoom-out"></i></td>
+              <td><div id="slider" class="slider" /></td>
+              <td><i class="icon-zoom-in"></i></td>
+            </tr>
+          </table>
+        </div>
+        <!-- end slider row -->
+
+        <!-- actual content! -->
+        <div class="row-fluid">
+          <div class="span12" id="contents-container" />
+        </div>
+
+      </div> <!-- end right side of screen container -->
+    </div> <!-- end content well -->
+  </div>
+</div>
+
+<!--- MODAL SHIT -->
+
+<div id="backdrop" class = "modal-backdrop fade in" style="opacity:0; pointer-events:none"></div>
+<div id="openModal" class="modal hide fade" role="dialog">
+  <div class="modal-header">
+    <button id="closeModal" type="button" class="close">x</button>
+    <h4> Picture </h4>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="span6 offset1" id="leftCol">
+        <img class="imageHolder" id="modalImage" src=""></img>
+        <div class="favoriteIcon">&#9734</div>
+          <!--
+          <button class="btn favorited"> Favorited </button>
+        -->
+      </div>
+      <div class="span5" id="rightCol">
+        <h4> Album Membership </h4>
+        <ul class="albumList">
+        </ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span11 offset1" id="descriptionBox">
+        <h4> Description </h4>
+        <p class="imageDescription">
+
+        </p>
+
+        <textarea class="descriptionInput hidden"> </textarea>
+        <button class="btn btn-success buttonRight" id="editButton"> Edit </button>
+        <br> <br>
+      </div>
+    </div>
+  </div>
+    <!--
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="deletePicture"> Delete </button>
+    </div>
+  -->
+</div>
+
+
+
+<div id="upload" style="float:right">
+ <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+  <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
+
+</div>
+
+<div id="example" class="modal hide fade in" style="display: none; ">  
+  <div class="modal-header">  
+    <h3 align="center">Upload Preview</h3>  
+  </div>  
+  <div class="modal-body">  
+    <div id="blah" align="center"></div>              
+    <div align="center" style="margin-top:30px">
+      Add To Album:
+      <select id="album_list" name="album">
+        <option value="1">None</option> 
+      </select>
+    </div>
+  </div>  
+  <div class="modal-footer">  
+    <input class="btn btn-primary" type="submit" style="width:80px"/>
+    <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</a>  
+  </div>  
+</div>  
+</div>  
+</form>
+{% endblock %}
+
+
+
+
+
+
+
+

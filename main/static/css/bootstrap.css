@@ -99,6 +99,8 @@ sub {
 }
 
 img {
+  width: auto\9;
+  height: auto;
   max-width: 100%;
   vertical-align: middle;
   border: 0;
@@ -137,10 +139,6 @@ input[type="reset"],
 input[type="submit"] {
   cursor: pointer;
   -webkit-appearance: button;
-}
-
-.mosaic-button{
-  float: left;
 }
 
 label,
@@ -616,30 +614,9 @@ a:focus {
   float: right;
 }
 
-.floated_img
-{
-    float: left;
-    padding:10px;
-}
-
-img { 
-   border: 1px solid #e3e3e3;
-}
-
-.picture-collection{
-  margin-left: 75px;
-  float:left;
-}
-
-.child-picture{
-  vertical-align: middle;
-  margin-right: 10px;
-  margin-top: 5px;
-}
-
 .container {
-  margin-right: 5%;
-  margin-left: 2%;
+  margin-right: auto;
+  margin-left: auto;
   *zoom: 1;
 }
 
@@ -753,18 +730,6 @@ a.text-success:focus {
 
 .text-center {
   text-align: center;
-}
-
-.pictureSection{
-  font-size: 24.5px;
-  margin: 10px 0;
-  font-family: inherit;
-  font-weight: bold;
-  line-height: 20px;
-  color: inherit;
-  padding-top: 30px;
-  padding-left: 60px;
-  text-rendering: optimizelegibility;
 }
 
 h1,
@@ -1216,7 +1181,7 @@ input[type="reset"],
 input[type="button"],
 input[type="radio"],
 input[type="checkbox"] {
-  width: 200px;
+  width: auto;
 }
 
 select,
@@ -2317,7 +2282,7 @@ table th[class*="span"],
   *margin-right: .3em;
   line-height: 14px;
   vertical-align: text-top;
-  background-image: url("../img/glyphicons-halflings.png");
+  background-image: url("../assets/img/glyphicons-halflings.png");
   background-position: 14px 14px;
   background-repeat: no-repeat;
 }
@@ -2341,7 +2306,7 @@ table th[class*="span"],
 .dropdown-submenu:focus > a > [class^="icon-"],
 .dropdown-submenu:hover > a > [class*=" icon-"],
 .dropdown-submenu:focus > a > [class*=" icon-"] {
-  background-image: url("../img/glyphicons-halflings-white.png");
+  background-image: url("../assets/img/glyphicons-halflings-white.png");
 }
 
 .icon-glass {
@@ -3137,7 +3102,6 @@ table th[class*="span"],
 .well {
   min-height: 20px;
   padding: 19px;
-  margin-right: 30px;
   margin-bottom: 20px;
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
@@ -3973,10 +3937,6 @@ input[type="submit"].btn.btn-mini {
   margin-top: 5px;
 }
 
-.update{
-  padding-left: 12px;
-}
-
 .nav {
   margin-bottom: 20px;
   margin-left: 0;
@@ -4003,28 +3963,13 @@ input[type="submit"].btn.btn-mini {
 
 .nav-header {
   display: block;
-  padding: 3px 15px 3px 2px;
-  font-size: 15px;
+  padding: 3px 15px;
+  font-size: 11px;
   font-weight: bold;
   line-height: 20px;
   color: #999999;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
-}
-
-.album-header{
-  display: block;
-  padding: 3px 15px 3px 2px;
-  font-size: 15px;
-  font-weight: bold;
-  line-height: 20px;
-  color: #999999;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  text-transform: uppercase;
-}
-
-.album{
-  margin-left: 20px;
 }
 
 .nav li + .nav-header {
@@ -6164,7 +6109,7 @@ a.badge:focus {
 }
 
 .hero-unit {
-  padding: 20px 60px 60px;
+  padding: 60px;
   margin-bottom: 30px;
   font-size: 18px;
   font-weight: 200;

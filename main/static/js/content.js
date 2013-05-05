@@ -8,6 +8,8 @@
  */
 var Content = function(id,src,size) {
     this.id = id;
+    this.src = src;
+    this.height = size * 10;
 
     // TODO: create checkrep?
 
@@ -15,13 +17,24 @@ var Content = function(id,src,size) {
     this.get_content = function() {
 
         // use stubbed image for now
-        var output = new Image();
+        substrings = ['mov','MOV','mp4'];
+        var output;
+        if (new RegExp(substrings.join("|")).test(src)) {
+            output = document.createElement('video');
+    // At least one match
+        }
+        else {
+            output = new Image();
+        }
         output.src = "/media/" + src;
-        console.log(size);
-        output.height = size*10;
+        output.id = id;
+        output.height = 100;
+
+        // output.height = size*10;
+        this.output = output
+
         return output;
 
-        // TODO: interface with backend
         // request image object each time it's needed?
         // cache it?
     }
@@ -49,7 +62,7 @@ var Content = function(id,src,size) {
      *         false otherwise
      */
     this.equals = function(other) {
-        return this.id === other.id;
+        return this.src == other.src;
     }
     
 }

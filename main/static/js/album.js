@@ -6,10 +6,11 @@
  */
 var Album = function(id,name) {
     this.id  = id;
+    this.is_selected = false;
     this.name = name;
     this.is_auto = false;
     this.output = []
-    staticNames = ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "Favorites", "All Content", "Tasks"];
+    staticNames = ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "Favorites", "All Content", "Tasks", "Queue", "Spouse Content To Edit"];
 
     /*
     (function () {
@@ -23,7 +24,7 @@ var Album = function(id,name) {
 
     this.is_user_generated = function () {
         for (i in staticNames){
-            if (this.name === staticNames[i]){
+            if (this.name.indexOf(staticNames[i]) != -1){
                 return false;
             }
         }
@@ -36,7 +37,7 @@ var Album = function(id,name) {
 
     /** returns name of album */
     this.get_name = function() {
-        return this.name;
+        return this.name.replace("&#39;","'");
 
         // TODO: interface with server
         // caching?
@@ -61,23 +62,52 @@ var Album = function(id,name) {
     }
 
     /** adds @new_content to the album, if not already present */
-    this.add_content = function(id,src,size) {
+    this.add_content = function(id,src,size,is_new) {
         var content = new Content(id,src,size);
         this.output.push(content);
+        if (is_new) {
+          this.post_content(new Content(id, src, size));
+        }
 
-        // TODO: interface with server
+    }
+
+    this.post_content = function (content, callback) {
+        this.output.push(content);
+        var that = this;
+        
+              $.ajax({
+                        type: "POST",
+                        url: "/ajax/add_content/",
+                        data: { album_id: this.id, pic_id:content.id }
+                }).done(callback);
     }
 
     /** removes @content from this album, if present */
-    this.remove_content = function(content) {
-        // current does nothing
+    this.remove_content = function(content, callback) {
         var index = this.output.indexOf(content);
+        var srcs = [];
+        for (var i = 0; i < this.output.length; i++) {
+            srcs.push(this.output[i].src);
+            if (content.src == this.output[i].src) {
+                this.output.splice(i, 1);
+                console.log(i);
+            }
+        }
+        console.log(srcs);
+        console.dir(this.output);
+        console.log(content);
+        console.log(index);
         if (index >= 0) {
             this.output.splice(index, 1);
         }
 
+        $.ajax({
+                        type: "POST",
+                        url: "/ajax/remove_content/",
+                        data: { album_id: this.id, id:content.id }
+                }).done(callback);
 
-        // TODO: interface with server
+
     }
 
     /** 
@@ -89,7 +119,7 @@ var Album = function(id,name) {
     }
 
     this.can_rename = function() {
-        return !this.is_auto;
+        return this.is_user_generated;
     }
 
     this.can_remove = function() {

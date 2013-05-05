@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+.form-signin {
+    width: 300px;
+    margin-left: 400px;
+    margin-right: 400px;
+}
+</style>
+{% endblock %}
+{%block content %}
+
+<div class="container">
+
+      <form class="form-signin" method="post" action="/login_user/">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <input type="text" class="input-block-level" placeholder="Email address" name="email">
+        <input type="password" class="input-block-level" placeholder="Password" name="password">
+        <button class="btn btn-primary" type="submit">Sign in</button>
+      </form>
+
+    </div>
+{% endblock %}

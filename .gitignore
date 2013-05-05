@@ -2,3 +2,5 @@
 *.DS_Store
 coshare
 main/migrations/*
+media/*
+env/*
