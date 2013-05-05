@@ -66,9 +66,9 @@ def login_user(request):
 		if userprof is None:
 			print "no userprof"
 			if user.first_name:
-				queue = Album(name=user.first_name + "'s queue")
+				queue = Album(name=user.first_name + "'s Queue")
 			else:
-				queue = Album(name=user.username + "'s queue")
+				queue = Album(name=user.username + "'s Queue")
 			queue.save()
 			userprof = UserProfile(user=user,queue=queue)
 			userprof.save()
