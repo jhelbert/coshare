@@ -243,6 +243,7 @@ def query_all_album(couple):
 
 @csrf_exempt
 def upload(request):
+
 	album_id = request.POST.get('album')
 	delete = request.POST.get('deleted').split('|')
 	album = None
@@ -252,6 +253,14 @@ def upload(request):
 			album = Album.objects.get(id=album_id)
 		except:
 			album = None
+	new_album_name = request.POST.get('new_album_name')
+	if new_album_name:
+		userprof = get_user_profile(request)
+		couple = get_couple(userprof)
+		album = Album(name=new_album_name)
+		album.save()
+		couple.albums.add(album)
+		couple.save()
 	index = 0
 	for uploaded_content in request.FILES.getlist('content'):
 		if str(index) not in delete:

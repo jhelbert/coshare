@@ -99,14 +99,22 @@
     </div>
   </div>  
   <div class="modal-footer">  
+    <div style="float:left">
     Add To Album:
-      <select id="album_list" name="album">
+      <select id="album_list" name="album" onchange="document.getElementById('new_album_name').value=''">
         <option value="1">None</option> 
       </select>
+      <br>
+      Or create new album:<input id="new_album_name" name="new_album_name" onfocus="document.getElementById('album_list').selectedIndex=0;"/>
+    </div>
     <input class="btn btn-primary" type="submit" style="width:80px"/>
-    <a href="#" style="width:80px" class="btn" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</a>  
+    <button style="width:80px" class="btn-danger" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</button>  
+    <br>
+
+    
   </div>  
 </div>  
+</form>
 </div>  
   <div class="push"></div>
 
