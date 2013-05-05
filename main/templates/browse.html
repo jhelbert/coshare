@@ -388,6 +388,17 @@ $("#album-" + e.album.id).addClass("select-extend");
     });
     pckry.layout();
   });
+
+  if (contents.length == 0) {
+
+    var message = $("<p />")
+      .text("This album is empty.")
+      .addClass("empty-message")
+      .addClass("text-center");
+    
+    $("#contents-container").append(message);
+  }
+
   $("#content").text("content from " + e.album.get_name());
 
   $(".content").dblclick(function() {

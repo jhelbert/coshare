@@ -1,3 +1,9 @@
+.empty-message {
+    font-size: 60pt;
+    margin-top: 1em;
+    color: #AAA;
+}
+
 .slider {
     width: 200px;
     margin-left: 20px;
