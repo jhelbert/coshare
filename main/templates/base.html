@@ -27,18 +27,44 @@
 
   <!-- Upload -->
   <script>
+  
   function readURL(input) {
     if (input.files && input.files[0]) {
       for (var i = 0, f; f = input.files[i]; i++) {
+        (function(i) {
         var reader = new FileReader();
 
         reader.onload = function (e) {
+          var div = document.createElement('div');
+          div.id = "divx" + i;
+          div.style.float = "left";
           var output = new Image();
           output.src = e.target.result;
-          output.height = "150";
-          $('#blah').append(output);
+          output.height = "150px";
+          div.style.border = "2px solid black";
+          div.style.paddingRight = "15px";
+          div.style.margin = "10px";
+          var x = new Image();
+          x.src = "/static/Red-X.svg"
+          x.id = i;
+          x.style.height="15px";
+          x.style.width="15px";
+          x.style.position = "absolute";
+          x.style.right = output.style.left + output.style.width;
+
+          x.style.top = output.style.top;
+          console.log(output.style.top);
+          div.appendChild(output);
+          div.appendChild(x);
+          x.onclick = function(ev) {
+            console.dir(ev.target.id);
+            $("#deleted_uploads")[0].value += "" + ev.target.id + "|";
+            $("#divx" + ev.target.id)[0].style.display = "none";
+          }
+          $('#blah').append(div);
         }
         reader.readAsDataURL(f);
+      })(i);
       }   
     }
     $("#example").toggle();
@@ -55,6 +81,41 @@
   
   {% block content %}
   {% endblock %}
+  <div id="upload" style="float:right">
+ <form id="signupForm" method="post" action="/upload/" enctype="multipart/form-data">
+  <input name="content" type="file" multiple style="visibility:hidden;" id="uploadme"  onchange="readURL(this);" />
+
+</div>
+
+<div id="example" class="modal hide fade in" style="display: none; ">  
+  <div class="modal-header">  
+    <h3 align="center">Upload Preview</h3>  
+  </div>  
+  <div class="modal-body">  
+    <div id="blah" align="center" style="position:relative;float:left"></div>              
+    <div align="center" style="margin-top:30px;clear:both;">
+      
+      <input name="deleted" id="deleted_uploads" style="display:none"/>
+    </div>
+  </div>  
+  <div class="modal-footer">  
+    <div style="float:left">
+    Add To Album:
+      <select id="album_list" name="album" onchange="document.getElementById('new_album_name').value=''">
+        <option value="1">None</option> 
+      </select>
+      <br>
+      Or create new album:<input id="new_album_name" name="new_album_name" onfocus="document.getElementById('album_list').selectedIndex=0;"/>
+    </div>
+    <input class="btn btn-primary" type="submit" style="width:80px"/>
+    <button style="width:80px" class="btn-danger" data-dismiss="modal" onclick="$('#example').hide();$('#backdrop').css('opacity',0);$('#blah')[0].innerHTML='';">Close</button>  
+    <br>
+
+    
+  </div>  
+</div>  
+</form>
+</div>  
   <div class="push"></div>
 
   <footer>

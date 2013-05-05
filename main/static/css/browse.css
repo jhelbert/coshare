@@ -1,3 +1,9 @@
+.empty-message {
+    font-size: 60pt;
+    margin-top: 1em;
+    color: #AAA;
+}
+
 .slider {
     width: 200px;
     margin-left: 20px;
@@ -25,8 +31,16 @@
     margin-top: 10px;
 }
 
-.album-name:hover {
+.new-album-dd-active {
     cursor: pointer;
+}
+
+.new-album-dd-hover {
+    background-color: #08c !important;
+}
+
+.new-album-dd-hover::-webkit-input-placeholder {
+    color: white;
 }
 
 .selected-album {
@@ -259,6 +273,12 @@ td {
         margin-top: -27px;
         z-index: 10;
         position: relative;
+        cursor: pointer;
+    }
+
+    .mouseOver {
+        font-size:3em;
+        margin-top:-35px;
     }
 
     .isFavorited {
@@ -268,7 +288,7 @@ td {
     .album-well{
         margin-top: 40px;
         margin-right: 30px;
-        position: fixed;
+        /*position: fixed;*/
         width: 250px;
     }
 
@@ -281,3 +301,13 @@ td {
         background-color: white;
         color: #0088cc;
     }
+
+    .create{
+    padding: 2px 6px 2px 6px;
+    }
+
+    .album-well{
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
+

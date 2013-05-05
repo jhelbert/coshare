@@ -1,4 +1,4 @@
-from main.models import Content,Album, UserProfile, Couple
+from main.models import Content,Album, UserProfile, Couple, Child
 from django.shortcuts import render_to_response
 from django import forms
 from django.template import RequestContext
@@ -39,6 +39,20 @@ def get_couple(userprof):
 
 	return Couple.objects.get(members=userprof)
 
+
+def go_to_recently_added(request):
+	userprof = get_user_profile(request)
+	couple = get_couple(userprof)
+	possible_albums = couple.albums.all()
+	recently_added_plist = possible_albums.get(name="Recently Added")
+	return HttpResponseRedirect('/browse/?id=' + str(recently_added_plist.id))
+
+def go_to_recently_favorited(request):
+	userprof = get_user_profile(request)
+	couple = get_couple(userprof)
+	possible_albums = couple.albums.all()
+	recently_added_plist = possible_albums.get(name="Recently Favorited")
+	return HttpResponseRedirect('/browse/?id=' + str(recently_added_plist.id))
 @csrf_exempt
 def login_user(request):
 	email = request.POST.get('email')
@@ -52,9 +66,9 @@ def login_user(request):
 		if userprof is None:
 			print "no userprof"
 			if user.first_name:
-				queue = Album(name=user.first_name + "'s queue")
+				queue = Album(name=user.first_name + "'s Queue")
 			else:
-				queue = Album(name=user.username + "'s queue")
+				queue = Album(name=user.username + "'s Queue")
 			queue.save()
 			userprof = UserProfile(user=user,queue=queue)
 			userprof.save()
@@ -73,11 +87,15 @@ def logout_user(request):
 def main(request):
 	user = get_user(request)
 	
-	get_recently_added()
+	
 	userprof = get_user_profile(request)
+
 	if userprof is None:
 		return HttpResponseRedirect('/login/')
 	couple = get_couple(userprof)
+	children = couple.children.all();
+	get_recently_added(couple)
+	get_recently_favorited(couple)
 	query_all_album(couple)
 	name = ""
 	if user:
@@ -94,7 +112,7 @@ def main(request):
 		recently_added_2 = None
 	try:
 		possible_albums = couple.albums.all()
-		recent_plist = possible_albums.get(name="Recently Favorited")
+		fav_plist = possible_albums.get(name="Recently Favorited")
 		favs = fav_plist.content.all()
 		fav_1 = favs[:4]
 		fav_2 = favs[4:8]
@@ -111,13 +129,15 @@ def main(request):
 			"favs_1":fav_1,
 			"favs_2": fav_2,
 			"userprof":user,
-			"name":name
+			"name":name,
+			"children":children
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
-def get_recently_added():
+def get_recently_added(couple):
 	try:
-		recently_added_plist = Album.objects.get(name="Recently Added")
+		possible_albums = couple.albums.all()
+		recently_added_plist = possible_albums.get(name="Recently Added")
 		print "got ra plist"
 		recently_added_plist.content.clear()
 		content = Content.objects.all()
@@ -127,7 +147,24 @@ def get_recently_added():
 					recently_added_plist.content.add(c)
 		print "done with get recently added"
 	except:
-		pass
+		print "recently added failed"
+
+def get_recently_favorited(couple):
+
+	possible_albums = couple.albums.all()
+	favorited = possible_albums.get(name="Favorites")
+	recently_added_plist = possible_albums.get(name="Recently Favorited")
+	print "got ra plist"
+	recently_added_plist.content.clear()
+	content = Content.objects.all()
+	for c in content:
+		if c.favorited_time:
+			if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
+				for f in favorited.content.all():
+					if f.id == c.id:
+						recently_added_plist.content.add(c)
+	print "done with get recently added"
+
 
 def mobile(request):
 	user_albums = []
@@ -160,7 +197,7 @@ def new_plist(request):
 	return HttpResponseRedirect('/')
 
 def browse(request):
-	get_recently_added()
+	
 
 	userprof = get_user_profile(request)
 
@@ -168,6 +205,9 @@ def browse(request):
 	 	return HttpResponseRedirect('/login/')
 
 	couple = get_couple(userprof)
+	children = couple.children.all()
+	get_recently_added(couple)
+	get_recently_favorited(couple)
 	print "got couple"
 	albums = couple.albums.all()
 	query_all_album(couple)
@@ -178,12 +218,15 @@ def browse(request):
 		print selected_album
 	except:
 		pass
+	print children
+	print albums
+
 	return render_to_response('browse.html', 
 		{
 		 "albums":albums,
 		 "selected_album": selected_album,
 		 "user_queue_id": userprof.queue.id,
-
+		 "children":children
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -200,8 +243,12 @@ def query_all_album(couple):
 
 @csrf_exempt
 def upload(request):
+
 	album_id = request.POST.get('album')
-	
+	try:
+		delete = request.POST.get('deleted').split('|')
+	except:
+		delete = []
 	album = None
 	if album_id != -1 and album_id != None:
 		print album_id
@@ -209,21 +256,33 @@ def upload(request):
 			album = Album.objects.get(id=album_id)
 		except:
 			album = None
-
+	new_album_name = request.POST.get('new_album_name')
+	if new_album_name:
+		userprof = get_user_profile(request)
+		couple = get_couple(userprof)
+		album = Album(name=new_album_name)
+		album.save()
+		couple.albums.add(album)
+		couple.save()
+	index = 0
 	for uploaded_content in request.FILES.getlist('content'):
-		print uploaded_content
-		new_content = Content()
-		file_content = ContentFile(uploaded_content.read()) 
-		new_content.image.save(uploaded_content.name, file_content)
-		ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
-		if ext not in ["jpg",'jpeg','png','gif']:
-			new_content.is_video = True
-		new_content.metric = int(random.random() * 6) + 8
-		new_content.save()
-		new_content.save()
-		if album:
-			album.content.add(new_content)
-			album.save()
+		if str(index) not in delete:
+			print uploaded_content
+			new_content = Content()
+			file_content = ContentFile(uploaded_content.read()) 
+			new_content.image.save(uploaded_content.name, file_content)
+			ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
+			if ext not in ["jpg",'jpeg','png','gif']:
+				new_content.is_video = True
+			new_content.metric = int(random.random() * 6) + 8
+			new_content.save()
+			new_content.save()
+			if album:
+				album.content.add(new_content)
+				album.save()
+		else:
+			print "not uploading index:%i" % index
+		index += 1
 	return HttpResponseRedirect('/browse/')
 
 @csrf_exempt
@@ -238,7 +297,16 @@ def add_album(request):
 		couple.save()
 	else:
 		return HttpResponse("create a couple")
-	return HttpResponse('OK')
+	return HttpResponse('%i' % (plist.id, ))
+
+@csrf_exempt
+def rename_album(request):
+	new_name = request.POST.get("name")
+	album_id = request.POST.get("album_id")
+	album = Album.objects.get(id=album_id)
+	album.name = new_name
+	album.save()
+	return HttpResponse('ok')
 
 @csrf_exempt
 def add_content(request):
@@ -254,6 +322,10 @@ def add_content(request):
 	album.content.add(content)
 	album.save()
 	print album.content.all()
+
+	if album.name == "Favorites":
+		content.favorited_time = datetime.datetime.now()
+		content.save()
 
 	return HttpResponse("%i" % (len(album.content.all()), ))
 

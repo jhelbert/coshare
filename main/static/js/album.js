@@ -129,4 +129,13 @@ var Album = function(id,name) {
     this.can_edit_content = function() {
         return !this.is_auto;
     }
+
+    this.content_in = function(content_id) {
+        for (var i=0; i < this.output.length; i++) {
+            if (this.output[i].id == content_id) {
+                return true
+            }
+        }
+        return false
+    } 
 }
