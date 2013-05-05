@@ -47,13 +47,13 @@
           var x = new Image();
           x.src = "/static/Red-X.svg"
           x.id = i;
-          x.height=15;
+          x.style.height="15px";
+          x.style.width="15px";
           x.style.position = "absolute";
           x.style.right = output.style.left + output.style.width;
 
           x.style.top = output.style.top;
           console.log(output.style.top);
-          x.width = 15;
           div.appendChild(output);
           div.appendChild(x);
           x.onclick = function(ev) {
