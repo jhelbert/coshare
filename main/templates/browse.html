@@ -419,9 +419,12 @@ $("#album-" + e.album.id).addClass("select-extend");
   $("#content").text("content from " + e.album.get_name());
 
   $(".content").dblclick(function() {
+    /*
     if (last_clicked_content.height == 200) {
       $(".favorited").addClass("btn-success")
     }
+    */
+
     $(".alert").alert('close');
     
     $("#openModal").modal("show");
@@ -666,6 +669,7 @@ model.addEventListener("deselect_content", function(e) {
 
   $("#editButton").click(function() {
     var state = $("#editButton").html();
+    console.log(state);
     if (state.toString() == "Save Changes") {
       saveDescription();
     } else {
@@ -699,6 +703,7 @@ model.addEventListener("deselect_content", function(e) {
     else {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
+    $(".imageHolder").css("height","");
     console.dir(image);
 
 
@@ -818,6 +823,7 @@ var albumClick = function(albumName) {
     editDescription();
   });
 
+  /*
   $(".imageDescription").blur(function(){
     if (mousedownHappened) {
       mousedownHappened = false;
@@ -830,9 +836,12 @@ var albumClick = function(albumName) {
   }
   );
 
+
   $("#cancelButton").mousedown(function() {
     mousedownHappened = true;
 });
+
+*/
 
   $("#cancelButton").click(function (){
     $(".imageDescription")[0].innerHTML = cached_description;
