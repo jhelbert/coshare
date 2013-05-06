@@ -317,8 +317,12 @@ $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_site()">From 
       var edit = document.createElement("i");
       edit.setAttribute("class", "icon-pencil pull-right");
       edit.setAttribute("id", "pencil");
+      var remove = document.createElement("i");
+      remove.setAttribute("class", "icon-remove pull-right");
+      remove.setAttribute("id", "remove");
 
       $("#album-" + e.album.id).addClass("selected-album");
+      $("#album-" + e.album.id).find("a").append(remove);
       $("#album-" + e.album.id).find("a").append(edit);
     //e.album.set_is_selected(true);
     $("#album-" + e.album.id + "> a > span").attr("id","selected-span");
@@ -428,6 +432,7 @@ model.addEventListener("deselect_album", function(e) {
   .removeClass("selected-auto-album").removeClass("active");
   // album_div.removeChild(album_div.lastChild);
   $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
+  $("#album-" + e.album.id+ "> a > .icon-remove").remove();
   // album_div.remove(album_div.find(pencil));
 });
 
@@ -538,7 +543,7 @@ model.addEventListener("deselect_content", function(e) {
 
   // CRUD operations on albums
 
-  //Event listener for edit pencil - editing albums
+  // Event listener for edit pencil - editing albums
   $(".active > .album-name >#pencil").click(function(e){
     $("#selected-span").attr("contenteditable",true);
     $("#selected-span").addClass("editable");
@@ -547,7 +552,6 @@ model.addEventListener("deselect_content", function(e) {
   });
 
   $('.active').click(function() {
-    console.log("active click");
     $(".active > .album-name >#pencil").click(function(e){
       $("#selected-span").attr("contenteditable",true);
       $("#selected-span").addClass("editable");
@@ -571,7 +575,6 @@ model.addEventListener("deselect_content", function(e) {
       $(this).removeClass("editable");
       rename_album($(this)[0].innerHTML);
     }
-   
   });
 
   function rename_album(name) {
@@ -582,25 +585,38 @@ model.addEventListener("deselect_content", function(e) {
       data: { name:name, album_id:id }
     }).done(function( msg ) {
     });
-
   }
 
-//    $("#selected-span").onfocus = function() {
-//     window.setTimeout(function() {
-//         var sel, range;
-//         if (window.getSelection && document.createRange) {
-//             range = document.createRange();
-//             range.selectNodeContents(div);
-//             sel = window.getSelection();
-//             sel.removeAllRanges();
-//             sel.addRange(range);
-//         } else if (document.body.createTextRange) {
-//             range = document.body.createTextRange();
-//             range.moveToElementText(div);
-//             range.select();
-//         }
-//     }, 1);
-// };
+   $(".active > .album-name >#remove").click(function(e){
+    $('#confirm-delete').modal('show');
+  });
+
+  $('.active').click(function() {
+    $(".active > .album-name >#remove").click(function(e){
+      $('#confirm-delete').modal('show');
+    });
+    return false;
+    });
+
+  $(".cancel_delete").click(function(){
+    $('#confirm-delete').modal('hide');
+  });
+
+  $(".perform_delete").click(function(){
+    remove_album();
+    $('#confirm-delete').modal('hide');
+    location.reload();
+  });
+
+  function remove_album() {
+    var album_id = $(".active")[0].id.split("-")[1];
+    $.ajax({
+      type: "POST",
+      url: "/ajax/remove_album/",
+      data: {album_id:album_id}
+    }).done(function( msg ) {
+    });
+  }
 
   // create
 
@@ -778,17 +794,6 @@ var albumClick = function(albumName) {
       $("#editButton").html('Edit');
     });
   };
-
-  // $(".descriptionInput").bind('keypress',function(e) {
-  //   var code = (e.keyCode ? e.keyCode : e.which);
-  //   if (code ==13) {
-  //     var text = $(".descriptionInput").val();
-  //     text = text.trim();
-  //     $(".imageDescription").text(text);
-  //     $(".descriptionInput").addClass("hidden");
-  //     $(".imageDescription").removeClass("hidden");
-  //   }
-  // });
 
   $("#closeModal").click(function() {
     $(".alert").alert('close');
@@ -1041,6 +1046,21 @@ function remove_from_site() {
       <button class="btn btn-danger" id="deletePicture"> Delete </button>
     </div>
   -->
+</div>
+
+<div id="confirm-delete" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close cancel_delete">&times;</a>
+      <h3>Delete Album</h3>
+    </div>
+    <div class="modal-body">
+      <p>You are about to delete an album, this procedure is irreversible.</p>
+      <p>Do you want to proceed?</p>
+    </div>
+    <div class="modal-footer">
+      <a class="btn cancel_delete buttonLeft">Cancel</a>
+      <a class="btn btn-danger perform_delete buttonRight">Delete</a>
+    </div>
 </div>
 
 {% endblock %}

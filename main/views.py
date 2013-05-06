@@ -311,6 +311,13 @@ def rename_album(request):
 	return HttpResponse('ok')
 
 @csrf_exempt
+def remove_album(request):
+	album_id = request.POST.get('album_id')
+	album = Album.objects.get(id=int(album_id))
+	album.delete()
+	return HttpResponse('ok')
+
+@csrf_exempt
 def add_content(request):
 	album_id = request.POST.get('album_id')
 	pic_id = request.POST.get('pic_id')
