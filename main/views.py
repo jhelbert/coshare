@@ -172,7 +172,7 @@ def mobile(request):
 	user_albums = []
 	all_albums = Album.objects.all()
 	for album in all_albums:
-		if album.name not in ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "Favorites", "All Content", "Tasks", "Content To Edit", "Spouse Content To Edit"]:
+		if album.name not in ["Recently Favorited", "Recently Added", "All Added", "All Favorites", "Favorites", "All Content", "Tasks"] and "Queue" not in album.name:
 			user_albums.append(album)
 	print user_albums
 	return render_to_response('mobile.html', 
@@ -245,8 +245,9 @@ def query_all_album(couple):
 
 @csrf_exempt
 def upload(request):
-
+	mobile = request.POST.get('mobile')
 	album_id = request.POST.get('album')
+	userprof = get_user_profile(request)
 	try:
 		delete = request.POST.get('deleted').split('|')
 	except:
@@ -260,7 +261,7 @@ def upload(request):
 			album = None
 	new_album_name = request.POST.get('new_album_name')
 	if new_album_name:
-		userprof = get_user_profile(request)
+		
 		couple = get_couple(userprof)
 		album = Album(name=new_album_name)
 		album.save()
@@ -282,9 +283,13 @@ def upload(request):
 			if album:
 				album.content.add(new_content)
 				album.save()
+			if mobile:
+				userprof.queue.content.add(new_content);
+				userprof.queue.save()
 		else:
 			print "not uploading index:%i" % index
 		index += 1
+
 	return HttpResponseRedirect('/browse/')
 
 @csrf_exempt
@@ -308,6 +313,13 @@ def rename_album(request):
 	album = Album.objects.get(id=album_id)
 	album.name = new_name
 	album.save()
+	return HttpResponse('ok')
+
+@csrf_exempt
+def remove_album(request):
+	album_id = request.POST.get('album_id')
+	album = Album.objects.get(id=int(album_id))
+	album.delete()
 	return HttpResponse('ok')
 
 @csrf_exempt

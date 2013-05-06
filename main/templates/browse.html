@@ -45,6 +45,8 @@ var model = new Model();
 var user_queue_id = {{user_queue_id}};
 var already_favorited = false;
 var child_list = [];
+var cached_description = "";
+var mousedownHappened = false;
 
 
 $(function() {
@@ -73,19 +75,9 @@ $(function() {
   /***************************************/
   /************* COSMETICS ***************/
   /***************************************/
-  function new_plist(name, callback) {
-    $.ajax({
-      type: "POST",
-      url: "/ajax/add_album/",
-      data: { name:name }
-    }).done(callback);
-    $("#new_plist")[0].value = "";
-  }
-
   $('#new_plist')
   .watermark('New Album')
   .keyup(function (e) {
-    console.dir(e);
     if (e.keyCode == 13 && e.target.value != "") {
       var name = e.target.value;
       new_plist(name, function(id) {
@@ -200,7 +192,14 @@ The model will propagate the appropriate effects.s
       album_li
       .attr("id", "album-" + e.album.id)
       .click(function() {
+        console.dir(this)
+        console.dir(this.classList)
+        if (this.classList[2] == "active"){
+          return false
+        }
+        else{
         model.select_album(e.album);
+      }
       });
       nameSpan.innerHTML = e.album.get_name();
       link.innerHTML = icon.outerHTML+ nameSpan.outerHTML + " &nbsp;";
@@ -230,7 +229,12 @@ The model will propagate the appropriate effects.s
       album_li
       .attr("id", "album-" + e.album.id)
       .click(function() {
+       if (this.classList[2] == "active"){
+          return false
+        }
+        else{
         model.select_album(e.album);
+      }
       });
       link.innerHTML = icon.outerHTML+ e.album.get_name() + " ";
       if (e.album.id === user_queue_id) {
@@ -325,8 +329,12 @@ $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_site()">From 
       var edit = document.createElement("i");
       edit.setAttribute("class", "icon-pencil pull-right");
       edit.setAttribute("id", "pencil");
+      var remove = document.createElement("i");
+      remove.setAttribute("class", "icon-remove pull-right");
+      remove.setAttribute("id", "remove");
 
       $("#album-" + e.album.id).addClass("selected-album");
+      $("#album-" + e.album.id).find("a").append(remove);
       $("#album-" + e.album.id).find("a").append(edit);
     //e.album.set_is_selected(true);
     $("#album-" + e.album.id + "> a > span").attr("id","selected-span");
@@ -436,6 +444,7 @@ model.addEventListener("deselect_album", function(e) {
   .removeClass("selected-auto-album").removeClass("active");
   // album_div.removeChild(album_div.lastChild);
   $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
+  $("#album-" + e.album.id+ "> a > .icon-remove").remove();
   // album_div.remove(album_div.find(pencil));
 });
 
@@ -453,7 +462,7 @@ model.addEventListener("remove_content", function(e) {
     pckry.remove(v);
     
   });
-  $("#undo_div")[0].style.display="block";
+  $("#undo_div")[0].style.visibility="visible";
   pckry.layout();
 });
 
@@ -546,23 +555,21 @@ model.addEventListener("deselect_content", function(e) {
 
   // CRUD operations on albums
 
-  //Event listener for edit pencil - editing albums
+  // Event listener for edit pencil - editing albums
   $(".active > .album-name >#pencil").click(function(e){
     $("#selected-span").attr("contenteditable",true);
     $("#selected-span").addClass("editable");
     $("#selected-span").focus(); 
     document.execCommand('selectAll', false, null);
-    console.log("pencil click");
+    return false;
   });
 
   $('.active').click(function() {
-    console.log("active click");
     $(".active > .album-name >#pencil").click(function(e){
       $("#selected-span").attr("contenteditable",true);
       $("#selected-span").addClass("editable");
       $("#selected-span").focus();
       document.execCommand('selectAll', false, null);
-      console.log("pencil click");
     });
     return false;
     });
@@ -581,7 +588,6 @@ model.addEventListener("deselect_content", function(e) {
       $(this).removeClass("editable");
       rename_album($(this)[0].innerHTML);
     }
-   
   });
 
   function rename_album(name) {
@@ -592,25 +598,39 @@ model.addEventListener("deselect_content", function(e) {
       data: { name:name, album_id:id }
     }).done(function( msg ) {
     });
-
   }
 
-//    $("#selected-span").onfocus = function() {
-//     window.setTimeout(function() {
-//         var sel, range;
-//         if (window.getSelection && document.createRange) {
-//             range = document.createRange();
-//             range.selectNodeContents(div);
-//             sel = window.getSelection();
-//             sel.removeAllRanges();
-//             sel.addRange(range);
-//         } else if (document.body.createTextRange) {
-//             range = document.body.createTextRange();
-//             range.moveToElementText(div);
-//             range.select();
-//         }
-//     }, 1);
-// };
+   $(".active > .album-name >#remove").click(function(e){
+    $('#confirm-delete').modal('show');
+    return false;
+  });
+
+  $('.active').click(function() {
+    $(".active > .album-name >#remove").click(function(e){
+      $('#confirm-delete').modal('show');
+    });
+    return false;
+    });
+
+  $(".cancel_delete").click(function(){
+    $('#confirm-delete').modal('hide');
+  });
+
+  $(".perform_delete").click(function(){
+    remove_album();
+    $('#confirm-delete').modal('hide');
+    location.reload();
+  });
+
+  function remove_album() {
+    var album_id = $(".active")[0].id.split("-")[1];
+    $.ajax({
+      type: "POST",
+      url: "/ajax/remove_album/",
+      data: {album_id:album_id}
+    }).done(function( msg ) {
+    });
+  }
 
   // create
 
@@ -632,7 +652,7 @@ model.addEventListener("deselect_content", function(e) {
   });
 
   $("#editButton").click(function() {
-    var state = $("#editButton").html()
+    var state = $("#editButton").html();
     if (state.toString() == "Save Changes") {
       saveDescription();
     } else {
@@ -723,26 +743,51 @@ var albumClick = function(albumName) {
     
 
   }
+  $(".imageDescription").dblclick(function(){
+    editDescription();
+  });
 
+  $(".imageDescription").blur(function(){
+    if (mousedownHappened) {
+      mousedownHappened = false;
+    }
+    else{
+      $(this).attr("contenteditable",false);
+      console.log("blur");
+      saveDescription();
+    }
+  }
+  );
+
+  $("#cancelButton").mousedown(function() {
+    mousedownHappened = true;
+});
+
+  $("#cancelButton").click(function (){
+    $(".imageDescription")[0].innerHTML = cached_description;
+    $(".imageDescription").attr("contenteditable",false);
+    $(this)[0].style.visibility = "hidden";
+    $("#editButton").html('Edit');
+    console.log("canceled");
+  });
 
   var editDescription = function() {
-    var text = $(".imageDescription").text();
-    text = text.trim();
+    $("#cancelButton")[0].style.visibility = "visible";
+    $('.imageDescription').attr("spellcheck","false");
+    cached_description = $(".imageDescription")[0].innerText;
     $(".alert").alert('close');
-    $(".descriptionInput").val(text);
-    $(".descriptionInput").removeClass("hidden");
-    $(".imageDescription").addClass("hidden");
-    $(".descriptionInput").focus();
+    $('.imageDescription').attr("contenteditable",true);
+    $(".imageDescription").focus();
+    document.execCommand('selectAll', false, null);
     $("#editButton").html('Save Changes');
   };
 
 
   var saveDescription = function() {
-    var text = $(".descriptionInput").val();
+    $("#cancelButton")[0].style.visibility = "hidden";
+    var text = $(".imageDescription")[0].innerText;
     text = text.trim();
-    $(".imageDescription").text(text);
-    $(".descriptionInput").addClass("hidden");
-    $(".imageDescription").removeClass("hidden");
+    $('.imageDescription').attr("contenteditable",false);
     var id_val = $(".imageHolder").attr("id-num").toString();
     // send new text value to the server
     $.ajax({
@@ -763,17 +808,6 @@ var albumClick = function(albumName) {
       $("#editButton").html('Edit');
     });
   };
-
-  $(".descriptionInput").bind('keypress',function(e) {
-    var code = (e.keyCode ? e.keyCode : e.which);
-    if (code ==13) {
-      var text = $(".descriptionInput").val();
-      text = text.trim();
-      $(".imageDescription").text(text);
-      $(".descriptionInput").addClass("hidden");
-      $(".imageDescription").removeClass("hidden");
-    }
-  });
 
   $("#closeModal").click(function() {
     $(".alert").alert('close');
@@ -836,17 +870,30 @@ var albumClick = function(albumName) {
 
 });
 
+function new_plist(name, callback) {
+    $.ajax({
+      type: "POST",
+      url: "/ajax/add_album/",
+      data: { name:name }
+    }).done(callback);
+    $("#new_plist")[0].value = "";
+  }
+
+function new_album() {
+    var name = $("#new_plist")[0].value;
+    new_plist(name, function(id) {
+        var album = new Album(parseInt(id),name);
+        model.add_album(album);
+      });
+  }
+
 function undo_remove() {
   var album = last_removed_content_album;
   for (var i = 0; i < last_removed_content_list.length; i++ ) {
     album.post_content(last_removed_content_list[i]);
-
   }
-
-
   location.reload(true);
 }
-
 
 var update_queue_size = function(album, new_size) {
   if (album.name.indexOf("Queue") != -1) {
@@ -872,14 +919,6 @@ function remove_from_album() {
 function remove_from_site() {
   model.remove_selected_contents_from_selected_album(true, callback);
 }
-
-function new_album() {
-    var e = jQuery.Event("keyup");
-    e.keyCode = 13;
-    e.target.value = $("#new_plist")[0].value;
-    console.log("trigger");
-    $("#new_plist").trigger(e);
-  }
 
 
 </script>
@@ -915,15 +954,16 @@ function new_album() {
           </ul>
           <input name="name" id="new_plist" type="text"/>
         </div>
-        <div class="text-center"><button class="btn create" onclick="">Create</button>
+        <div class="text-center"><button class="btn create" onclick="new_album()">Create</button>
           </div>
       </div><!--/.well -->
     </div><!--/span-->
     <div id="content-well" class="span9">
       <div>
-        <div align="right" id="undo_div" style="display:none">
-          Content Removed: <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
+        <div align="right" id="undo_div" style="visibility:hidden;color:orange">
+          Content Removed! <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
         </div>
+
       </div>
       <div class="container-fluid">
         <!-- TITLE -->
@@ -1007,13 +1047,11 @@ function new_album() {
     <div class="row-fluid">
       <div class="span12" id="descriptionBox">
         <h4> Description </h4>
-        <p class="imageDescription">
-
-        </p>
-
-        <textarea class="descriptionInput hidden"> </textarea>
+        <div class="imageDescription"></div>
+        <button class='btn buttonLeft' id='cancelButton' onclick='cancelDescription()' style="visibility:hidden;"> Cancel </button>  
         <button class="btn btn-success buttonRight" id="editButton"> Edit </button>
-        <br> <br>
+        <br>
+        <br>
       </div>
     </div>
   </div>
@@ -1022,6 +1060,21 @@ function new_album() {
       <button class="btn btn-danger" id="deletePicture"> Delete </button>
     </div>
   -->
+</div>
+
+<div id="confirm-delete" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close cancel_delete">&times;</a>
+      <h3>Delete Album</h3>
+    </div>
+    <div class="modal-body">
+      <p>You are about to delete an album, this procedure is irreversible.</p>
+      <p>Do you want to proceed?</p>
+    </div>
+    <div class="modal-footer">
+      <a class="btn cancel_delete buttonLeft">Cancel</a>
+      <a class="btn btn-danger perform_delete buttonRight">Delete</a>
+    </div>
 </div>
 
 {% endblock %}
