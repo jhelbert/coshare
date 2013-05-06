@@ -668,14 +668,40 @@ model.addEventListener("deselect_content", function(e) {
     }
   });
 
+  function vidplay() {
+       var video = document.getElementById("Video1");
+
+       if (video.paused) {
+          video.play();
+
+       } else {
+          video.pause();
+       }
+    }
+
   var populateModal = function(image, id_val) {
+    if (image.indexOf('.MOV') != -1 || image.indexOf('.mov') != -1 || image.indexOf('.mp4') != -1) {
+      console.log('video');
+      var output = document.createElement('video');
+      output.src = image;
+      output.height = 150;
+      output.id = "Video1";
+
+      document.getElementById("leftCol").insertBefore(output,document.getElementById("leftCol").firstChild);
+      output.onclick = vidplay;
+      console.log($("#leftCol"));
+    }
+    else {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
+    console.dir(image);
+
 
     image_info = {};
     image_info['src'] = image.substring(7);
     image_info['id'] = id_val;
     image_info['height'] = $(this).children("img").attr("height") / 10;
+  }
     already_favorited = false;
     // Add favorited icon to reflect picture
     if (favorites_album.content_in(id_val)) {
