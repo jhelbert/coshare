@@ -9,14 +9,12 @@ Welcome to CoShare!
 <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
 
 <style>
-img {
-  height:60px;
-  width:60px;
-  margin: 15px;
-}
-
 .children-well {
   width:200px;
+}
+
+#coshare-title {
+  font-family: 'Autour One', cursive;
 }
 
 
@@ -24,65 +22,58 @@ img {
 {% endblock %}
 
 {% block content %}
-<div class="content-container">
-  <div class="container">
-    <div data-intro="These are your beautiful children! <br><br> Clicking on them will bring you directly to their album on the browsing page." data-step="2" class="well pull-right children-well">
-      <div>
-      <ul class="nav nav-list">
-        <li class="nav-header">Children</li>
-        {% for child in children %}
-        <li><a href="#"><i class="icon-user"></i>{{child.name}}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-    </div>
-    <h1 data-intro="Welcome to CoShare, your family's content manager! <br><br>Use the menu bar at the top of the page to add content and navigate to the content browsing page." data-step='1'>Smith Family</h1>
-    <div class="well" style="width:500px;margin-top:30px">
-    <div class="pictureSection"><b>Recently Added</b><a href="/recently_added/" style="margin-left:300px; text-decoration:none" data-intro="These links convenitely bring you to the browsing page displaying all of the sections content." data-step='3'>See All</a></div>
-    <div>
-      <div class="picture-collection" >
-        {% for image in recently_added_1 %}
-        <div class="floated_img" style="float:left">
-          <img src="/media/{{image.image}}" alt="Some image">
-        </div>
-        {% endfor %}
-
-      </div>
-
-      <div class="picture-collection" style="clear:both;width:500px;height:100px" >
-        {% for image in recently_added_2 %}
-        <div class="floated_img" style="float:left">
-          <img src="/media/{{image.image}}" alt="Some image">
-        </div>
-        {% endfor %}
+<!-- page container -->
+<div class="container-fluid">
+    <!-- TITLE -->
+    <div class="row-fluid">
+      <div class="span12">
+        <h1 class="text-center">Welcome to <span id="coshare-title">CoShare</span>!</h1>
       </div>
     </div>
-  </div>
-  <div style="background-color:lightgray;width:500px">
-    <div class="well pull-left" style="float:left;clear:both;margin-top:30px;width:500px;">
-
-      <div class="pictureSection"><b>Recently Favorited</b><a href="/recently_favorited/" style="margin-left:250px; text-decoration:none">See All</a></div>
-
-      <div class="picture-collection">
-        {% for image in favs_1 %}
-        <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120">
-        </div>
-        {% endfor %}
-
+    <!-- KIDS -->
+    <div class="row-fluid">
+      <div class="span6 well" align="center">
+        <h3><i>INSERT PICTUERS HERE</i></h3>
+        <button class="btn btn-success">See John's Album</button>
       </div>
-      <br>
-      <div class="picture-collection">
-        {% for image in favs_2 %}
-        <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120">
-        </div>
-        {% endfor %}
+      <div class="span6 well" align="center">
+        <h3><i>INSERT PICTUERS HERE</i></h3>
+        <button class="btn btn-success">See Jane's Album</button>
       </div>
     </div>
-  </div>
-</div>
+    <!-- SPECIAL ALBUMS -->
+    <div class="row-fluid">
+      <!-- YOUR QUEUE -->
+      <div class="span4" align="center">
+        <div class="well">
+          <h3><i>INSERT PICTUERS HERE</i></h3>
+          <button class="btn btn-success">See Your Queue</button>
+        </div>
+      </div>
+      <!-- FAVORITS -->
+      <div class="span4" align="center">
+        <div class="well">
+          <h3><i>INSERT PICTUERS HERE</i></h3>
+          <button class="btn btn-success">See Your Favorites</button>
+        </div>
+      </div>
+      <!-- RECENTLY ADDED -->
+      <div class="span4" align="center">
+        <div class="well">
+          <h3><i>INSERT PICTUERS HERE</i></h3>
+          <button class="btn btn-success">See Recently Added</button>
+        </div>
+      </div>
+    </div>
+    <!-- All Content -->
+    <div class="row-fluid">
+      <div class="span12" align="center">
+        <div class="well">
+          <h3><i>INSERT PICTUERS HERE</i></h3>
+          <button class="btn btn-success btn-large">See Your Queue</button>
+        </div>
+      </div>
+    </div>
 </div>
 
-</form>
 {% endblock %}
