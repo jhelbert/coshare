@@ -192,7 +192,14 @@ The model will propagate the appropriate effects.s
       album_li
       .attr("id", "album-" + e.album.id)
       .click(function() {
+        console.dir(this)
+        console.dir(this.classList)
+        if (this.classList[2] == "active"){
+          return false
+        }
+        else{
         model.select_album(e.album);
+      }
       });
       nameSpan.innerHTML = e.album.get_name();
       link.innerHTML = icon.outerHTML+ nameSpan.outerHTML + " &nbsp;";
@@ -222,7 +229,12 @@ The model will propagate the appropriate effects.s
       album_li
       .attr("id", "album-" + e.album.id)
       .click(function() {
+       if (this.classList[2] == "active"){
+          return false
+        }
+        else{
         model.select_album(e.album);
+      }
       });
       link.innerHTML = icon.outerHTML+ e.album.get_name() + " ";
       if (e.album.id === user_queue_id) {
@@ -549,6 +561,7 @@ model.addEventListener("deselect_content", function(e) {
     $("#selected-span").addClass("editable");
     $("#selected-span").focus(); 
     document.execCommand('selectAll', false, null);
+    return false;
   });
 
   $('.active').click(function() {
@@ -589,6 +602,7 @@ model.addEventListener("deselect_content", function(e) {
 
    $(".active > .album-name >#remove").click(function(e){
     $('#confirm-delete').modal('show');
+    return false;
   });
 
   $('.active').click(function() {
