@@ -31,15 +31,12 @@ Welcome to CoShare!
 }
 
 .header {
-  font-size: 48pt;
-  color: #666;
-  padding: 10px;
-  line-height: 1.2em;
-  height: 300px;
+  height: 160px;
+  text-align: center;
 }
 
-.header-span {
-  vertical-align: middle;
+.album-button {
+  margin-top: 30px;
 }
 
 
@@ -82,11 +79,11 @@ $(function() {
       <div class="container-fluid">
         {% for album in albums %}
           <div class="row-fluid well">
-            <div class="span4">
-              <h1>{{album.name}}</h1>
-              <button class="btn btn-success">See {{album.name}}</button>
-            </div>
-            <div class="span8 contents-container">
+            <div class="span12 contents-container">
+              <div class="header content">
+                <h1>{{album.name}}</h1>
+                <button class="btn btn-success album-button">Go to Album</button>  
+              </div>
               {% for content in album.content.all %}
               <img class="content" src="/media/{{content.image}}" />
               {% endfor %}
