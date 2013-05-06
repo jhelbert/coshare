@@ -66,9 +66,9 @@ def login_user(request):
 		if userprof is None:
 			print "no userprof"
 			if user.first_name:
-				queue = Album(name=user.first_name + "'s queue")
+				queue = Album(name=user.first_name + "'s Queue")
 			else:
-				queue = Album(name=user.username + "'s queue")
+				queue = Album(name=user.username + "'s Queue")
 			queue.save()
 			userprof = UserProfile(user=user,queue=queue)
 			userprof.save()
@@ -150,20 +150,22 @@ def get_recently_added(couple):
 		print "recently added failed"
 
 def get_recently_favorited(couple):
-
-	possible_albums = couple.albums.all()
-	favorited = possible_albums.get(name="Favorites")
-	recently_added_plist = possible_albums.get(name="Recently Favorited")
-	print "got ra plist"
-	recently_added_plist.content.clear()
-	content = Content.objects.all()
-	for c in content:
-		if c.favorited_time:
-			if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
-				for f in favorited.content.all():
-					if f.id == c.id:
-						recently_added_plist.content.add(c)
-	print "done with get recently added"
+	try:
+		possible_albums = couple.albums.all()
+		favorited = possible_albums.get(name="Favorites")
+		recently_added_plist = possible_albums.get(name="Recently Favorited")
+		print "got ra plist"
+		recently_added_plist.content.clear()
+		content = Content.objects.all()
+		for c in content:
+			if c.favorited_time:
+				if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
+					for f in favorited.content.all():
+						if f.id == c.id:
+							recently_added_plist.content.add(c)
+		print "done with get recently added"
+	except:
+		pass
 
 
 def mobile(request):
@@ -243,8 +245,12 @@ def query_all_album(couple):
 
 @csrf_exempt
 def upload(request):
+
 	album_id = request.POST.get('album')
-	delete = request.POST.get('deleted').split('|')
+	try:
+		delete = request.POST.get('deleted').split('|')
+	except:
+		delete = []
 	album = None
 	if album_id != -1 and album_id != None:
 		print album_id
@@ -252,6 +258,14 @@ def upload(request):
 			album = Album.objects.get(id=album_id)
 		except:
 			album = None
+	new_album_name = request.POST.get('new_album_name')
+	if new_album_name:
+		userprof = get_user_profile(request)
+		couple = get_couple(userprof)
+		album = Album(name=new_album_name)
+		album.save()
+		couple.albums.add(album)
+		couple.save()
 	index = 0
 	for uploaded_content in request.FILES.getlist('content'):
 		if str(index) not in delete:

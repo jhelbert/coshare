@@ -35,5 +35,5 @@ class Child(models.Model):
 class Couple(models.Model):
 	members = models.ManyToManyField(UserProfile)
 	albums = models.ManyToManyField(Album)
-	children = models.ManyToManyField(Child)
+	children = models.ManyToManyField(Child,null=True,blank=True)
 
