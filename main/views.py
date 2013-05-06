@@ -120,10 +120,13 @@ def main(request):
 		fav_1 = None
 		fav_2 = None
 
-	albums = []
-	all_content = couple.albums.get(name="All Content")
-	albums.append(all_content)
+	# ignore shit above, below is what counts
 
+	albums = [couple.albums.get(name=x) for x in ("All Content",
+										     "Recently Added",
+										     "Recently Favorited")]
+
+	albums = [album for album in albums if len(album.content.all()) > 0]
 
 	return render_to_response('index.html', 
 		{

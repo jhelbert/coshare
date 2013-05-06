@@ -33,10 +33,10 @@ Welcome to CoShare!
 .header {
   height: 160px;
   text-align: center;
+  max-width: 200px;
 }
 
 .album-button {
-  margin-top: 30px;
 }
 
 
@@ -81,8 +81,8 @@ $(function() {
           <div class="row-fluid well">
             <div class="span12 contents-container">
               <div class="header content">
-                <h1>{{album.name}}</h1>
-                <button class="btn btn-success album-button">Go to Album</button>  
+                <h2>{{album.name}}</h2>
+                <button class="btn btn-success album-button" onclick="window.location='/browse/?id={{album.id}}'">Go to Album</button>  
               </div>
               {% for content in album.content.all %}
               <img class="content" src="/media/{{content.image}}" />
@@ -95,24 +95,20 @@ $(function() {
     <!-- KIDS -->
     <div class="span6">
       <div class="container-fluid">
-        <div class="row-fluid well">
-          <div class="span6">
-            <img class="img-rounded" src="/media/static/content/images_1_1.jpeg" />
+        {% for child in children %}
+          <div class="row-fluid well">
+            <div class="span12 contents-container">
+              <div class="header content">
+                <h1>{{child.name}}</h1>
+                <button class="btn btn-success album-button" onclick="window.location='/browse/?id={{child.album.id}}'">Go to Album</button>  
+              </div>
+              {% for content in child.album.content.all %}
+                <img class="content" src="/media/{{content.image}}" />
+              {% endfor %}
+
+            </div>
           </div>
-          <div class="span6">
-            <h1>John</h1>
-            <button class="btn btn-success">See John's Album</button>
-          </div>
-        </div>
-        <div class="row-fluid well">
-          <div class="span6">
-            <img class="img-rounded" src="/media/static/content/images_4_1.jpeg" />
-          </div>
-          <div class="span6">
-            <h1>Jane</h1>
-            <button class="btn btn-success">See John's Album</button>
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </div>
   </div>
