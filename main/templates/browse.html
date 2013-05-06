@@ -519,6 +519,9 @@ model.addEventListener("deselect_content", function(e) {
   // get albums from django
   // MUST APPEAR AFTER LISTENERS ARE CREATED
   {% for album in albums %}
+  /*
+  {{album.name}}
+  */
   var album = new Album({{album.id}},"{{album.name}}");
   
   album_map[{{album.id}}] = album;
