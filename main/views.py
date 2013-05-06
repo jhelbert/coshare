@@ -199,7 +199,10 @@ def new_plist(request):
 	return HttpResponseRedirect('/')
 
 def browse(request):
-	
+	user = get_user(request)
+	name = None
+	if user:
+		name = user.first_name + " " + user.last_name
 
 	userprof = get_user_profile(request)
 
@@ -228,7 +231,9 @@ def browse(request):
 		 "albums":albums,
 		 "selected_album": selected_album,
 		 "user_queue_id": userprof.queue.id,
-		 "children":children
+		 "children":children,
+		 "userprof":user,
+		 "name":name
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
