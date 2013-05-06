@@ -120,6 +120,9 @@ def main(request):
 		fav_1 = None
 		fav_2 = None
 
+	albums = []
+	all_content = couple.albums.get(name="All Content")
+	albums.append(all_content)
 
 
 	return render_to_response('index.html', 
@@ -130,7 +133,8 @@ def main(request):
 			"favs_2": fav_2,
 			"userprof":user,
 			"name":name,
-			"children":children
+			"children":children,
+			"albums": albums,
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
