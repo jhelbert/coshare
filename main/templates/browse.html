@@ -757,16 +757,48 @@ var albumClick = function(albumName) {
 
     // Get correct album
     var match;
-    //console.log($("#albums-container").find("li"));
-    $("#albums-container").find("li").each(function(index,element) {
-      console.log(index,element);
-      if ($(element).text().toString() == albumName) {
+    albumName = albumName.trim();
+    if (albumName.indexOf("My Queue") != -1) {
+      albumName = "Your Queue";
+    }
+
+    $("#children-albums").find("a").each(function(index,element) {
+      var text = $(element).text();
+      if (text.trim() == albumName) {
+        match = $(element);
+      }
+    });
+
+    $("#automatic-albums").find("a").each(function(index,element) {
+      var text = $(element).text();
+      if (text.trim() == albumName) {
+        match = $(element);
+      }
+    });
+
+    $("#special-albums").find("a").each(function(index,element) {
+      var text = $(element).text();
+      console.log(text,albumName);
+      
+      if (text.indexOf("Queue") != -1) {
+        text = text.substring(0,text.length - 2);
+      }
+      if (text.trim() == albumName) {
+        match = $(element);
+      }
+    });
+
+
+
+    $("#user-created-albums").find("a").each(function(index,element) {
+      var text = $(element).text();
+      if (text.trim() == albumName) {
         match = $(element);
       }
     });
 
     // Get album object
-    var id = match.attr("id");
+    var id = match.parent().attr("id");
     id = id.substring(6);
     var album;
     for (var i=0; i < model.albums.length; i++) {
@@ -828,6 +860,7 @@ var albumClick = function(albumName) {
     text = text.trim();
     $('.imageDescription').attr("contenteditable",false);
     var id_val = $(".imageHolder").attr("id-num").toString();
+    var alertBox;
     // send new text value to the server
     $.ajax({
       type: "POST",
@@ -836,17 +869,22 @@ var albumClick = function(albumName) {
     }).done(function( msg ) {
       $(".alert").alert('close');
       if (msg != "error") {
-        var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
+        alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
 
         $("#descriptionBox").append(alertBox);
       } else {
-        var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
+        alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
 
         $("#descriptionBox").append(alertBox);
       }
       $("#editButton").html('Edit');
+      fadeAlert(alertBox);
     });
   };
+
+  var fadeAlert = function(alert) {
+    alert.fadeOut(3000);
+  }
 
   $("#closeModal").click(function() {
     $(".alert").alert('close');
