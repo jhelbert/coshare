@@ -689,6 +689,14 @@ model.addEventListener("deselect_content", function(e) {
     }
 
   var populateModal = function(image, id_val) {
+    try {
+      $(".imageHolder")[0].style.display = "none";
+    document.getElementById("Video1").style.display = "none";
+    
+    }
+    catch (err){
+
+    }
     if (image.indexOf('.MOV') != -1 || image.indexOf('.mov') != -1 || image.indexOf('.mp4') != -1) {
       console.log('video');
       var output = document.createElement('video');
@@ -697,6 +705,7 @@ model.addEventListener("deselect_content", function(e) {
       output.id = "Video1";
 
       document.getElementById("leftCol").insertBefore(output,document.getElementById("leftCol").firstChild);
+      document.getElementById("Video1").style.display = "block";
       output.onclick = vidplay;
       console.log($("#leftCol"));
     }
@@ -704,6 +713,7 @@ model.addEventListener("deselect_content", function(e) {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
     $(".imageHolder").css("height","");
+    $(".imageHolder")[0].style.display = "block";
     console.dir(image);
 
 

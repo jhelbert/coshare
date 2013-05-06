@@ -338,9 +338,11 @@ def remove_album(request):
 def add_content(request):
 	album_id = request.POST.get('album_id')
 	pic_id = request.POST.get('pic_id')
+	print "pic_id:%s" % pic_id
 	album = Album.objects.get(id=int(album_id))
 	print 'got plist'
 	content = Content.objects.get(id=int(pic_id))
+	print "got content"
 	if album.name == "Favorites":
 		content.metric = 20
 		content.save()

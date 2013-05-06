@@ -38,9 +38,22 @@
           var div = document.createElement('div');
           div.id = "divx" + i;
           div.style.float = "left";
-          var output = new Image();
-          output.src = e.target.result;
-          output.height = "150px";
+          substrings = ['mov','MOV','mp4'];
+        var output;
+        if (new RegExp(substrings.join("|")).test(e.target.result)) {
+            output = document.createElement('label');
+            output.style.float = "left";
+            output.innerHTML = "Video";
+
+    // At least one match
+        }
+        else {
+            output = new Image();
+             output.height = "150px";
+             output.src = e.target.result;
+        }
+          
+         
           div.style.border = "2px solid black";
           div.style.paddingRight = "15px";
           div.style.margin = "10px";
