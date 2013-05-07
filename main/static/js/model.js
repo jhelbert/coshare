@@ -109,6 +109,7 @@ var Model = function() {
      */
     this.select_album = function(album) {
         if (this.selected_album != null) {
+            console.log(this.selected_album);
             this.fireEvent("deselect_album", {album: this.selected_album})
         }
         this.selected_album = album;

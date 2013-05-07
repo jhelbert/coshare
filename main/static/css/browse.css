@@ -272,9 +272,8 @@ td {
     }
 
     .innerUI {
-        height: 45px;
+        height: 50px;
         display: inline-block;
-        width: 52px;
         float: left;
         margin-left: 2px;
         margin-right: 2px;
