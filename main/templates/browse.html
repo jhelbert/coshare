@@ -723,11 +723,26 @@ model.addEventListener("deselect_content", function(e) {
     image_info['height'] = $(this).children("img").attr("height") / 10;
   }
     already_favorited = false;
+    $("#favoriteStatus").empty();
     // Add favorited icon to reflect picture
     if (favorites_album.content_in(id_val)) {
-      $(".favoriteIcon").addClass("isFavorited");
-      $(".favoriteIcon").html('&#9733');
+      $("#favoriteStatus").html("<i class='icon-thumbs-up'></i> In Favorites </span> <br>");
+      var a = $("<a class='removeFavoriteLink'> Remove </a>");
+      a.click(function() {
+        favorites_album.remove_content(last_clicked_content);
+        already_favorited = false;
+        populateModal(image,id_val);
+      });
+      $("#favoriteStatus").append(a);
+
       already_favorited = true;
+    } else {
+      var a = $("<a class='favoriteLink'> Add to Favorites </a>");
+      a.click(function() {
+        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
+        populateModal(image,id_val);
+      });
+      $("#favoriteStatus").append(a);
     }
     // Add albums info to list
     $.ajax({
@@ -936,34 +951,6 @@ var albumClick = function(albumName) {
     }
   });
 
-
-  // Favorited icon click handler
-  $(".favoriteIcon").click(function() {
-    $(this).toggleClass("isFavorited");
-    if ($(this).hasClass("isFavorited")) {
-      $(this).html('&#9733');
-    } else {
-      $(this).html('&#9734');
-
-    }
-  });
-
-  $(".favoriteIcon").hover(
-    function() {
-      $(this).addClass('mouseOver');
-    },
-    function() {
-      $(this).removeClass('mouseOver');
-      // After mouse leaves update back end
-      if ($(this).hasClass('isFavorited')) {
-        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
-      } else {
-        favorites_album.remove_content(last_clicked_content);
-        already_favorited = false;
-      }
-    }
-  );
-
 });
 
 function new_plist(name, callback) {
@@ -1129,10 +1116,9 @@ function remove_from_site() {
     <div class="row-fluid">
       <div class="span6" id="leftCol">
         <img class="imageHolder" id="modalImage" src=""></img>
-        <div class="favoriteIcon">&#9734</div>
-          <!--
-          <button class="btn favorited"> Favorited </button>
-        -->
+        <div id="favoriteStatus">
+          
+        </div>
       </div>
       <div class="span5 offset1" id="rightCol">
         <h4> Album Membership </h4>
