@@ -292,7 +292,7 @@ def upload(request):
 			file_content = ContentFile(uploaded_content.read()) 
 			new_content.image.save(uploaded_content.name, file_content)
 			ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
-			if ext not in ["jpg",'jpeg','png','gif']:
+			if ext in ["mov","MOV","mp4"]:
 				new_content.is_video = True
 			new_content.metric = int(random.random() * 6) + 8
 			new_content.save()
