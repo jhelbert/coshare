@@ -109,6 +109,7 @@ var Model = function() {
      */
     this.select_album = function(album) {
         if (this.selected_album != null) {
+            console.log(this.selected_album);
             this.fireEvent("deselect_album", {album: this.selected_album})
         }
         this.selected_album = album;
@@ -117,6 +118,10 @@ var Model = function() {
         // TODO: manage content selection
         // what if we are selecting the current album again?
         this.selected_contents = [];
+    }
+
+    this.deselect_album = function(album){
+        this.fireEvent("deselect_album", album);
     }
 
 

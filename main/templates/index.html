@@ -8,81 +8,94 @@ Welcome to CoShare!
 <link href="{{STATIC_URL}}/css/index.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
 
-<style>
-img {
-  height:60px;
-  width:60px;
-  margin: 15px;
-}
+<!-- packery -->
+<script src="{{STATIC_URL}}/js/packery.min.js"></script>
+<script src="{{STATIC_URL}}/js/jquery.imagesloaded.js"></script>
 
-.children-well {
-  width:200px;
-}
-
-
-</style>
+<script>
+$(function() {
+  $(".contents-container").imagesLoaded(function() {
+    $(this).packery({
+      itemSelector: ".content",
+      gutter: 10,
+    });
+  });
+})
+</script>
 {% endblock %}
 
 {% block content %}
-<div class="content-container">
-  <div class="container">
-    <div data-intro="These are your beautiful children! <br><br> Clicking on them will bring you directly to their album on the browsing page." data-step="2" class="well pull-right children-well">
-      <div>
-      <ul class="nav nav-list">
-        <li class="nav-header">Children</li>
+<!-- page container -->
+<div class="container-fluid">
+  <!-- TITLE -->
+  <div class="row-fluid">
+    <div class="span12" align="center">
+      <div class="text-center"><div id="coshare-title">CoShare</div>
+      <i><h3>Manage your children's content together.</h3></i>
+    </div>
+  </div>
+  {% if queue_size > 0 %}
+  <div class="row-fluid">
+    <div class="span3"></div>
+    <div class="span6 alert alert-error">
+      <div style="vertical-align:middle; padding-top: 6px;">
+        <span>You have <b>{{queue_size}}</b> item{% if queue_size > 1 %}s{% endif %} in your queue.</span>
+        <button class="btn btn-danger pull-right" onclick="window.location.href='/browse/?id={{userprof.queue.id}}'">Review Your Queue</button>
+      </div>
+    </div>
+    <div class="span3"></div>
+  </div>
+  {% endif %}
+  <!-- BRUNT OF CONTENT -->
+  <div class="row-fluid">
+    <!-- POPULAR ALBUMS -->
+    <div class="span6">
+      <div class="container-fluid">
+        {% for album in albums %}
+          <div class="row-fluid well">
+            <div class="span12 contents-container">
+              <div class="header content">
+                <h2>{{album.name}}</h2>
+                <button class="btn btn-success album-button" onclick="window.location='/browse/?id={{album.id}}'">Go to Album</button>  
+              </div>
+              {% for content in album.content.all %}
+              {% if content.is_video %}
+              <video  class="content" src="/media/{{content.image}}" height="100" width="100"></video>
+              {% else %}
+              <img class="content" src="/media/{{content.image}}"></image>
+
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <!-- KIDS -->
+    <div class="span6">
+      <div class="container-fluid">
         {% for child in children %}
-        <li><a href="#"><i class="icon-user"></i>{{child.name}}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-    </div>
-    <h1 data-intro="Welcome to CoShare, your family's content manager! <br><br>Use the menu bar at the top of the page to add content and navigate to the content browsing page." data-step='1'>Smith Family</h1>
-    <div class="well" style="width:500px;margin-top:30px">
-    <div class="pictureSection"><b>Recently Added</b><a href="/recently_added/" style="margin-left:300px; text-decoration:none" data-intro="These links convenitely bring you to the browsing page displaying all of the sections content." data-step='3'>See All</a></div>
-    <div>
-      <div class="picture-collection" >
-        {% for image in recently_added_1 %}
-        <div class="floated_img" style="float:left">
-          <img src="/media/{{image.image}}" alt="Some image">
-        </div>
-        {% endfor %}
+          <div class="row-fluid well">
+            <div class="span12 contents-container">
+              <div class="header content">
+                <h1>{{child.name}}</h1>
+                <button class="btn btn-success album-button" onclick="window.location='/browse/?id={{child.album.id}}'">Go to Album</button>  
+              </div>
+              {% for content in child.album.content.all %}
+              {% if content.is_video %}
+              <video  class="content" src="/media/{{content.image}}" height="100" width="100"></video>
+              {% else %}
+              <img class="content" src="/media/{{content.image}}"></image>
 
-      </div>
+              {% endif %}
+              {% endfor %}
 
-      <div class="picture-collection" style="clear:both;width:500px;height:100px" >
-        {% for image in recently_added_2 %}
-        <div class="floated_img" style="float:left">
-          <img src="/media/{{image.image}}" alt="Some image">
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-  <div style="background-color:lightgray;width:500px">
-    <div class="well pull-left" style="float:left;clear:both;margin-top:30px;width:500px;">
-
-      <div class="pictureSection"><b>Recently Favorited</b><a href="/recently_favorited/" style="margin-left:250px; text-decoration:none">See All</a></div>
-
-      <div class="picture-collection">
-        {% for image in favs_1 %}
-        <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120">
-        </div>
-        {% endfor %}
-
-      </div>
-      <br>
-      <div class="picture-collection">
-        {% for image in favs_2 %}
-        <div class="floated_img">
-          <img src="/media/{{image.image}}" alt="Some image" height="120">
-        </div>
+            </div>
+          </div>
         {% endfor %}
       </div>
     </div>
   </div>
 </div>
-</div>
 
-</form>
 {% endblock %}

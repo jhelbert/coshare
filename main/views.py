@@ -120,7 +120,15 @@ def main(request):
 		fav_1 = None
 		fav_2 = None
 
+	# ignore shit above, below is what counts
 
+	albums = [couple.albums.get(name=x) for x in ("All Content",
+										     "Recently Added",
+										     "Recently Favorited")]
+
+	albums = [album for album in albums if len(album.content.all()) > 0]
+
+	queue_size = len(userprof.queue.content.all())
 
 	return render_to_response('index.html', 
 		{
@@ -128,9 +136,11 @@ def main(request):
 			"recently_added_2":recently_added_2,
 			"favs_1":fav_1,
 			"favs_2": fav_2,
-			"userprof":user,
+			"userprof":userprof,
 			"name":name,
-			"children":children
+			"children":children,
+			"albums": albums,
+			"queue_size": queue_size,
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -140,7 +150,7 @@ def get_recently_added(couple):
 		recently_added_plist = possible_albums.get(name="Recently Added")
 		print "got ra plist"
 		recently_added_plist.content.clear()
-		content = Content.objects.all()
+		content = query_all_album(couple).content.all()
 		for c in content:
 			if c.uploaded_date:
 				if c.uploaded_date + datetime.timedelta(days=2) > datetime.datetime.today():
@@ -156,7 +166,7 @@ def get_recently_favorited(couple):
 		recently_added_plist = possible_albums.get(name="Recently Favorited")
 		print "got ra plist"
 		recently_added_plist.content.clear()
-		content = Content.objects.all()
+		content = query_all_album(couple).content.all()
 		for c in content:
 			if c.favorited_time:
 				if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
@@ -199,7 +209,10 @@ def new_plist(request):
 	return HttpResponseRedirect('/')
 
 def browse(request):
-	
+	user = get_user(request)
+	name = None
+	if user:
+		name = user.first_name + " " + user.last_name
 
 	userprof = get_user_profile(request)
 
@@ -228,20 +241,26 @@ def browse(request):
 		 "albums":albums,
 		 "selected_album": selected_album,
 		 "user_queue_id": userprof.queue.id,
-		 "children":children
+		 "children":children,
+		 "userprof":user,
+		 "name":name
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
 def query_all_album(couple):
-	try:
-		possible_albums = couple.albums.all()
-		all_album = possible_albums.get(auto_all=True)
-		print "got all_album"
-		all_content = Content.objects.all()
-		for content in all_content:
-			all_album.content.add(content)
-	except:
-		pass
+	possible_albums = couple.albums.all()
+	all_album = possible_albums.get(auto_all=True)
+	all_album.content.clear()
+	all_content = Content.objects.all()
+	for content in all_content:
+		for userprof in couple.members.all():
+			if userprof == content.owner:
+				print content
+				all_album.content.add(content)
+
+	all_album.save()
+	return all_album
+
 
 @csrf_exempt
 def upload(request):
@@ -272,10 +291,11 @@ def upload(request):
 		if str(index) not in delete:
 			print uploaded_content
 			new_content = Content()
+			new_content.owner = userprof
 			file_content = ContentFile(uploaded_content.read()) 
 			new_content.image.save(uploaded_content.name, file_content)
 			ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
-			if ext not in ["jpg",'jpeg','png','gif']:
+			if ext in ["mov","MOV","mp4"]:
 				new_content.is_video = True
 			new_content.metric = int(random.random() * 6) + 8
 			new_content.save()
@@ -326,9 +346,11 @@ def remove_album(request):
 def add_content(request):
 	album_id = request.POST.get('album_id')
 	pic_id = request.POST.get('pic_id')
+	print "pic_id:%s" % pic_id
 	album = Album.objects.get(id=int(album_id))
 	print 'got plist'
 	content = Content.objects.get(id=int(pic_id))
+	print "got content"
 	if album.name == "Favorites":
 		content.metric = 20
 		content.save()
@@ -362,7 +384,7 @@ def remove_content(request):
 def delete_content(request):
 	pic_id = request.POST.get('id')
 	content = Content.objects.get(id=int(pic_id))
-	content.delete()
+	content.owner = None;
 	return HttpResponse('OK')
 
 
