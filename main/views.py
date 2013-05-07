@@ -128,6 +128,8 @@ def main(request):
 
 	albums = [album for album in albums if len(album.content.all()) > 0]
 
+	queue_size = len(userprof.queue.content.all())
+
 	return render_to_response('index.html', 
 		{
 			"recently_added_1":recently_added_1,
@@ -138,6 +140,7 @@ def main(request):
 			"name":name,
 			"children":children,
 			"albums": albums,
+			"queue_size": queue_size,
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -381,7 +384,7 @@ def remove_content(request):
 def delete_content(request):
 	pic_id = request.POST.get('id')
 	content = Content.objects.get(id=int(pic_id))
-	content.delete()
+	content.owner = None;
 	return HttpResponse('OK')
 
 
