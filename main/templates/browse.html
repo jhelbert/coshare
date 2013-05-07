@@ -428,7 +428,7 @@ $("#album-" + e.album.id).addClass("select-extend");
     $(".alert").alert('close');
     
     $("#openModal").modal("show");
-    $(".albumList").empty();
+    
     var image = $(this).attr("src");
 
     if (!image) {
@@ -689,6 +689,7 @@ model.addEventListener("deselect_content", function(e) {
     }
 
   var populateModal = function(image, id_val) {
+    $(".albumList").empty();
     try {
       $(".imageHolder")[0].style.display = "none";
     document.getElementById("Video1").style.display = "none";
