@@ -47,7 +47,8 @@ var already_favorited = false;
 var child_list = [];
 var cached_description = "";
 var mousedownHappened = false;
-
+var pencilDown = false;
+var pencilSave = false;
 
 $(function() {
 
@@ -112,6 +113,7 @@ $(function() {
         });
       }
       model.select_album(album);
+      $("#remove").css("visibility", "hidden");
       $("#selected-span").attr("contenteditable","true");
       $("#selected-span").addClass("editable");
       $("#selected-span").focus(); 
@@ -608,38 +610,73 @@ model.addEventListener("deselect_content", function(e) {
 
   // CRUD operations on albums
 
+  $("#pencil").mousedown(function(e) {
+    pencilDown = true;
+  });
+
   // Event listener for edit pencil - editing albums
   $(".active > .album-name >#pencil").click(function(e){
-    $("#selected-span").attr("contenteditable",true);
-    $("#selected-span").addClass("editable");
-    $("#selected-span").focus(); 
-    document.execCommand('selectAll', false, null);
+    if (!pencilSave){
+      $("#remove").css("visibility", "hidden");
+      $("#selected-span").attr("contenteditable",true);
+      $("#selected-span").addClass("editable");
+      $("#selected-span").focus(); 
+      document.execCommand('selectAll', false, null);
+      pencilSave = false;
+    }
+    else{
+      $("#remove").css("visibility", "visible");
+      $("#selected-span").blur();
+      $("#selected-span").attr("contenteditable",false);
+      $("#selected-span").removeClass("editable");
+      rename_album($("#selected-span")[0].innerHTML);
+    }
+    pencilDown = false;
     return false;
   });
 
   $('.active').click(function() {
     $(".active > .album-name >#pencil").click(function(e){
-      $("#selected-span").attr("contenteditable",true);
-      $("#selected-span").addClass("editable");
-      $("#selected-span").focus();
-      document.execCommand('selectAll', false, null);
+      if (!pencilSave){
+        $("#remove").css("visibility", "hidden");
+        $("#selected-span").attr("contenteditable",true);
+        $("#selected-span").addClass("editable");
+        $("#selected-span").focus(); 
+        document.execCommand('selectAll', false, null);
+        pencilSave = false;
+      }
+      else{
+        $("#remove").css("visibility", "visible");
+        $("#selected-span").blur();
+        $("#selected-span").attr("contenteditable",false);
+        $("#selected-span").removeClass("editable");
+        rename_album($("#selected-span")[0].innerHTML);
+        document.execCommand('unselect', false, null);
+      }
+      pencilDown = false;
     });
     return false;
     });
 
    $("#selected-span").blur(function(){
+      $("#remove").css("visibility", "visible");
       $(this).attr("contenteditable",false);
       $(this).removeClass("editable");
       rename_album($(this)[0].innerHTML);
-    }
-  );
+      if (pencilDown){
+        pencilSave = !pencilSave;
+      }
+      document.execCommand('unselect', false, null);
+    });
 
   $('#selected-span').keydown(function(event) {
     if (event.which == 13) {
+      $("#remove").css("visibility", "visible");
       $(this).blur();
       $(this).attr("contenteditable",false);
       $(this).removeClass("editable");
       rename_album($(this)[0].innerHTML);
+      document.execCommand('unselect', false, null);
     }
   });
 
