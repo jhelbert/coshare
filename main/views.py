@@ -163,7 +163,7 @@ def get_recently_favorited(couple):
 		recently_added_plist = possible_albums.get(name="Recently Favorited")
 		print "got ra plist"
 		recently_added_plist.content.clear()
-		content = Content.objects.all()
+		content = query_all_album(couple).content.all()
 		for c in content:
 			if c.favorited_time:
 				if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
