@@ -416,6 +416,7 @@ $("#album-" + e.album.id).addClass("select-extend");
     .addClass("content")
     .attr("id", "content-" + content.id)
     .attr("id-num", content.id)
+    .attr("draggable", "false")
     .click(function() {
       if ($(this).data("dragging")) {
         return;
