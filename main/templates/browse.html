@@ -111,11 +111,43 @@ $(function() {
           update_queue_size(album, new_size);  
         });
       }
+      model.select_album(album);
+      $("#selected-span").attr("contenteditable","true");
+      $("#selected-span").addClass("editable");
+      $("#selected-span").focus(); 
+      document.execCommand('selectAll', false, null);
 
+      $("#selected-span").blur(function(){
+        $(this).attr("contenteditable",false);
+        $(this).removeClass("editable");
+        rename_album($(this)[0].innerHTML);
+        }
+      );
 
+      $('#selected-span').keydown(function(event) {
+        if (event.which == 13) {
+          $(this).blur();
+          $(this).attr("contenteditable",false);
+          $(this).removeClass("editable");
+          rename_album($(this)[0].innerHTML);
+        }
+      });
 
+      $("#remove").click(function(){
+       $('#confirm-delete').modal('show');
+       return false;
+      });
+
+      $(".cancel_delete").click(function(){
+        $('#confirm-delete').modal('hide');
+      });
+
+      $(".perform_delete").click(function(){
+        remove_album();
+        $('#confirm-delete').modal('hide');
+        location.reload();
+      });
     });
-    console.log("TODO: initiate editing.");
 
     },
 
@@ -195,7 +227,7 @@ The model will propagate the appropriate effects.s
         console.dir(this)
         console.dir(this.classList)
         if (this.classList[2] == "active"){
-          return false
+          return false;
         }
         else{
         model.select_album(e.album);
@@ -230,7 +262,7 @@ The model will propagate the appropriate effects.s
       .attr("id", "album-" + e.album.id)
       .click(function() {
        if (this.classList[2] == "active"){
-          return false
+          return false;
         }
         else{
         model.select_album(e.album);
@@ -457,11 +489,14 @@ model.addEventListener("deselect_album", function(e) {
 
   }
   var pencil = document.getElementById("pencil");
+  console.dir(album_div);
   album_div.removeClass("selected-album")
   .removeClass("selected-auto-album").removeClass("active");
+  album_div[0].children[0].children[1].id = "";
   // album_div.removeChild(album_div.lastChild);
   $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
   $("#album-" + e.album.id+ "> a > .icon-remove").remove();
+
   // album_div.remove(album_div.find(pencil));
 });
 
@@ -608,7 +643,7 @@ model.addEventListener("deselect_content", function(e) {
   });
 
   function rename_album(name) {
-    var id = $(".active")[0].id.split("-")[1];
+    var id = $(".selected-album")[0].id.split("-")[1];
     $.ajax({
       type: "POST",
       url: "/ajax/rename_album/",
@@ -617,13 +652,17 @@ model.addEventListener("deselect_content", function(e) {
     });
   }
 
-   $(".active > .album-name >#remove").click(function(e){
+   $(".selected-album > .album-name >#remove").click(function(e){
     $('#confirm-delete').modal('show');
     return false;
   });
 
-  $('.active').click(function() {
-    $(".active > .album-name >#remove").click(function(e){
+   $("#remove").click(function(){
+      $('#confirm-delete').modal('show');
+   });
+
+  $('.selected-album').click(function() {
+    $(".selected-album > .album-name >#remove").click(function(e){
       $('#confirm-delete').modal('show');
     });
     return false;
@@ -640,7 +679,7 @@ model.addEventListener("deselect_content", function(e) {
   });
 
   function remove_album() {
-    var album_id = $(".active")[0].id.split("-")[1];
+    var album_id = $(".selected-album")[0].id.split("-")[1];
     $.ajax({
       type: "POST",
       url: "/ajax/remove_album/",
@@ -825,8 +864,7 @@ var albumClick = function(albumName) {
       console.log("blur");
       saveDescription();
     }
-  }
-  );
+  });
 
   $("#cancelButton").mousedown(function() {
     mousedownHappened = true;
