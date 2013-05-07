@@ -8,6 +8,7 @@ class Content(models.Model):
 	favorited_time = models.DateTimeField(blank=True,null=True)
 	metric = models.IntegerField(default=12)
 	is_video = models.BooleanField()
+	owner = models.ForeignKey('UserProfile',null=True,blank=True)
 	def __unicode__(self):
 		return str(self.image)
 	
