@@ -921,6 +921,29 @@ function remove_from_site() {
 }
 
 
+$('#children-albums').on('show hide', function (e) {
+  // if($(e.target).attr("id") != "children-albums")return;
+  $('#collapse-children').toggleClass('icon-arrow-left icon-arrow-down', 200);
+});
+
+$('#special-albums').on('show hide', function (e) {
+  console.log("work!!!");
+  // if($(e.target).attr("id") != "special-albums")return;
+  $('#collapse-special').toggleClass('icon-arrow-left icon-arrow-down', 200);
+});
+
+$('#automatic-albums').on('show hide', function (e) {
+  console.log("work!!!");
+  // if($(e.target).attr("id") != "automatic-albums")return;
+  $('#collapse-automatic').toggleClass('icon-arrow-left icon-arrow-down', 200);
+});
+
+$('#user-created-albums').on('show hide', function (e) {
+  console.log("work!!!");
+  // if($(e.target).attr("id") != "user-created-albums")return;
+  $('#collapse-user').toggleClass('icon-arrow-left icon-arrow-down', 200);
+});
+
 </script>
 {% endblock %}
 
@@ -931,32 +954,44 @@ function remove_from_site() {
     <div class="span3">
       <div class="well album-well sidebar-nav">
         <div id="albums-container">
-          <ul id="children-albums" class="nav nav-list">
-            <li class="nav-header">Children Albums</li>
+          <ul class="nav nav-list">
+              <li class="nav-header">Children Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#children-albums"><i class="icon-arrow-down" id="collapse-children"></i></button></li>
           </ul>
-        </div>
-      </div>
-        <div class="well album-well sidebar-nav">
-        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
-          <ul id="automatic-albums" class="nav nav-list" data-intro="These albums are automatically generated for you by us." data-step='2'>
-            <li class="nav-header">Standard Albums</li>
-          </ul>
+          <ul id="children-albums" class="nav nav-list"></ul>
         </div>
       </div>
 
-        <div class="well album-well sidebar-nav">
-          <div id="albums-container">
-            <ul id="special-albums" class="nav nav-list" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
-            <li class="nav-header">Edit Albums</li>
+      <div class="well album-well sidebar-nav">
+        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
+          <ul class="nav nav-list">
+            <li class="nav-header">Standard Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#automatic-albums"><i class="icon-arrow-down" id="collapse-automatic"></i></button></li>
+          </ul>
+          <ul id="automatic-albums" class="nav nav-list in collapse" data-intro="These albums are automatically generated for you by us." data-step='2'></ul>
+        </div>
+      </div>
+
+      <div class="well album-well sidebar-nav">
+        <div id="albums-container">
+            <ul class="nav nav-list">
+              <li class="nav-header">Edit Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#special-albums"><i class="icon-arrow-down" id="collapse-special"></i></button></li>
             </ul>
-            <ul id="user-created-albums" class="nav nav-list" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
-            <li class="nav-header">Your Albums</li>
+            <ul id="special-albums" class="nav nav-list in collapse" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+            </ul>
+        </div>
+      </div>
+
+      <div class="well album-well sidebar-nav">
+        <div id="albums-container">
+            <ul class="nav nav-list">
+              <li class="nav-header">Your Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#user-created-albums"><i class="icon-arrow-down" id="collapse-user"></i></button></li>
+            </ul>
+            <ul id="user-created-albums" class="nav nav-list in collapse" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
           </ul>
           <input name="name" id="new_plist" type="text"/>
         </div>
-        <div class="text-center"><button class="btn create" onclick="new_album()">Create</button>
-          </div>
-      </div><!--/.well -->
+        <div class="text-center"><button class="btn create" onclick="new_album()">Create</button></div>
+      </div>
+
     </div><!--/span-->
     <div id="content-well" class="span9">
       <div>

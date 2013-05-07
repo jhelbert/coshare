@@ -24,6 +24,10 @@
     margin-top: 2px;
 }
 
+#pencil:hover{
+    border: 1px solid white;
+}
+
 #remove{
     margin-top: 2px;
     margin-left: 3px;
