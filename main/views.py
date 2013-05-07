@@ -128,6 +128,8 @@ def main(request):
 
 	albums = [album for album in albums if len(album.content.all()) > 0]
 
+	queue_size = len(userprof.queue.content.all())
+
 	return render_to_response('index.html', 
 		{
 			"recently_added_1":recently_added_1,
@@ -138,6 +140,7 @@ def main(request):
 			"name":name,
 			"children":children,
 			"albums": albums,
+			"queue_size": queue_size,
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -163,7 +166,7 @@ def get_recently_favorited(couple):
 		recently_added_plist = possible_albums.get(name="Recently Favorited")
 		print "got ra plist"
 		recently_added_plist.content.clear()
-		content = Content.objects.all()
+		content = query_all_album(couple).content.all()
 		for c in content:
 			if c.favorited_time:
 				if c.favorited_time + datetime.timedelta(days=1) > datetime.datetime.today():
@@ -292,7 +295,7 @@ def upload(request):
 			file_content = ContentFile(uploaded_content.read()) 
 			new_content.image.save(uploaded_content.name, file_content)
 			ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
-			if ext not in ["jpg",'jpeg','png','gif']:
+			if ext in ["mov","MOV","mp4"]:
 				new_content.is_video = True
 			new_content.metric = int(random.random() * 6) + 8
 			new_content.save()
@@ -381,7 +384,7 @@ def remove_content(request):
 def delete_content(request):
 	pic_id = request.POST.get('id')
 	content = Content.objects.get(id=int(pic_id))
-	content.delete()
+	content.owner = None;
 	return HttpResponse('OK')
 
 

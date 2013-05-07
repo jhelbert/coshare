@@ -416,7 +416,7 @@ $("#album-" + e.album.id).addClass("select-extend");
     $(".alert").alert('close');
     
     $("#openModal").modal("show");
-    $(".albumList").empty();
+    
     var image = $(this).attr("src");
 
     if (!image) {
@@ -430,25 +430,18 @@ $("#album-" + e.album.id).addClass("select-extend");
 });
 
 $('#children-albums').on('show hide', function (e) {
-  // if($(e.target).attr("id") != "children-albums")return;
   $('#collapse-children').toggleClass('icon-arrow-left icon-arrow-down', 200);
 });
 
 $('#special-albums').on('show hide', function (e) {
-  console.log("work!!!");
-  // if($(e.target).attr("id") != "special-albums")return;
   $('#collapse-special').toggleClass('icon-arrow-left icon-arrow-down', 200);
 });
 
 $('#automatic-albums').on('show hide', function (e) {
-  console.log("work!!!");
-  // if($(e.target).attr("id") != "automatic-albums")return;
   $('#collapse-automatic').toggleClass('icon-arrow-left icon-arrow-down', 200);
 });
 
 $('#user-created-albums').on('show hide', function (e) {
-  console.log("work!!!");
-  // if($(e.target).attr("id") != "user-created-albums")return;
   $('#collapse-user').toggleClass('icon-arrow-left icon-arrow-down', 200);
 });
 
@@ -684,20 +677,73 @@ model.addEventListener("deselect_content", function(e) {
     }
   });
 
+  function vidplay() {
+       var video = document.getElementById("Video1");
+
+       if (video.paused) {
+          video.play();
+
+       } else {
+          video.pause();
+       }
+    }
+
   var populateModal = function(image, id_val) {
+    $(".albumList").empty();
+    try {
+      $(".imageHolder")[0].style.display = "none";
+    document.getElementById("Video1").style.display = "none";
+    
+    }
+    catch (err){
+
+    }
+    if (image.indexOf('.MOV') != -1 || image.indexOf('.mov') != -1 || image.indexOf('.mp4') != -1) {
+      console.log('video');
+      var output = document.createElement('video');
+      output.src = image;
+      output.height = 150;
+      output.id = "Video1";
+
+      document.getElementById("leftCol").insertBefore(output,document.getElementById("leftCol").firstChild);
+      document.getElementById("Video1").style.display = "block";
+      output.onclick = vidplay;
+      console.log($("#leftCol"));
+    }
+    else {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
+    $(".imageHolder").css("height","");
+    $(".imageHolder")[0].style.display = "block";
+    console.dir(image);
+
 
     image_info = {};
     image_info['src'] = image.substring(7);
     image_info['id'] = id_val;
     image_info['height'] = $(this).children("img").attr("height") / 10;
+  }
     already_favorited = false;
+    $("#favoriteStatus").empty();
     // Add favorited icon to reflect picture
     if (favorites_album.content_in(id_val)) {
-      $(".favoriteIcon").addClass("isFavorited");
-      $(".favoriteIcon").html('&#9733');
+      $("#favoriteStatus").html("<i class='icon-thumbs-up'></i> In Favorites </span> <br>");
+      var a = $("<a class='removeFavoriteLink'> Remove </a>");
+      a.click(function() {
+        favorites_album.remove_content(last_clicked_content);
+        already_favorited = false;
+        populateModal(image,id_val);
+      });
+      $("#favoriteStatus").append(a);
+
       already_favorited = true;
+    } else {
+      var a = $("<a class='favoriteLink'> Add to Favorites </a>");
+      a.click(function() {
+        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
+        populateModal(image,id_val);
+      });
+      $("#favoriteStatus").append(a);
     }
     // Add albums info to list
     $.ajax({
@@ -734,7 +780,6 @@ model.addEventListener("deselect_content", function(e) {
       });
 
 }
-
 var albumClick = function(albumName) {
     // Close Modal
     $(".alert").alert('close');
@@ -864,34 +909,6 @@ var albumClick = function(albumName) {
     }
   });
 
-
-  // Favorited icon click handler
-  $(".favoriteIcon").click(function() {
-    $(this).toggleClass("isFavorited");
-    if ($(this).hasClass("isFavorited")) {
-      $(this).html('&#9733');
-    } else {
-      $(this).html('&#9734');
-
-    }
-  });
-
-  $(".favoriteIcon").hover(
-    function() {
-      $(this).addClass('mouseOver');
-    },
-    function() {
-      $(this).removeClass('mouseOver');
-      // After mouse leaves update back end
-      if ($(this).hasClass('isFavorited')) {
-        favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
-      } else {
-        favorites_album.remove_content(last_clicked_content);
-        already_favorited = false;
-      }
-    }
-  );
-
 });
 
 function new_plist(name, callback) {
@@ -944,31 +961,6 @@ function remove_from_site() {
   model.remove_selected_contents_from_selected_album(true, callback);
 }
 
-
-$('#children-albums').on('show hide', function (e) {
-  // if($(e.target).attr("id") != "children-albums")return;
-  $('#collapse-children').toggleClass('icon-arrow-left icon-arrow-down', 200);
-});
-
-$('#special-albums').on('show hide', function (e) {
-  console.log("work!!!");
-  // if($(e.target).attr("id") != "special-albums")return;
-  $('#collapse-special').toggleClass('icon-arrow-left icon-arrow-down', 200);
-});
-
-$('#automatic-albums').on('show hide', function (e) {
-  console.log("work!!!");
-  // if($(e.target).attr("id") != "automatic-albums")return;
-  $('#collapse-automatic').toggleClass('icon-arrow-left icon-arrow-down', 200);
-});
-
-$('#user-created-albums').on('show hide', function (e) {
-  console.log("work!!!");
-  // if($(e.target).attr("id") != "user-created-albums")return;
-  $('#collapse-user').toggleClass('icon-arrow-left icon-arrow-down', 200);
-});
-
-
 </script>
 {% endblock %}
 
@@ -1017,7 +1009,7 @@ $('#user-created-albums').on('show hide', function (e) {
         <div class="text-center"><button class="btn create" onclick="new_album()">Create</button></div>
       </div>
 
-    </disabledv><!--/span-->
+    </div><!--/span-->
     <div id="content-well" class="span9">
       <div>
         <div align="right" id="undo_div" style="visibility:hidden;color:orange">
@@ -1093,10 +1085,9 @@ $('#user-created-albums').on('show hide', function (e) {
     <div class="row-fluid">
       <div class="span6" id="leftCol">
         <img class="imageHolder" id="modalImage" src=""></img>
-        <div class="favoriteIcon">&#9734</div>
-          <!--
-          <button class="btn favorited"> Favorited </button>
-        -->
+        <div id="favoriteStatus">
+          
+        </div>
       </div>
       <div class="span5 offset1" id="rightCol">
         <h4> Album Membership </h4>
