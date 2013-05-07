@@ -60,18 +60,22 @@ $(function() {
   <!-- TITLE -->
   <div class="row-fluid">
     <div class="span12" align="center">
-      <h1 class="text-center"><span id="coshare-title">Welcome to CoShare!</span></h1>
-      <i><h2>Manage your content - <b>together</b>.</h2></i>
+      <h1 class="text-center"><span id="coshare-title">CoShare</span></h1>
+      <i><h3>Manage your children's content together.</h3></i>
     </div>
   </div>
+  {% if queue_size > 0 %}
   <div class="row-fluid">
-    <div class="span4"></div>
-    <div class="span4 alert alert-error">
-      <span>Hey, you've got stuff in your queue!</span>
-      <button class="btn btn-danger pull-right" onclick="window.location.href='/browse/?id={{userprof.queue.id}}'">Go!</button>
+    <div class="span3"></div>
+    <div class="span6 alert alert-error">
+      <div style="vertical-align:middle; padding-top: 6px;">
+        <span>You have <b>{{queue_size}}</b> item{% if queue_size > 1 %}s{% endif %} in your queue.</span>
+        <button class="btn btn-danger pull-right" onclick="window.location.href='/browse/?id={{userprof.queue.id}}'">Review Your Queue</button>
+      </div>
     </div>
-    <div class="span4"></div>
+    <div class="span3"></div>
   </div>
+  {% endif %}
   <!-- BRUNT OF CONTENT -->
   <div class="row-fluid">
     <!-- POPULAR ALBUMS -->
@@ -84,7 +88,6 @@ $(function() {
                 <h2>{{album.name}}</h2>
                 <button class="btn btn-success album-button" onclick="window.location='/browse/?id={{album.id}}'">Go to Album</button>  
               </div>
-              <div >
               {% for content in album.content.all %}
               {% if content.is_video %}
               <video  class="content" src="/media/{{content.image}}" height="100" width="100"></video>
@@ -93,7 +96,6 @@ $(function() {
 
               {% endif %}
               {% endfor %}
-              </div>
             </div>
           </div>
         {% endfor %}
