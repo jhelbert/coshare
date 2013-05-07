@@ -119,6 +119,10 @@ var Model = function() {
         this.selected_contents = [];
     }
 
+    this.deselect_album = function(album){
+        this.fireEvent("deselect_album", album);
+    }
+
 
     // i'm really sorry about this name
     this.remove_selected_contents_from_selected_album = function(del, callback) {
