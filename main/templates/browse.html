@@ -485,8 +485,8 @@ $('#user-created-albums').on('show hide', function (e) {
 
 /******** DESELECT ALBUM LISTENER *********/
 model.addEventListener("deselect_album", function(e) {
-  var album_div = $("#album-" + e.album.id)
-  
+  var album_div = $("#album-" + e.album.id);
+
   if (e.album.is_user_generated()) {
     make_droppable(e.album, album_div);
   } else {
@@ -497,7 +497,7 @@ model.addEventListener("deselect_album", function(e) {
   console.dir(album_div);
   album_div.removeClass("selected-album")
   .removeClass("selected-auto-album").removeClass("active");
-  album_div[0].children[0].children[1].id = "";
+  //album_div[0].children[0].children[1].id = "";
   // album_div.removeChild(album_div.lastChild);
   $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
   $("#album-" + e.album.id+ "> a > .icon-remove").remove();
