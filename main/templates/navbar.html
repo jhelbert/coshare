@@ -10,7 +10,18 @@
       <div class="nav-collapse collapse">
         <p class="navbar-text pull-right">
           {% if userprof %}
+          <!--
           Hi {{name}}<button class="btn-warning" onclick="window.location.href='/logout/';" style="margin-left:20px; margin-top:-3px">Logout</button></a>
+        -->
+          <div class="btn-group pull-right">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+              {{name}}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="/logout/">Logout</a></li>
+            </ul>
+          </div>
           {% endif %}
         </p>
         <ul class="nav">
