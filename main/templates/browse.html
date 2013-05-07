@@ -38,6 +38,7 @@ var last_removed_content_list = [];
 var last_removed_content_album;
 var album_map = {};
 var favorites_album;
+var recently_favorited;
 var current_album;
 var album_list = [];
 var pckry;
@@ -159,6 +160,9 @@ The model will propagate the appropriate effects.s
     var childPlaylist = false;
     if (e.album.get_name() == "Favorites") {
       favorites_album = e.album;
+    }
+    if (e.album.get_name() == "Recently Favorited") {
+      recently_favorited = e.album;
     }
 
     for (var i=0; i < child_list.length; i++) {
@@ -488,7 +492,6 @@ model.addEventListener("remove_content", function(e) {
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
   $("#remove_button")[0].style.display = "block";
-  update_selection_count();
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
   content_div.addClass("selected-content");
@@ -730,7 +733,8 @@ model.addEventListener("deselect_content", function(e) {
       $("#favoriteStatus").html("<i class='icon-thumbs-up'></i> In Favorites </span> <br>");
       var a = $("<a class='removeFavoriteLink'> Remove </a>");
       a.click(function() {
-        favorites_album.remove_content(last_clicked_content);
+        favorites_album.remove_content(new Content(image_info["id"],image_info['src'],image_info['height']));
+        recently_favorited.remove_content(new Content(image_info["id"],image_info['src'],image_info['height']));
         already_favorited = false;
         populateModal(image,id_val);
       });
@@ -741,6 +745,7 @@ model.addEventListener("deselect_content", function(e) {
       var a = $("<a class='favoriteLink'> Add to Favorites </a>");
       a.click(function() {
         favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
+        recently_favorited.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
         populateModal(image,id_val);
       });
       $("#favoriteStatus").append(a);
@@ -787,11 +792,39 @@ var albumClick = function(albumName) {
 
     // Get correct album
     var match;
+    var text;
+    albumName = albumName.trim();
     //console.log($("#albums-container").find("li"));
-    $("#albums-container").find("li").each(function(index,element) {
-      console.log(index,element);
-      if ($(element).text().toString() == albumName) {
-        match = $(element);
+    $("#children-albums").find("a").each(function(index,element) {
+      text = $(element).text();
+      text = text.trim();
+
+      if (text.indexOf(albumName) == 0) {
+        match = $(element).parent();
+      }
+    });
+
+    $("#automatic-albums").find("a").each(function(index,element) {
+      text = $(element).text();
+      text = text.trim();
+      if (text.indexOf(albumName) == 0) {
+        match = $(element).parent();
+      }
+    });
+
+    $("#special-albums").find("a").each(function(index,element) {
+      text = $(element).text();
+      text = text.trim();
+      if (text.indexOf(albumName) == 0) {
+        match = $(element).parent();
+      }
+    });
+
+    $("#user-created-albums").find("a").each(function(index,element) {
+      text = $(element).text();
+      text = text.trim();
+      if (text.indexOf(albumName) == 0) {
+        match = $(element).parent();
       }
     });
 
@@ -864,16 +897,19 @@ var albumClick = function(albumName) {
       url: "/save_description/",
       data: { id: id_val, description: text}
     }).done(function( msg ) {
+      var alertBox;
       $(".alert").alert('close');
       if (msg != "error") {
-        var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
+        alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
 
         $("#descriptionBox").append(alertBox);
       } else {
-        var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
+        alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
 
         $("#descriptionBox").append(alertBox);
+
       }
+      alertBox.fadeOut(3000);
       $("#editButton").html('Edit');
     });
   };
@@ -881,6 +917,7 @@ var albumClick = function(albumName) {
   $("#closeModal").click(function() {
     $(".alert").alert('close');
     $("#openModal").modal("hide");
+    model.select_album(current_album);
   });
 
   // Full screen handler
