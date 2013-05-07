@@ -7,8 +7,12 @@
         <span class="icon-bar"></span>
       </button>
       <a class="brand coshare-title" href="/" >CoShare</a>
-      <div class="nav-collapse collapse">
-        <p class="navbar-text pull-right">
+        <ul class="nav">
+          <li><a href="/"><i class="icon-home icon-white"></i> Home</a></li>
+          <li><a href="/browse/"><i class="icon-search icon-white"></i> Browse</a></li>
+          <li><a href="#" onclick="$('#uploadme').click();"><i class="icon-plus icon-white"></i> Add Content</a></li>
+          <li><a href="#" onclick="introJs().start()"><i class="icon-question-sign icon-white"></i> Help</a></li>
+        </ul>
           {% if userprof %}
           <!--
           Hi {{name}}<button class="btn-warning" onclick="window.location.href='/logout/';" style="margin-left:20px; margin-top:-3px">Logout</button></a>
@@ -23,14 +27,6 @@
             </ul>
           </div>
           {% endif %}
-        </p>
-        <ul class="nav">
-          <li><a href="/"><i class="icon-home icon-white"></i> Home</a></li>
-          <li><a href="/browse/"><i class="icon-search icon-white"></i> Browse</a></li>
-          <li><a href="#" onclick="$('#uploadme').click();"><i class="icon-plus icon-white"></i> Add Content</a></li>
-          <li><a href="#" onclick="introJs().start()"><i class="icon-question-sign icon-white"></i> Help</a></li>
-        </ul>
-      </div>
     </div>
   </div>
 </div>
