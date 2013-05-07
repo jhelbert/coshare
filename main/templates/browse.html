@@ -941,15 +941,17 @@ var albumClick = function(albumName) {
       if (msg != "error") {
         alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
 
-        $("#descriptionBox").append(alertBox);
+        $(".modal-header").append(alertBox);
       } else {
         alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
 
-        $("#descriptionBox").append(alertBox);
+        $(".modal-header").append(alertBox);
+        
 
       }
-      alertBox.fadeOut(3000);
+      $('.alert').fadeOut(3000);
       $("#editButton").html('Edit');
+      
     });
   };
 
