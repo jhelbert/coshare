@@ -381,7 +381,7 @@ def remove_content(request):
 def delete_content(request):
 	pic_id = request.POST.get('id')
 	content = Content.objects.get(id=int(pic_id))
-	content.delete()
+	content.owner = None;
 	return HttpResponse('OK')
 
 
