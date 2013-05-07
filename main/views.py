@@ -147,7 +147,7 @@ def get_recently_added(couple):
 		recently_added_plist = possible_albums.get(name="Recently Added")
 		print "got ra plist"
 		recently_added_plist.content.clear()
-		content = Content.objects.all()
+		content = query_all_album(couple).content.all()
 		for c in content:
 			if c.uploaded_date:
 				if c.uploaded_date + datetime.timedelta(days=2) > datetime.datetime.today():
@@ -245,15 +245,19 @@ def browse(request):
 		context_instance=RequestContext(request))# Create your views here.
 
 def query_all_album(couple):
-	try:
-		possible_albums = couple.albums.all()
-		all_album = possible_albums.get(auto_all=True)
-		print "got all_album"
-		all_content = Content.objects.all()
-		for content in all_content:
-			all_album.content.add(content)
-	except:
-		pass
+	possible_albums = couple.albums.all()
+	all_album = possible_albums.get(auto_all=True)
+	all_album.content.clear()
+	all_content = Content.objects.all()
+	for content in all_content:
+		for userprof in couple.members.all():
+			if userprof == content.owner:
+				print content
+				all_album.content.add(content)
+
+	all_album.save()
+	return all_album
+
 
 @csrf_exempt
 def upload(request):
@@ -284,6 +288,7 @@ def upload(request):
 		if str(index) not in delete:
 			print uploaded_content
 			new_content = Content()
+			new_content.owner = userprof
 			file_content = ContentFile(uploaded_content.read()) 
 			new_content.image.save(uploaded_content.name, file_content)
 			ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
