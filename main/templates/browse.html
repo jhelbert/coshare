@@ -26,7 +26,11 @@ CoShare - Content Manager
 <link href="{{STATIC_URL}}/css/browse.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
 
-
+<style>
+.well {
+  position: static;
+}
+</style>
 
 
 <script type="text/javascript">
@@ -303,6 +307,10 @@ model.addEventListener("select_album", function(e) {
     $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_album()">From Album</a></li>');
                  
   }
+  if (e.album.name.indexOf('Queue') != -1) {
+    $("#remove_button").attr('class', 'btn dropdown-toggle btn-success');
+    $("#remove_button")[0].innerHTML = "Remove From Queue!";
+  }
 $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_site()">From Website</a></li>');
   for (var i in model.albums) {
     var album = model.albums[i];
@@ -404,15 +412,19 @@ $("#album-" + e.album.id).addClass("select-extend");
       .addClass("empty-message")
       .addClass("text-center");
     
+    $(".empty-message").remove();
     $("#contents-container").append(message);
   }
 
   $("#content").text("content from " + e.album.get_name());
 
   $(".content").dblclick(function() {
+    /*
     if (last_clicked_content.height == 200) {
       $(".favorited").addClass("btn-success")
     }
+    */
+
     $(".alert").alert('close');
     
     $("#openModal").modal("show");
@@ -518,8 +530,12 @@ model.addEventListener("deselect_content", function(e) {
 
   // get albums from django
   // MUST APPEAR AFTER LISTENERS ARE CREATED
+  var album;
   {% for album in albums %}
-  var album = new Album({{album.id}},"{{album.name}}");
+  /*
+  {{album.name}}
+  */
+ album = new Album({{album.id}},"{{album.name}}");
   
   album_map[{{album.id}}] = album;
   album_list.push(album);
@@ -653,6 +669,7 @@ model.addEventListener("deselect_content", function(e) {
 
   $("#editButton").click(function() {
     var state = $("#editButton").html();
+    console.log(state);
     if (state.toString() == "Save Changes") {
       saveDescription();
     } else {
@@ -660,14 +677,51 @@ model.addEventListener("deselect_content", function(e) {
     }
   });
 
+  function vidplay() {
+       var video = document.getElementById("Video1");
+
+       if (video.paused) {
+          video.play();
+
+       } else {
+          video.pause();
+       }
+    }
+
   var populateModal = function(image, id_val) {
+    try {
+      $(".imageHolder")[0].style.display = "none";
+    document.getElementById("Video1").style.display = "none";
+    
+    }
+    catch (err){
+
+    }
+    if (image.indexOf('.MOV') != -1 || image.indexOf('.mov') != -1 || image.indexOf('.mp4') != -1) {
+      console.log('video');
+      var output = document.createElement('video');
+      output.src = image;
+      output.height = 150;
+      output.id = "Video1";
+
+      document.getElementById("leftCol").insertBefore(output,document.getElementById("leftCol").firstChild);
+      document.getElementById("Video1").style.display = "block";
+      output.onclick = vidplay;
+      console.log($("#leftCol"));
+    }
+    else {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
+    $(".imageHolder").css("height","");
+    $(".imageHolder")[0].style.display = "block";
+    console.dir(image);
+
 
     image_info = {};
     image_info['src'] = image.substring(7);
     image_info['id'] = id_val;
     image_info['height'] = $(this).children("img").attr("height") / 10;
+  }
     already_favorited = false;
     // Add favorited icon to reflect picture
     if (favorites_album.content_in(id_val)) {
@@ -718,16 +772,48 @@ var albumClick = function(albumName) {
 
     // Get correct album
     var match;
-    //console.log($("#albums-container").find("li"));
-    $("#albums-container").find("li").each(function(index,element) {
-      console.log(index,element);
-      if ($(element).text().toString() == albumName) {
+    albumName = albumName.trim();
+    if (albumName.indexOf("My Queue") != -1) {
+      albumName = "Your Queue";
+    }
+
+    $("#children-albums").find("a").each(function(index,element) {
+      var text = $(element).text();
+      if (text.trim() == albumName) {
+        match = $(element);
+      }
+    });
+
+    $("#automatic-albums").find("a").each(function(index,element) {
+      var text = $(element).text();
+      if (text.trim() == albumName) {
+        match = $(element);
+      }
+    });
+
+    $("#special-albums").find("a").each(function(index,element) {
+      var text = $(element).text();
+      console.log(text,albumName);
+      
+      if (text.indexOf("Queue") != -1) {
+        text = text.substring(0,text.length - 2);
+      }
+      if (text.trim() == albumName) {
+        match = $(element);
+      }
+    });
+
+
+
+    $("#user-created-albums").find("a").each(function(index,element) {
+      var text = $(element).text();
+      if (text.trim() == albumName) {
         match = $(element);
       }
     });
 
     // Get album object
-    var id = match.attr("id");
+    var id = match.parent().attr("id");
     id = id.substring(6);
     var album;
     for (var i=0; i < model.albums.length; i++) {
@@ -747,6 +833,7 @@ var albumClick = function(albumName) {
     editDescription();
   });
 
+  /*
   $(".imageDescription").blur(function(){
     if (mousedownHappened) {
       mousedownHappened = false;
@@ -759,9 +846,12 @@ var albumClick = function(albumName) {
   }
   );
 
+
   $("#cancelButton").mousedown(function() {
     mousedownHappened = true;
 });
+
+*/
 
   $("#cancelButton").click(function (){
     $(".imageDescription")[0].innerHTML = cached_description;
@@ -789,6 +879,7 @@ var albumClick = function(albumName) {
     text = text.trim();
     $('.imageDescription').attr("contenteditable",false);
     var id_val = $(".imageHolder").attr("id-num").toString();
+    var alertBox;
     // send new text value to the server
     $.ajax({
       type: "POST",
@@ -797,17 +888,22 @@ var albumClick = function(albumName) {
     }).done(function( msg ) {
       $(".alert").alert('close');
       if (msg != "error") {
-        var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
+        alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
 
         $("#descriptionBox").append(alertBox);
       } else {
-        var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
+        alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
 
         $("#descriptionBox").append(alertBox);
       }
       $("#editButton").html('Edit');
+      fadeAlert(alertBox);
     });
   };
+
+  var fadeAlert = function(alert) {
+    alert.fadeOut(3000);
+  }
 
   $("#closeModal").click(function() {
     $(".alert").alert('close');

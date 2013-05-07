@@ -120,7 +120,13 @@ def main(request):
 		fav_1 = None
 		fav_2 = None
 
+	# ignore shit above, below is what counts
 
+	albums = [couple.albums.get(name=x) for x in ("All Content",
+										     "Recently Added",
+										     "Recently Favorited")]
+
+	albums = [album for album in albums if len(album.content.all()) > 0]
 
 	return render_to_response('index.html', 
 		{
@@ -128,9 +134,10 @@ def main(request):
 			"recently_added_2":recently_added_2,
 			"favs_1":fav_1,
 			"favs_2": fav_2,
-			"userprof":user,
+			"userprof":userprof,
 			"name":name,
-			"children":children
+			"children":children,
+			"albums": albums,
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -199,7 +206,10 @@ def new_plist(request):
 	return HttpResponseRedirect('/')
 
 def browse(request):
-	
+	user = get_user(request)
+	name = None
+	if user:
+		name = user.first_name + " " + user.last_name
 
 	userprof = get_user_profile(request)
 
@@ -228,7 +238,9 @@ def browse(request):
 		 "albums":albums,
 		 "selected_album": selected_album,
 		 "user_queue_id": userprof.queue.id,
-		 "children":children
+		 "children":children,
+		 "userprof":user,
+		 "name":name
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -326,9 +338,11 @@ def remove_album(request):
 def add_content(request):
 	album_id = request.POST.get('album_id')
 	pic_id = request.POST.get('pic_id')
+	print "pic_id:%s" % pic_id
 	album = Album.objects.get(id=int(album_id))
 	print 'got plist'
 	content = Content.objects.get(id=int(pic_id))
+	print "got content"
 	if album.name == "Favorites":
 		content.metric = 20
 		content.save()
