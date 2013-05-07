@@ -26,11 +26,7 @@ CoShare - Content Manager
 <link href="{{STATIC_URL}}/css/browse.css" rel="stylesheet">
 <link href='http://fonts.googleapis.com/css?family=Autour+One' rel='stylesheet' type='text/css'>
 
-<style>
-.well {
-  position: static;
-}
-</style>
+
 
 
 <script type="text/javascript">
@@ -307,10 +303,6 @@ model.addEventListener("select_album", function(e) {
     $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_album()">From Album</a></li>');
                  
   }
-  if (e.album.name.indexOf('Queue') != -1) {
-    $("#remove_button").attr('class', 'btn dropdown-toggle btn-success');
-    $("#remove_button")[0].innerHTML = "Remove From Queue!";
-  }
 $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_site()">From Website</a></li>');
   for (var i in model.albums) {
     var album = model.albums[i];
@@ -412,19 +404,15 @@ $("#album-" + e.album.id).addClass("select-extend");
       .addClass("empty-message")
       .addClass("text-center");
     
-    $(".empty-message").remove();
     $("#contents-container").append(message);
   }
 
   $("#content").text("content from " + e.album.get_name());
 
   $(".content").dblclick(function() {
-    /*
     if (last_clicked_content.height == 200) {
       $(".favorited").addClass("btn-success")
     }
-    */
-
     $(".alert").alert('close');
     
     $("#openModal").modal("show");
@@ -440,6 +428,30 @@ $("#album-" + e.album.id).addClass("select-extend");
 
   });
 });
+
+$('#children-albums').on('show hide', function (e) {
+  // if($(e.target).attr("id") != "children-albums")return;
+  $('#collapse-children').toggleClass('icon-arrow-left icon-arrow-down', 200);
+});
+
+$('#special-albums').on('show hide', function (e) {
+  console.log("work!!!");
+  // if($(e.target).attr("id") != "special-albums")return;
+  $('#collapse-special').toggleClass('icon-arrow-left icon-arrow-down', 200);
+});
+
+$('#automatic-albums').on('show hide', function (e) {
+  console.log("work!!!");
+  // if($(e.target).attr("id") != "automatic-albums")return;
+  $('#collapse-automatic').toggleClass('icon-arrow-left icon-arrow-down', 200);
+});
+
+$('#user-created-albums').on('show hide', function (e) {
+  console.log("work!!!");
+  // if($(e.target).attr("id") != "user-created-albums")return;
+  $('#collapse-user').toggleClass('icon-arrow-left icon-arrow-down', 200);
+});
+
 
 /******** DESELECT ALBUM LISTENER *********/
 model.addEventListener("deselect_album", function(e) {
@@ -530,12 +542,8 @@ model.addEventListener("deselect_content", function(e) {
 
   // get albums from django
   // MUST APPEAR AFTER LISTENERS ARE CREATED
-  var album;
   {% for album in albums %}
-  /*
-  {{album.name}}
-  */
- album = new Album({{album.id}},"{{album.name}}");
+  var album = new Album({{album.id}},"{{album.name}}");
   
   album_map[{{album.id}}] = album;
   album_list.push(album);
@@ -669,7 +677,6 @@ model.addEventListener("deselect_content", function(e) {
 
   $("#editButton").click(function() {
     var state = $("#editButton").html();
-    console.log(state);
     if (state.toString() == "Save Changes") {
       saveDescription();
     } else {
@@ -677,51 +684,14 @@ model.addEventListener("deselect_content", function(e) {
     }
   });
 
-  function vidplay() {
-       var video = document.getElementById("Video1");
-
-       if (video.paused) {
-          video.play();
-
-       } else {
-          video.pause();
-       }
-    }
-
   var populateModal = function(image, id_val) {
-    try {
-      $(".imageHolder")[0].style.display = "none";
-    document.getElementById("Video1").style.display = "none";
-    
-    }
-    catch (err){
-
-    }
-    if (image.indexOf('.MOV') != -1 || image.indexOf('.mov') != -1 || image.indexOf('.mp4') != -1) {
-      console.log('video');
-      var output = document.createElement('video');
-      output.src = image;
-      output.height = 150;
-      output.id = "Video1";
-
-      document.getElementById("leftCol").insertBefore(output,document.getElementById("leftCol").firstChild);
-      document.getElementById("Video1").style.display = "block";
-      output.onclick = vidplay;
-      console.log($("#leftCol"));
-    }
-    else {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
-    $(".imageHolder").css("height","");
-    $(".imageHolder")[0].style.display = "block";
-    console.dir(image);
-
 
     image_info = {};
     image_info['src'] = image.substring(7);
     image_info['id'] = id_val;
     image_info['height'] = $(this).children("img").attr("height") / 10;
-  }
     already_favorited = false;
     // Add favorited icon to reflect picture
     if (favorites_album.content_in(id_val)) {
@@ -772,48 +742,16 @@ var albumClick = function(albumName) {
 
     // Get correct album
     var match;
-    albumName = albumName.trim();
-    if (albumName.indexOf("My Queue") != -1) {
-      albumName = "Your Queue";
-    }
-
-    $("#children-albums").find("a").each(function(index,element) {
-      var text = $(element).text();
-      if (text.trim() == albumName) {
-        match = $(element);
-      }
-    });
-
-    $("#automatic-albums").find("a").each(function(index,element) {
-      var text = $(element).text();
-      if (text.trim() == albumName) {
-        match = $(element);
-      }
-    });
-
-    $("#special-albums").find("a").each(function(index,element) {
-      var text = $(element).text();
-      console.log(text,albumName);
-      
-      if (text.indexOf("Queue") != -1) {
-        text = text.substring(0,text.length - 2);
-      }
-      if (text.trim() == albumName) {
-        match = $(element);
-      }
-    });
-
-
-
-    $("#user-created-albums").find("a").each(function(index,element) {
-      var text = $(element).text();
-      if (text.trim() == albumName) {
+    //console.log($("#albums-container").find("li"));
+    $("#albums-container").find("li").each(function(index,element) {
+      console.log(index,element);
+      if ($(element).text().toString() == albumName) {
         match = $(element);
       }
     });
 
     // Get album object
-    var id = match.parent().attr("id");
+    var id = match.attr("id");
     id = id.substring(6);
     var album;
     for (var i=0; i < model.albums.length; i++) {
@@ -833,7 +771,6 @@ var albumClick = function(albumName) {
     editDescription();
   });
 
-  /*
   $(".imageDescription").blur(function(){
     if (mousedownHappened) {
       mousedownHappened = false;
@@ -846,12 +783,9 @@ var albumClick = function(albumName) {
   }
   );
 
-
   $("#cancelButton").mousedown(function() {
     mousedownHappened = true;
 });
-
-*/
 
   $("#cancelButton").click(function (){
     $(".imageDescription")[0].innerHTML = cached_description;
@@ -879,7 +813,6 @@ var albumClick = function(albumName) {
     text = text.trim();
     $('.imageDescription').attr("contenteditable",false);
     var id_val = $(".imageHolder").attr("id-num").toString();
-    var alertBox;
     // send new text value to the server
     $.ajax({
       type: "POST",
@@ -888,22 +821,17 @@ var albumClick = function(albumName) {
     }).done(function( msg ) {
       $(".alert").alert('close');
       if (msg != "error") {
-        alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
+        var alertBox = $("<div class='alert alert-block alert-success'> Description was updated. </div>");
 
         $("#descriptionBox").append(alertBox);
       } else {
-        alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
+        var alertBox = $("<div class='alert alert-block alert-error'> <strong> ERROR!</strong> Description was not updated. </div>");
 
         $("#descriptionBox").append(alertBox);
       }
       $("#editButton").html('Edit');
-      fadeAlert(alertBox);
     });
   };
-
-  var fadeAlert = function(alert) {
-    alert.fadeOut(3000);
-  }
 
   $("#closeModal").click(function() {
     $(".alert").alert('close');
@@ -1040,6 +968,7 @@ $('#user-created-albums').on('show hide', function (e) {
   $('#collapse-user').toggleClass('icon-arrow-left icon-arrow-down', 200);
 });
 
+
 </script>
 {% endblock %}
 
@@ -1051,27 +980,27 @@ $('#user-created-albums').on('show hide', function (e) {
       <div class="well album-well sidebar-nav">
         <div id="albums-container">
           <ul class="nav nav-list">
-              <li class="nav-header">Children Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#children-albums"><i class="icon-arrow-down" id="collapse-children"></i></button></li>
+              <li class="nav-header glyph-color">Children Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#children-albums"><i class="icon-arrow-down" id="collapse-children"></i></button></li>
           </ul>
-          <ul id="children-albums" class="nav nav-list"></ul>
+          <ul id="children-albums" class="nav nav-list in collapse albums"></ul>
         </div>
       </div>
 
       <div class="well album-well sidebar-nav">
         <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
           <ul class="nav nav-list">
-            <li class="nav-header">Standard Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#automatic-albums"><i class="icon-arrow-down" id="collapse-automatic"></i></button></li>
+            <li class="nav-header glyph-color">Standard Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#automatic-albums"><i class="icon-arrow-down" id="collapse-automatic"></i></button></li>
           </ul>
-          <ul id="automatic-albums" class="nav nav-list in collapse" data-intro="These albums are automatically generated for you by us." data-step='2'></ul>
+          <ul id="automatic-albums" class="nav nav-list in collapse albums" data-intro="These albums are automatically generated for you by us." data-step='2'></ul>
         </div>
       </div>
 
       <div class="well album-well sidebar-nav">
         <div id="albums-container">
             <ul class="nav nav-list">
-              <li class="nav-header">Edit Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#special-albums"><i class="icon-arrow-down" id="collapse-special"></i></button></li>
+              <li class="nav-header glyph-color">Edit Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#special-albums"><i class="icon-arrow-down" id="collapse-special"></i></button></li>
             </ul>
-            <ul id="special-albums" class="nav nav-list in collapse" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+            <ul id="special-albums" class="nav nav-list in collapse albums" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
             </ul>
         </div>
       </div>
@@ -1079,16 +1008,16 @@ $('#user-created-albums').on('show hide', function (e) {
       <div class="well album-well sidebar-nav">
         <div id="albums-container">
             <ul class="nav nav-list">
-              <li class="nav-header">Your Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#user-created-albums"><i class="icon-arrow-down" id="collapse-user"></i></button></li>
+              <li class="nav-header glyph-color">Your Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#user-created-albums"><i class="icon-arrow-down" id="collapse-user"></i></button></li>
             </ul>
-            <ul id="user-created-albums" class="nav nav-list in collapse" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
+            <ul id="user-created-albums" class="nav nav-list in collapse albums" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
           </ul>
           <input name="name" id="new_plist" type="text"/>
         </div>
         <div class="text-center"><button class="btn create" onclick="new_album()">Create</button></div>
       </div>
 
-    </div><!--/span-->
+    </disabledv><!--/span-->
     <div id="content-well" class="span9">
       <div>
         <div align="right" id="undo_div" style="visibility:hidden;color:orange">
