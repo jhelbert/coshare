@@ -134,7 +134,7 @@ def main(request):
 			"recently_added_2":recently_added_2,
 			"favs_1":fav_1,
 			"favs_2": fav_2,
-			"userprof":user,
+			"userprof":userprof,
 			"name":name,
 			"children":children,
 			"albums": albums,
