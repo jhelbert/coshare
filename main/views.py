@@ -378,15 +378,19 @@ def remove_content(request):
 		content.metric = int(random.random() * 6) + 8
 		content.save()
 	print 'got content'
-	album.content.remove(content)
-	album.save()
+	userprof = get_user_profile(request)
+	couple = get_couple(userprof)
+	for a in couple.albums.all():
+		a.content.remove(content)
+		a.save()
 	return HttpResponse("%i" % (len(album.content.all()), ))
 
 @csrf_exempt
 def delete_content(request):
 	pic_id = request.POST.get('id')
 	content = Content.objects.get(id=int(pic_id))
-	content.owner = None;
+	content.owner = None
+	content.save()
 	return HttpResponse('OK')
 
 

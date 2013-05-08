@@ -39,8 +39,8 @@
           div.id = "divx" + i;
           div.style.float = "left";
           substrings = ['mov','MOV','mp4'];
-        var output;
-        if (new RegExp(substrings.join("|")).test(e.target.result)) {
+          var output;
+          if (new RegExp(substrings.join("|")).test(e.target.result)) {
             output = document.createElement('label');
             output.style.float = "left";
             output.innerHTML = "Video";
