@@ -179,7 +179,7 @@ def get_recently_favorited(couple):
 		pass
 
 
-def mobile(request):
+def mobile(request,confirmed=False):
 	user_albums = []
 	all_albums = Album.objects.all()
 	for album in all_albums:
@@ -188,7 +188,8 @@ def mobile(request):
 	print user_albums
 	return render_to_response('mobile.html', 
 		{
-			"albums":user_albums
+			"albums":user_albums,
+			"confirmed":confirmed
 		},
 		context_instance=RequestContext(request))# Create your views here.
 
@@ -312,6 +313,8 @@ def upload(request):
 			print "not uploading index:%i" % index
 		index += 1
 
+	if mobile:
+		return HttpResponseRedirect('/mobile_confirm/')
 	return HttpResponseRedirect('/browse/')
 
 @csrf_exempt
