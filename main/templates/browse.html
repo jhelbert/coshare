@@ -338,12 +338,14 @@ model.addEventListener("select_album", function(e) {
   $("#remove_button")[0].style.display = "none";
   var dropdown = $('#remove_dropdown')[0];
   dropdown.innerHTML = "";
-  if (e.album.name != "All Content" && e.album.name != "Recently Added" && e.album.name && "Recently Favorited") {
+  if (e.album.name != "All Content" && e.album.name != "Recently Added" && e.album.name && "Recently Favorited" && e.album.name.indexOf('Queue') == -1) {
     $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_album()">From Album</a></li>');
                  
   }
   if (e.album.name.indexOf('Queue') != -1) {
-    $("#remove_button").attr('class', 'btn dropdown-toggle btn-success');
+    $("#remove_button").attr('class', 'btn btn-success');
+    $("#remove_button").attr('onclick', 'remove_from_album()');
+    $("#remove_button").attr('data-toggle', 'none');
     $("#remove_button")[0].innerHTML = "Remove From Queue!";
   } else {
 
