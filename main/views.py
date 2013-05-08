@@ -358,9 +358,13 @@ def add_content(request):
 		content.save()
 	print 'got content'
 	album.content.add(content)
+	userprof = get_user_profile(request)
+	print 'got userprof'
+	content.owner = userprof
 	album.save()
 	print album.content.all()
-	userprof = get_user_profile(userprof)
+	
+
 
 	if album.name == "Favorites":
 		content.favorited_time = datetime.datetime.now()
