@@ -1096,7 +1096,7 @@ function remove_from_site() {
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span4">
+    <div class="span4" data-intro='Here are all your albums.' data-step='0'>
       <div class="well album-well sidebar-nav">
         <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
           <ul class="nav nav-list">
@@ -1132,7 +1132,7 @@ function remove_from_site() {
             </ul>
             <ul id="user-created-albums" class="nav nav-list in collapse albums">
           </ul>
-          <input name="name" id="new_plist" type="text"/>
+          <input data-intro='Create new albums here. You can even drag and drop onto it.' data-step='4' name="name" id="new_plist" type="text"/>
         </div>
         <div class="text-center"><button class="btn create" onclick="new_album()">Create Album</button></div>
       </div>
@@ -1149,13 +1149,13 @@ function remove_from_site() {
         <!-- TITLE -->
         <div id="row-fluid">
           <div class="span12">
-            <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop These pieces of content between Albums.' data-step='5'></h2>
+            <h2 align="center" style="line-height:100%" id="album-title"></h2>
           </div>
         </div>
         <!-- Selection -->
         <div class="row-fluid">
           <!-- left buttons -->
-          <div class="span5">
+          <div class="span5" data-intro='Quickly select and deselect all content from the current album.' data-step='5'>
 
            <button class="btn btn-primary" id="btnSelectAll">Select All</button>
            <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
@@ -1181,7 +1181,7 @@ function remove_from_site() {
 
         <!-- slider row -->
         <div align="center" class="row-fluid">
-          <table data-intro='This allows dynamic sizing of your content. Try it out!' data-step='5'>
+          <table data-intro='This allows dynamic sizing of your content. Try it out!' data-step='6'>
             <tr>
               <td><i class="icon-zoom-out"></i></td>
               <td><div id="slider" class="slider" /></td>
