@@ -23,7 +23,16 @@ $(function() {
       gutter: 10,
     });
   });
-})
+
+  var fading = "img, video";
+  var fade = 0.6;
+  $(fading).fadeTo(500, fade);
+  $(".well").hover(function() {
+    $(this).find(fading).fadeTo(500, 1);
+  }, function() {
+    $(this).find(fading).fadeTo(100, fade);
+  });
+});
 </script>
 {% endblock %}
 
