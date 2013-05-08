@@ -40,11 +40,11 @@
           div.style.float = "left";
           substrings = ['mov','MOV','mp4'];
           var output;
-          if (new RegExp(substrings.join("|")).test(e.target.result)) {
+          console.log(e.target.result);
+          if (e.target.result.indexOf('video') != -1) {
             output = document.createElement('label');
             output.style.float = "left";
             output.innerHTML = "Video";
-            console.log(e);
 
     // At least one match
         }
