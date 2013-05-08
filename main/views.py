@@ -360,10 +360,11 @@ def add_content(request):
 	album.content.add(content)
 	album.save()
 	print album.content.all()
+	userprof = get_user_profile(userprof)
 
 	if album.name == "Favorites":
 		content.favorited_time = datetime.datetime.now()
-		content.save()
+	content.save()
 
 	return HttpResponse("%i" % (len(album.content.all()), ))
 
