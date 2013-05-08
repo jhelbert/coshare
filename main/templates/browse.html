@@ -123,9 +123,13 @@ $(function() {
       document.execCommand('selectAll', false, null);
 
       $("#selected-span").blur(function(){
+        $("#remove").css("visibility", "visible");
         $(this).attr("contenteditable",false);
         $(this).removeClass("editable");
-        rename_album($(this)[0].innerHTML);
+        rename_album($(this)[0].innerHTML, function() {
+          window.location ="/browse/?id="+album.id;
+          
+        });
         }
       );
 
@@ -134,7 +138,9 @@ $(function() {
           $(this).blur();
           $(this).attr("contenteditable",false);
           $(this).removeClass("editable");
-          rename_album($(this)[0].innerHTML);
+          rename_album($(this)[0].innerHTML, function() {
+            window.location ="/browse/?id="+album.id;
+          });
         }
       });
 
@@ -148,9 +154,8 @@ $(function() {
       });
 
       $(".perform_delete").click(function(){
-        remove_album();
+        remove_album(model.selected_album.id);
         $('#confirm-delete').modal('hide');
-        location.reload();
       });
     });
 
@@ -234,12 +239,6 @@ The model will propagate the appropriate effects.s
       .click(function() {
         console.dir(this)
         console.dir(this.classList)
-        if (this.classList[2] == "active"){
-          return false;
-        }
-        else{
-        model.select_album(e.album);
-      }
       });
       nameSpan.innerHTML = e.album.get_name();
       link.innerHTML = icon.outerHTML+ nameSpan.outerHTML + " &nbsp;";
@@ -268,14 +267,6 @@ The model will propagate the appropriate effects.s
       /**.addClass("album-name")**/
       album_li
       .attr("id", "album-" + e.album.id)
-      .click(function() {
-       if (this.classList[2] == "active"){
-          return false;
-        }
-        else{
-        model.select_album(e.album);
-      }
-      });
       link.innerHTML = icon.outerHTML+ e.album.get_name() + " ";
       if (e.album.id === user_queue_id) {
         link.innerHTML = icon.outerHTML + "Your Queue ";
@@ -480,6 +471,10 @@ $("#album-" + e.album.id).addClass("select-extend");
   });
 });
 
+////////////////////////////////////////////////////////
+////////////// Album Collapse Listeners  ///////////////
+////////////////////////////////////////////////////////
+
 $('#children-albums').on('show hide', function (e) {
   $('#collapse-children').toggleClass('icon-arrow-left icon-arrow-down', 200);
 });
@@ -505,18 +500,15 @@ model.addEventListener("deselect_album", function(e) {
     make_droppable(e.album, album_div);
   } else {
     album_div.droppable();
-
   }
-  var pencil = document.getElementById("pencil");
-  console.dir(album_div);
+
   album_div.removeClass("selected-album")
   .removeClass("selected-auto-album").removeClass("active");
-  //album_div[0].children[0].children[1].id = "";
-  // album_div.removeChild(album_div.lastChild);
+
+  $("#selected-span").removeAttr("id");
+
   $("#album-" + e.album.id+ "> a > .icon-pencil").remove();
   $("#album-" + e.album.id+ "> a > .icon-remove").remove();
-
-  // album_div.remove(album_div.find(pencil));
 });
 
 /********** REMOVE ALBUM LISTENER *********/
@@ -531,8 +523,8 @@ model.addEventListener("remove_content", function(e) {
   $("#content-" + e.content.id).each(function(i, v) {
     last_removed_content_list.push(e.content);
     pckry.remove(v);
-    
   });
+
   $("#undo_div")[0].style.visibility="visible";
   pckry.layout();
 });
@@ -616,7 +608,6 @@ model.addEventListener("deselect_content", function(e) {
       model.select_album(album_list[i]);
       valid_album = true;
     }
-
   }
 
   if (!valid_album) {
@@ -624,13 +615,14 @@ model.addEventListener("deselect_content", function(e) {
   }
 
 
-  // CRUD operations on albums
+  //////////////////////////////////////////////////////
+  ////////////// Rename Album Listeners  ///////////////
+  //////////////////////////////////////////////////////
 
   $("#pencil").mousedown(function(e) {
     pencilDown = true;
   });
 
-  // Event listener for edit pencil - editing albums
   $(".active > .album-name >#pencil").click(function(e){
     if (!pencilSave){
       $("#remove").css("visibility", "hidden");
@@ -670,8 +662,8 @@ model.addEventListener("deselect_content", function(e) {
         document.execCommand('unselect', false, null);
       }
       pencilDown = false;
+      // return false;
     });
-    return false;
     });
 
    $("#selected-span").blur(function(){
@@ -696,15 +688,18 @@ model.addEventListener("deselect_content", function(e) {
     }
   });
 
-  function rename_album(name) {
+  function rename_album(name, callback) {
     var id = $(".selected-album")[0].id.split("-")[1];
     $.ajax({
       type: "POST",
       url: "/ajax/rename_album/",
       data: { name:name, album_id:id }
-    }).done(function( msg ) {
-    });
+    }).done(callback);
   }
+
+  ////////////////////////////////////////////////////////
+  ////////////// Remove Album Listeners  ///////////////
+////////////////////////////////////////////////////////
 
    $(".selected-album > .album-name >#remove").click(function(e){
     $('#confirm-delete').modal('show');
@@ -727,26 +722,21 @@ model.addEventListener("deselect_content", function(e) {
   });
 
   $(".perform_delete").click(function(){
-    remove_album();
+    remove_album(model.selected_album.id);
     $('#confirm-delete').modal('hide');
-    location.reload();
   });
 
-  function remove_album() {
-    var album_id = $(".selected-album")[0].id.split("-")[1];
+  function remove_album(album_id) {
     $.ajax({
       type: "POST",
       url: "/ajax/remove_album/",
       data: {album_id:album_id}
-    }).done(function( msg ) {
-    });
+    }).done(location.reload());
   }
 
-  // create
-
-  $("#btnRenameAlbum").click(function() {
-    model.rename_selected_album();
-  });
+////////////////////////////////////////////////////////
+  ////////////// Album Button Listeners  ///////////////
+////////////////////////////////////////////////////////
 
   $("#btnRemoveAlbum").click(function() {
     model.remove_selected_album();
@@ -761,14 +751,9 @@ model.addEventListener("deselect_content", function(e) {
     model.deselect_all();
   });
 
-  $("#editButton").click(function() {
-    var state = $("#editButton").html();
-    if (state.toString() == "Save Changes") {
-      saveDescription();
-    } else {
-      editDescription();
-    }
-  });
+  ////////////////////////////////////////////////////////
+  ////////////// Video Play  ///////////////////////
+////////////////////////////////////////////////////////
 
   function vidplay() {
        var video = document.getElementById("Video1");
@@ -788,10 +773,8 @@ model.addEventListener("deselect_content", function(e) {
     try {
       $(".imageHolder")[0].style.display = "none";
     document.getElementById("Video1").style.display = "none";
-    
     }
     catch (err){
-
     }
     if (image.indexOf('.MOV') != -1 || image.indexOf('.mov') != -1 || image.indexOf('.mp4') != -1) {
       console.log('video');
@@ -803,15 +786,12 @@ model.addEventListener("deselect_content", function(e) {
       document.getElementById("leftCol").insertBefore(output,document.getElementById("leftCol").firstChild);
       document.getElementById("Video1").style.display = "block";
       output.onclick = vidplay;
-      console.log($("#leftCol"));
     }
     else {
     $(".imageHolder").attr("src",image);
     $(".imageHolder").attr("id-num",id_val);
     $(".imageHolder").css("height","");
     $(".imageHolder")[0].style.display = "block";
-    console.dir(image);
-
 
     image_info = {};
     image_info['src'] = image.substring(7);
@@ -930,6 +910,10 @@ var populate_related = function(id_val) {
     });
 }
 
+////////////////////////////////////////////////////////
+  ////////////// Album Click  ///////////////////////
+////////////////////////////////////////////////////////
+
 var albumClick = function(albumName) {
     // Close Modal
     $(".alert").alert('close');
@@ -984,12 +968,12 @@ var albumClick = function(albumName) {
         break;
       }
     }
-
-    // Trigger event to load selected album
-    //model.select_album(album);
-    
-
   }
+
+
+////////////////////////////////////////////////////////
+  //////////Content Modal Description//////////////
+////////////////////////////////////////////////////////
   $(".imageDescription").dblclick(function(){
     editDescription();
   });
@@ -1028,6 +1012,15 @@ var albumClick = function(albumName) {
     $("#editButton").html('Save Changes');
   };
 
+   $("#editButton").click(function() {
+    var state = $("#editButton").html();
+    if (state.toString() == "Save Changes") {
+      saveDescription();
+    } else {
+      editDescription();
+    }
+  });
+
 
   var saveDescription = function() {
     $("#cancelButton")[0].style.visibility = "hidden";
@@ -1059,6 +1052,10 @@ var albumClick = function(albumName) {
       
     });
   };
+
+  ////////////////////////////////////////////////////////
+  //////////////// Content Modal //////////////////////
+////////////////////////////////////////////////////////
 
   $("#closeModal").click(function() {
     $(".alert").alert('close');
@@ -1105,10 +1102,12 @@ function new_plist(name, callback) {
 
 function new_album() {
     var name = $("#new_plist")[0].value;
+    if(name!=""){
     new_plist(name, function(id) {
         var album = new Album(parseInt(id),name);
         model.add_album(album);
       });
+  }
   }
 
 function undo_remove() {
@@ -1133,7 +1132,6 @@ var update_queue_size = function(album, new_size) {
 }
 
 var callback = function(new_size) {
-  console.log("wasup");
   update_queue_size(model.selected_album, new_size)
 };
 
@@ -1151,7 +1149,7 @@ function remove_from_site() {
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span4">
+    <div class="span4" data-intro='Here are all your albums.' data-step='0'>
       <div class="well album-well sidebar-nav">
         <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
           <ul class="nav nav-list">
@@ -1187,7 +1185,7 @@ function remove_from_site() {
             </ul>
             <ul id="user-created-albums" class="nav nav-list in collapse albums">
           </ul>
-          <input name="name" id="new_plist" type="text"/>
+          <input data-intro='Create new albums here. You can even drag and drop onto it.' data-step='4' name="name" id="new_plist" type="text"/>
         </div>
         <div class="text-center"><button class="btn create" onclick="new_album()">Create Album</button></div>
       </div>
@@ -1204,13 +1202,13 @@ function remove_from_site() {
         <!-- TITLE -->
         <div id="row-fluid">
           <div class="span12">
-            <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop These pieces of content between Albums.' data-step='5'></h2>
+            <h2 align="center" style="line-height:100%" id="album-title"></h2>
           </div>
         </div>
         <!-- Selection -->
         <div class="row-fluid">
           <!-- left buttons -->
-          <div class="span5">
+          <div class="span5" data-intro='Quickly select and deselect all content from the current album.' data-step='5'>
 
            <button class="btn btn-primary" id="btnSelectAll">Select All</button>
            <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
@@ -1236,7 +1234,7 @@ function remove_from_site() {
 
         <!-- slider row -->
         <div align="center" class="row-fluid">
-          <table data-intro='This allows dynamic sizing of your content. Try it out!' data-step='5'>
+          <table data-intro='This allows dynamic sizing of your content. Try it out!' data-step='6'>
             <tr>
               <td><i class="icon-zoom-out"></i></td>
               <td><div id="slider" class="slider" /></td>
