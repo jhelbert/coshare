@@ -539,6 +539,7 @@ model.addEventListener("remove_content", function(e) {
 
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
+  update_selection_count();
   $("#remove_button")[0].style.display = "block";
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
@@ -1093,7 +1094,7 @@ function remove_from_site() {
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span3">
+    <div class="span4">
       <div class="well album-well sidebar-nav">
         <div id="albums-container">
           <ul class="nav nav-list">
@@ -1135,7 +1136,7 @@ function remove_from_site() {
       </div>
 
     </div><!--/span-->
-    <div id="content-well" class="span9">
+    <div id="content-well" class="span8">
       <div>
         <div align="right" id="undo_div" style="visibility:hidden;color:orange">
           Content Removed! <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
