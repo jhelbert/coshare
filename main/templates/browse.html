@@ -475,7 +475,7 @@ $("#album-" + e.album.id).addClass("select-extend");
     }
 
     var id_val = $(this).attr("id-num");
-    populateModal(image,id_val);
+    populateModal(image,id_val,true);
 
   });
 });
@@ -781,8 +781,10 @@ model.addEventListener("deselect_content", function(e) {
        }
     }
 
-  var populateModal = function(image, id_val) {
-    $(".albumList").empty();
+  var populateModal = function(image, id_val, pop_related) {
+    if (pop_related) {
+      $(".albumList").empty();
+    }
     try {
       $(".imageHolder")[0].style.display = "none";
     document.getElementById("Video1").style.display = "none";
@@ -816,65 +818,118 @@ model.addEventListener("deselect_content", function(e) {
     image_info['id'] = id_val;
     image_info['height'] = $(this).children("img").attr("height") / 10;
   }
-    already_favorited = false;
     $("#favoriteStatus").empty();
     // Add favorited icon to reflect picture
     if (favorites_album.content_in(id_val)) {
+      already_favorited = true;
       $("#favoriteStatus").html("<i class='icon-thumbs-up'></i> In Favorites </span> <br>");
       var a = $("<a class='removeFavoriteLink'> Remove </a>");
       a.click(function() {
-        favorites_album.remove_content(new Content(image_info["id"],image_info['src'],image_info['height']));
-        recently_favorited.remove_content(new Content(image_info["id"],image_info['src'],image_info['height']));
+        favorites_album.remove_content_src(image_info['src']);
+        recently_favorited.remove_content_src(image_info['src']);
         already_favorited = false;
-        populateModal(image,id_val);
+        remove_favorites_albums();
+        populateModal(image,id_val,false);
       });
       $("#favoriteStatus").append(a);
 
-      already_favorited = true;
     } else {
       var a = $("<a class='favoriteLink'> Add to Favorites </a>");
+      already_favorited = false;
       a.click(function() {
         favorites_album.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
         recently_favorited.add_content(image_info['id'],image_info['src'],image_info['height'],!already_favorited);
-        populateModal(image,id_val);
+        add_favorites_albums();
+        populateModal(image,id_val,false);
       });
       $("#favoriteStatus").append(a);
     }
     // Add albums info to list
-    $.ajax({
-      type: "POST",
-      url: "/open_modal_view/",
-      data: {id: id_val}
-    }).done(function( msg ) {
-        // upload picture description
-        var description = msg["des"];
-        var pls = msg["albums"];
-        var photo_table = msg["photos"];
-        
-        $(".imageDescription").text(description);
-
-        for (var i = 0; i < pls.length; i++) {
-          var plName = pls[i];
-          if (plName == "All Content") {
-            continue;
-          }
-          var titleElement = $("<h5>" + plName + "</h5>");
-          var uiElement = $("<ui style='cursor:hand;' class='outerUI'> </ui>");
-          uiElement.append(titleElement);
-          uiElement.click(function() {
-            var curName = $(this).children("h5").html();
-            albumClick(curName.toString());
-          });
-          var ulPhoto = $("<ul class='previewPhoto'> </ul>");
-          for (var j=0; j < photo_table[plName].length; j++) {
-            ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
-          }
-          uiElement.append(ulPhoto);
-          $(".albumList").append(uiElement);
-        }
-      });
+    if (pop_related) {
+      populate_related(id_val);
+    }
 
 }
+var remove_favorites_albums = function() {
+  $(".RecFavAlbum").remove();
+  $(".FavAlbum").remove();
+}
+
+var add_favorites_albums = function() {
+  var titleElement = $("<h5> Favorites </h5>");
+  var uiElement = $("<ui style='cursor:hand;' class='outerUI FavAlbum'> </ui>");
+
+  uiElement.append(titleElement);
+  uiElement.click(function() {
+    albumClick("Favorites");
+  });
+  var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+  var l = Math.min(favorites_album.get_contents().length,3);
+  for (var i=0; i < l; i++) {
+    var src = favorites_album.get_contents()[i].src;
+    ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='/media/"+src+"'></img></ui"));
+  }
+  uiElement.append(ulPhoto);
+  $(".albumList").append(uiElement);
+
+  var titleElement2 = $("<h5> Recently Favorited </h5>");
+  var uiElement2 = $("<ui style='cursor:hand;' class='outerUI RecFavAlbum'> </ui>");
+
+  uiElement2.append(titleElement2);
+  uiElement2.click(function() {
+    albumClick("Recently Favorited");
+  });
+  var ulPhoto2 = $("<ul class='previewPhoto'> </ul>");
+  l = Math.min(recently_favorited.get_contents().length,3);
+  for (var i=0; i < l; i++) {
+    var src = recently_favorited.get_contents()[i].src;
+    ulPhoto2.append($("<ui class='innerUI'> <img class='thumbnail' src='/media/"+src+"'></img></ui"));
+  }
+  uiElement2.append(ulPhoto2);
+  $(".albumList").append(uiElement2);
+}
+
+
+var populate_related = function(id_val) {
+  $.ajax({
+    type: "POST",
+    url: "/open_modal_view/",
+    data: {id: id_val}
+  }).done(function( msg ) {
+      // upload picture description
+      var description = msg["des"];
+      var pls = msg["albums"];
+      var photo_table = msg["photos"];
+      
+      $(".imageDescription").text(description);
+
+      for (var i = 0; i < pls.length; i++) {
+        var plName = pls[i];
+        if (plName == "All Content") {
+          continue;
+        }
+        var titleElement = $("<h5>" + plName + "</h5>");
+        var uiElement = $("<ui style='cursor:hand;' class='outerUI'> </ui>");
+        if (plName == "Favorites") {
+          uiElement.addClass("FavAlbum");
+        } else if (plName == "Recently Favorited") {
+          uiElement.addClass("RecFavAlbum");
+        }
+        uiElement.append(titleElement);
+        uiElement.click(function() {
+          var curName = $(this).children("h5").html();
+          albumClick(curName.toString());
+        });
+        var ulPhoto = $("<ul class='previewPhoto'> </ul>");
+        for (var j=0; j < photo_table[plName].length; j++) {
+          ulPhoto.append($("<ui class='innerUI'> <img class='thumbnail' src='"+photo_table[plName][j]+"'></img></ui"));
+        }
+        uiElement.append(ulPhoto);
+        $(".albumList").append(uiElement);
+      }
+    });
+}
+
 var albumClick = function(albumName) {
     // Close Modal
     $(".alert").alert('close');

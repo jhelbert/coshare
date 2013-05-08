@@ -63,6 +63,11 @@ var Album = function(id,name) {
 
     /** adds @new_content to the album, if not already present */
     this.add_content = function(id,src,size,is_new) {
+        for (var i = 0; i < this.output.length; i++) {
+            if (this.output[i].id.toString() === id.toString()) {
+                return;
+            }
+        }
         var content = new Content(id,src,size);
         this.output.push(content);
         if (is_new) {
@@ -72,7 +77,7 @@ var Album = function(id,name) {
     }
 
     this.post_content = function (content, callback) {
-        this.output.push(content);
+        // this.output.push(content);
         var that = this;
         
               $.ajax({
@@ -108,6 +113,18 @@ var Album = function(id,name) {
                 }).done(callback);
 
 
+    }
+
+    this.remove_content_src = function(src) {
+        var content;
+        for (var i = 0; i < this.output.length; i++) {
+            if (src === this.output[i].src) {
+                content = this.output[i];
+                console.log(i);
+                break;
+            } 
+        }
+        this.remove_content(content,null);
     }
 
     /** 
