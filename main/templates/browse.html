@@ -53,6 +53,8 @@ var pencilSave = false;
 
 $(function() {
 
+
+
   var update_selection_count = function() {
     var num_selected = model.get_num_selected_contents();
     var num_total =  model.selected_album.get_contents().length;
@@ -329,11 +331,19 @@ model.addEventListener("select_album", function(e) {
   $("#remove_button")[0].style.display = "none";
   var dropdown = $('#remove_dropdown')[0];
   dropdown.innerHTML = "";
-  if (e.album.name != "All Content" && e.album.name != "Recently Added" && e.album.name && "Recently Favorited") {
+  if (e.album.name != "All Content" && e.album.name != "Recently Added" && e.album.name && "Recently Favorited" && e.album.name.indexOf('Queue') == -1) {
     $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_album()">From Album</a></li>');
                  
   }
+  if (e.album.name.indexOf('Queue') != -1) {
+    $("#remove_button").attr('class', 'btn btn-success');
+    $("#remove_button").attr('onclick', 'remove_from_album()');
+    $("#remove_button").attr('data-toggle', 'none');
+    $("#remove_button")[0].innerHTML = "Remove From Queue!";
+  } else {
+
 $('#remove_dropdown').append('<li><a href="#" onclick="remove_from_site()">From Website</a></li>');
+}
   for (var i in model.albums) {
     var album = model.albums[i];
     update_queue_size(album, album.get_contents().length);  
@@ -430,6 +440,7 @@ $("#album-" + e.album.id).addClass("select-extend");
 
   if (contents.length == 0) {
 
+    $(".empty-message").remove();
     var message = $("<p />")
       .text("This album is empty.")
       .addClass("empty-message")
@@ -522,6 +533,7 @@ model.addEventListener("remove_content", function(e) {
 
 /****** SELECT CONTENT LISETENER ********/
 model.addEventListener("select_content", function(e) {
+  update_selection_count();
   $("#remove_button")[0].style.display = "block";
   last_clicked_content = e.content;
   var content_div = $("#content-" + e.content.id);
@@ -1085,9 +1097,9 @@ function remove_from_site() {
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span3">
+    <div class="span4" data-intro='Here are all your albums.' data-step='0'>
       <div class="well album-well sidebar-nav">
-        <div id="albums-container">
+        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
           <ul class="nav nav-list">
               <li class="nav-header glyph-color">Children Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#children-albums"><i class="icon-arrow-down" id="collapse-children"></i></button></li>
           </ul>
@@ -1096,38 +1108,38 @@ function remove_from_site() {
       </div>
 
       <div class="well album-well sidebar-nav">
-        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='1'>
+        <div id="albums-container" data-intro='Here are all your albums - they help group related content and are automatically shared with your spouse. <br><br>Try selecting one.' data-step='2'>
           <ul class="nav nav-list">
             <li class="nav-header glyph-color">Auto Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#automatic-albums"><i class="icon-arrow-down" id="collapse-automatic"></i></button></li>
           </ul>
-          <ul id="automatic-albums" class="nav nav-list in collapse albums" data-intro="These albums are automatically generated for you by us." data-step='2'></ul>
+          <ul id="automatic-albums" class="nav nav-list in collapse albums"></ul>
         </div>
       </div>
 
       <div class="well album-well sidebar-nav">
-        <div id="albums-container">
+        <div id="albums-container" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
             <ul class="nav nav-list">
               <li class="nav-header glyph-color">Standard Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#special-albums"><i class="icon-arrow-down" id="collapse-special"></i></button></li>
             </ul>
-            <ul id="special-albums" class="nav nav-list in collapse albums" data-intro="These albums help you communicate with your spouse on what content you need view or edit. <br><br> If you want your spouse to edit something, drag it to the <b>Spouse Content to Edit</b> album. <br><br> If you want to see what your spouse wants you to look at, check out <b>Content to Edit</b>." data-step='3'>
+            <ul id="special-albums" class="nav nav-list in collapse albums">
             </ul>
         </div>
       </div>
 
       <div class="well album-well sidebar-nav">
-        <div id="albums-container">
+        <div id="albums-container" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
             <ul class="nav nav-list">
               <li class="nav-header glyph-color">Your Albums<button class="btn-link pull-right" data-toggle="collapse" data-target="#user-created-albums"><i class="icon-arrow-down" id="collapse-user"></i></button></li>
             </ul>
-            <ul id="user-created-albums" class="nav nav-list in collapse albums" data-intro='These are your custom albums. Fill them however you please.' data-step='4'>
+            <ul id="user-created-albums" class="nav nav-list in collapse albums">
           </ul>
-          <input name="name" id="new_plist" type="text"/>
+          <input data-intro='Create new albums here. You can even drag and drop onto it.' data-step='4' name="name" id="new_plist" type="text"/>
         </div>
         <div class="text-center"><button class="btn create" onclick="new_album()">Create Album</button></div>
       </div>
 
     </div><!--/span-->
-    <div id="content-well" class="span9">
+    <div id="content-well" class="span8">
       <div>
         <div align="right" id="undo_div" style="visibility:hidden;color:orange">
           Content Removed! <button class = "btn btn-warning" onclick="undo_remove()"> Undo </button>
@@ -1138,13 +1150,13 @@ function remove_from_site() {
         <!-- TITLE -->
         <div id="row-fluid">
           <div class="span12">
-            <h2 align="center" style="line-height:100%" id="album-title" data-intro='This shows content from your currently selected album. <br>Try selecting some content. <br><br><b>Note</b>: You can drag and drop These pieces of content between Albums.' data-step='5'></h2>
+            <h2 align="center" style="line-height:100%" id="album-title"></h2>
           </div>
         </div>
         <!-- Selection -->
         <div class="row-fluid">
           <!-- left buttons -->
-          <div class="span5">
+          <div class="span5" data-intro='Quickly select and deselect all content from the current album.' data-step='5'>
 
            <button class="btn btn-primary" id="btnSelectAll">Select All</button>
            <button class="btn btn-primary" id="btnDeselectAll">Deselect All</button>
@@ -1170,7 +1182,7 @@ function remove_from_site() {
 
         <!-- slider row -->
         <div align="center" class="row-fluid">
-          <table>
+          <table data-intro='This allows dynamic sizing of your content. Try it out!' data-step='6'>
             <tr>
               <td><i class="icon-zoom-out"></i></td>
               <td><div id="slider" class="slider" /></td>

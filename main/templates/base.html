@@ -1,4 +1,4 @@
-<html5>
+<html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -39,12 +39,12 @@
           div.id = "divx" + i;
           div.style.float = "left";
           substrings = ['mov','MOV','mp4'];
-        var output;
-        if (new RegExp(substrings.join("|")).test(e.target.result)) {
+          var output;
+          console.log(e.target.result);
+          if (e.target.result.indexOf('video') != -1) {
             output = document.createElement('label');
             output.style.float = "left";
             output.innerHTML = "Video";
-            console.log(e);
 
     // At least one match
         }
@@ -107,7 +107,7 @@
     <h3 align="center">Upload Preview</h3>  
   </div>  
   <div class="modal-body">  
-    <div id="blah" align="center" style="position:relative;float:left"></div>              
+    <div id="blah" align="center" style="position:relative;float:left;max-height:500px"></div>              
     <div align="center" style="margin-top:30px;clear:both;">
       
       <input name="deleted" id="deleted_uploads" style="display:none"/>
@@ -140,4 +140,4 @@
   </footer>
 </body>
 
-</html5>
+</html>

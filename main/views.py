@@ -11,6 +11,7 @@ import json
 from django.contrib.auth import authenticate,login, logout
 import datetime
 import random
+import os
 from django.contrib.auth.models import User
 
 def login_page(request):
@@ -294,7 +295,8 @@ def upload(request):
 			new_content.owner = userprof
 			file_content = ContentFile(uploaded_content.read()) 
 			new_content.image.save(uploaded_content.name, file_content)
-			ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
+			# ext = uploaded_content.name[uploaded_content.name.find('.')+1:]
+			ext = os.path.splitext(uploaded_content.name)[1]
 			if ext in ["mov","MOV","mp4"]:
 				new_content.is_video = True
 			new_content.metric = int(random.random() * 6) + 8
@@ -356,12 +358,17 @@ def add_content(request):
 		content.save()
 	print 'got content'
 	album.content.add(content)
+	userprof = get_user_profile(request)
+	print 'got userprof'
+	content.owner = userprof
 	album.save()
 	print album.content.all()
+	
+
 
 	if album.name == "Favorites":
 		content.favorited_time = datetime.datetime.now()
-		content.save()
+	content.save()
 
 	return HttpResponse("%i" % (len(album.content.all()), ))
 
@@ -376,15 +383,19 @@ def remove_content(request):
 		content.metric = int(random.random() * 6) + 8
 		content.save()
 	print 'got content'
-	album.content.remove(content)
-	album.save()
+	userprof = get_user_profile(request)
+	couple = get_couple(userprof)
+	for a in couple.albums.all():
+		a.content.remove(content)
+		a.save()
 	return HttpResponse("%i" % (len(album.content.all()), ))
 
 @csrf_exempt
 def delete_content(request):
 	pic_id = request.POST.get('id')
 	content = Content.objects.get(id=int(pic_id))
-	content.owner = None;
+	content.owner = None
+	content.save()
 	return HttpResponse('OK')
 
 
