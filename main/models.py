@@ -32,6 +32,8 @@ class UserProfile(models.Model):
 class Child(models.Model):
 	name = models.CharField(max_length=100)
 	album = models.ForeignKey(Album)
+	def __unicode__(self):
+		return self.name
 
 class Couple(models.Model):
 	members = models.ManyToManyField(UserProfile)
